@@ -1,0 +1,11 @@
+services:
+  monopoly-world-tour:
+    image: monopoly-world-tour:latest
+    container_name: monopoly-world-tour
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+    ports:
+      - "127.0.0.1:3001:3001"
+    mem_limit: 512m

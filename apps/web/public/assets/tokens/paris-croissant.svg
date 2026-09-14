@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title">
+  <title id="title">巴黎 · 可颂</title>
+  <ellipse cx="32" cy="53" rx="25" ry="4" fill="#304d6514"/>
+  <path d="M7 24c-5 6-5 16 1 23 3 3 7 4 11 2l4-7h18l4 7c4 2 8 1 11-2 6-7 6-17 1-23l-9-8-16-5-16 5Z" fill="#cc8844" stroke="#a3703b" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M7 24c-4 8-3 15 3 20l9 3 5-10h16l5 10 9-3c6-5 7-12 3-20l-9-8-16-5-16 5Z" fill="#efba62"/>
+  <path d="M6 26c-2 6-1 10 2 15l10-9-4-11Zm52 0c2 6 1 10-2 15l-10-9 4-11Z" fill="#f7d58b"/>
+  <path d="m10 21 10-7 9 22-11 8Z" fill="#e8a74f" stroke="#c18b43" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="m54 21-10-7-9 22 11 8Z" fill="#e8a74f" stroke="#c18b43" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M19 14c7-6 19-6 26 0l-6 23H25Z" fill="#f5c979" stroke="#c18b43" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="m27 11-2 26h14l-2-26" fill="#f8d994"/>
+  <path d="m23 17 4 15m14-15-4 15" stroke="#e3a653" stroke-width="2" stroke-linecap="round"/>
+  <path d="M27 15c3-1 7-1 10 0m-21 5 3 6m29-6-3 6" stroke="#fff0bb" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="m11 39 4-4m38 4-4-4" stroke="#dfa053" stroke-width="2" stroke-linecap="round"/>
+  <path d="m9 45 4 2m42-2-4 2" stroke="#f9db95" stroke-width="2" stroke-linecap="round"/>
+</svg>

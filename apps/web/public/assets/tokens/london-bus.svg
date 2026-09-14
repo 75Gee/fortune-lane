@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title">
+  <title id="title">伦敦 · 双层巴士</title>
+  <ellipse cx="32" cy="57" rx="24" ry="3" fill="#304d6514"/>
+  <rect x="7" y="9" width="50" height="44" rx="7" fill="#bd3d59" stroke="#8d354c" stroke-width="1.8"/>
+  <rect x="8" y="10" width="44" height="39" rx="6" fill="#e76578"/>
+  <path d="M13 12h31" stroke="#ffabb5" stroke-width="2" stroke-linecap="round"/>
+  <path d="M8 30h44" stroke="#b9435c" stroke-width="2"/>
+  <rect x="12" y="16" width="39" height="11" rx="2.5" fill="#49647b"/>
+  <path d="M15 17h8v9h-8a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2Zm11 0h10v9H26Zm13 0h9a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-9Z" fill="#b8dce7"/>
+  <path d="m16 22 3-3m11 3 3-3m9 3 3-3" stroke="#e6f6f8" stroke-width="1.8" stroke-linecap="round"/>
+  <rect x="12" y="34" width="25" height="10" rx="2" fill="#b8dce7" stroke="#49647b" stroke-width="1.5"/>
+  <path d="M24 35v8" stroke="#49647b" stroke-width="2"/>
+  <rect x="41" y="33" width="10" height="19" rx="1.5" fill="#7e3b51"/>
+  <path d="M43 35h6v10h-6Z" fill="#accfdf"/>
+  <path d="M46 35v15" stroke="#7e3b51" stroke-width="1.5"/>
+  <path d="M10 47h27" stroke="#f9bfac" stroke-width="2"/>
+  <circle cx="18" cy="52" r="5" fill="#415466"/>
+  <circle cx="18" cy="52" r="2.5" fill="#ccd9df"/>
+  <circle cx="46" cy="52" r="5" fill="#415466"/>
+  <circle cx="46" cy="52" r="2.5" fill="#ccd9df"/>
+  <rect x="53" y="43" width="3" height="5" rx="1" fill="#f7d57d"/>
+</svg>

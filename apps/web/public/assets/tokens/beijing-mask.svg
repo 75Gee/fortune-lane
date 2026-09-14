@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title">
+  <title id="title">北京 · 京剧脸谱</title>
+  <ellipse cx="32" cy="59" rx="17" ry="3" fill="#304d6514"/>
+  <path d="M13 21C13 10 20 5 32 5s19 5 19 16v14c0 12-11 23-19 25-8-2-19-13-19-25Z" fill="#b43654" stroke="#773346" stroke-width="2"/>
+  <path d="M15 21c0-10 6-14 17-14s17 4 17 14v12c0 11-10 22-17 24-7-2-17-13-17-24Z" fill="#eb6776"/>
+  <path d="M32 7c11 0 17 4 17 14v12c0 11-10 22-17 24V7Z" fill="#d94c66"/>
+  <path d="m32 9-7 11 7 8 7-8Z" fill="#fff3dc"/>
+  <path d="m32 13-3 7 3 3 3-3Z" fill="#4a3d54"/>
+  <path d="M15 20c7-2 12 3 14 10-6 7-11 5-14 1Zm34 0c-7-2-12 3-14 10 6 7 11 5 14 1Z" fill="#fff5e8"/>
+  <path d="M16 22c5 0 9 3 11 7l-5 3-6-3Zm32 0c-5 0-9 3-11 7l5 3 6-3Z" fill="#433c50"/>
+  <path d="m18 27 6 2m22-2-6 2" stroke="#fff7ea" stroke-width="1.7" stroke-linecap="round"/>
+  <path d="m32 28-3 10h6Z" fill="#fff0d8"/>
+  <path d="m19 35 4 8 5-2m17-6-4 8-5-2" stroke="#913249" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m25 46 7-3 7 3-7 5Z" fill="#493a4a"/>
+  <path d="M28 46h8" stroke="#fff0dc" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M19 14c2-3 5-4 8-4" stroke="#ffa6ac" stroke-width="2" stroke-linecap="round"/>
+</svg>

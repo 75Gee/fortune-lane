@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title">
+  <title id="title">威尼斯 · 贡多拉</title>
+  <path d="M8 53h13m4 3h17m3-5h11" stroke="#a4d3de" stroke-width="2" stroke-linecap="round"/>
+  <path d="m19 17 28 30" stroke="#ad8857" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="m16 12 6 5-3 3-5-6Z" fill="#d2af7b" stroke="#a68153" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M8 36c9 3 28 1 44-6L42 43 19 47Z" fill="#365c73" stroke="#284d65" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M12 36c12 1 25-1 36-5l-8 8-21 4Z" fill="#bd9a77"/>
+  <path d="m20 34 5-9 13-2 6 10-8 9-16 1Z" fill="#84485e" stroke="#694156" stroke-width="1.7" stroke-linejoin="round"/>
+  <path d="m25 26 11-2 2 9-15 2Z" fill="#d97b8d"/>
+  <path d="m23 35 15-2 4 3-18 4Z" fill="#f0a0a8"/>
+  <path d="M4 26c0 13 9 25 23 25 15 0 27-11 33-28-12 15-28 24-42 20C11 41 7 35 4 26Z" fill="#3e647c" stroke="#264b63" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M9 37c11 17 32 9 45-6" stroke="#83a6b5" stroke-width="2" stroke-linecap="round"/>
+  <path d="M58 26V10l-5 2v6h7m-7 3h7m-7-6h7" stroke="#b7c8d2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M4 26v-7" stroke="#3e647c" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="m43 42 9 10" stroke="#ad8857" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="m49 47 7 5-2 3-7-5Z" fill="#d2af7b" stroke="#a68153" stroke-width="1.2" stroke-linejoin="round"/>
+</svg>

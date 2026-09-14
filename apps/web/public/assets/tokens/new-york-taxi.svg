@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title">
+  <title id="title">纽约 · 黄色出租车</title>
+  <ellipse cx="32" cy="54" rx="26" ry="3" fill="#304d6514"/>
+  <rect x="27" y="11" width="13" height="7" rx="2" fill="#fff1c5" stroke="#b2924f" stroke-width="1.5"/>
+  <path d="M30 14h7" stroke="#71684e" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="m13 31 8-14h22l10 14 6 4v13H5V36Z" fill="#dfab42" stroke="#a7853e" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="m14 31 8-13h20l9 13 5 4v11H6V36Z" fill="#f5cf62"/>
+  <path d="m23 20-6 11h14V20Zm11 0v11h13l-7-11Z" fill="#9bc9dc" stroke="#887d55" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="m21 28 5-5m11 4 2-2" stroke="#e2f5f8" stroke-width="2" stroke-linecap="round"/>
+  <path d="M7 35h47" stroke="#ffeaa5" stroke-width="2" stroke-linecap="round"/>
+  <path d="M32 33v12" stroke="#d3a346" stroke-width="1.5"/>
+  <path d="M35 36h4" stroke="#a8873f" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M21 38h21v5H21Z" fill="#fff4c7"/>
+  <path d="M21 38h3v2.5h-3Zm6 0h3v2.5h-3Zm6 0h3v2.5h-3Zm6 0h3v2.5h-3Zm-15 2.5h3V43h-3Zm6 0h3V43h-3Zm6 0h3V43h-3Z" fill="#5b6468"/>
+  <rect x="5" y="39" width="5" height="5" rx="1" fill="#f4a08b"/>
+  <rect x="53" y="38" width="5" height="6" rx="1.5" fill="#fff8dd"/>
+  <circle cx="16" cy="48" r="6" fill="#425467"/>
+  <circle cx="16" cy="48" r="3" fill="#d2dfe4"/>
+  <circle cx="48" cy="48" r="6" fill="#425467"/>
+  <circle cx="48" cy="48" r="3" fill="#d2dfe4"/>
+</svg>

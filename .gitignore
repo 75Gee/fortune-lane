@@ -1,0 +1,12 @@
+node_modules
+dist
+.vite
+.DS_Store
+*.log
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+
+# Local production operations record
+docs/deployment.md
