@@ -1,4 +1,4 @@
-import { cardPropertyCandidates, wheelProperties, type GameCommand, type GameState } from '@fortune/game'
+import { cardPropertyCandidates, stockPortfolioSummary, suggestStockSales, wheelProperties, type GameCommand, type GameState } from '@fortune/game'
 export const TURN_SECONDS = 30
 
 export function decisionSeconds(game: GameState): number {
@@ -41,8 +41,16 @@ export function timeoutCommand(game: GameState, alreadyRolled: boolean): GameCom
         const tile = wheelProperties(game, wheel.playerId, wheel.outcome)[0]
         return tile ? { type: 'CHOOSE_WHEEL_PROPERTY', wheelId: wheel.id, tileIndex: tile.index } : null
       }
-      case 'WAITING_FOR_DEBT':
-        return { type: game.pendingDebt && (game.players.find((player) => player.id === game.pendingDebt?.debtorId)?.cash ?? 0) >= game.pendingDebt.amount ? 'SETTLE_DEBT' : 'DECLARE_BANKRUPTCY' }
+      case 'WAITING_FOR_DEBT': {
+        const debt = game.pendingDebt
+        if (!debt) return null
+        const cash = game.players.find(player => player.id === debt.debtorId)?.cash ?? 0
+        if (cash >= debt.amount) return { type: 'SETTLE_DEBT' }
+        if (game.stockMarket && stockPortfolioSummary(game.stockMarket, debt.debtorId).marketValue >= debt.amount - cash) {
+          return { type: 'LIQUIDATE_ASSETS', selections: [], stockSales: suggestStockSales(game.stockMarket, debt.debtorId, debt.amount - cash), quoteRevision: game.stockMarket.quoteRevision }
+        }
+        return { type: 'DECLARE_BANKRUPTCY' }
+      }
       case 'WAITING_FOR_END_TURN':
         return { type: 'END_TURN' }
       case 'FINISHED':

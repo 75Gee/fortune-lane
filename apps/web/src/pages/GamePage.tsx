@@ -12,6 +12,8 @@ import { ItemInventory } from '../components/ItemInventory.js'
 import { LandingDialog } from '../components/LandingDialog.js'
 import { CommandAvailabilityContext, Modal } from '../components/Modal.js'
 import { TokenImage } from '../components/TokenImage.js'
+import { StockEntry } from '../components/stocks/StockSummary.js'
+import { StockMarketPanel } from '../components/stocks/StockMarketPanel.js'
 
 interface GamePageProps {
   room: RoomSnapshot
@@ -30,7 +32,7 @@ import { ActionPanel } from '../components/game/ActionPanel.js'
 import { GameInfoPanel, type InfoTab } from '../components/game/GameInfoPanel.js'
 import { RouteView } from '../components/game/RouteView.js'
 import { TileDetail } from '../components/game/TileDetail.js'
-type Panel = { type: 'info'; tab: InfoTab; owner: string } | { type: 'tile'; index: number } | { type: 'items' } | null
+type Panel = { type: 'info'; tab: InfoTab; owner: string } | { type: 'tile'; index: number } | { type: 'items' } | { type: 'stocks' } | null
 function readPreference(key: string): boolean { try { return localStorage.getItem(key) !== 'false' } catch { return true } }
 const money = (value: number) => `¥${value.toLocaleString('zh-CN')}`
 export function GamePage({ room, game, playerId, events, connectionStatus, commandPending = false, onCommand: sendCommand, onRestart, onLeave }: GamePageProps) {
@@ -69,6 +71,11 @@ export function GamePage({ room, game, playerId, events, connectionStatus, comma
   useEffect(() => setWatchedDecision(null), [decisionKey])
   const required = needsDecision(game, playerId)
   useEffect(() => { if (required && (!isPlaying || game.pendingAuction)) setPanel(null) }, [decisionKey, required, isPlaying])
+  useEffect(() => {
+    // Return to the board when a new turn/debt needs this player's attention.
+    // Opening the market again during that same turn remains an explicit choice.
+    if (game.currentPlayerId === playerId || game.pendingDebt?.debtorId === playerId) setPanel(current => current?.type === 'stocks' ? null : current)
+  }, [game.currentPlayerId, game.turnNumber, game.pendingDebt?.debtorId, playerId])
   const openInfo = (tab: InfoTab, owner = playerId) => setPanel({ type: 'info', tab, owner })
   const openAssets = () => openInfo('assets')
   const openHistory = () => openInfo('activity')
@@ -147,17 +154,18 @@ export function GamePage({ room, game, playerId, events, connectionStatus, comma
 
       <DicePresentation event={activeEvent} playerName={game.players.find((player) => player.id === activeEvent?.playerId)?.name ?? '当前玩家'} dice={displayDice} startedAt={activeEventStartedAt} />
       <footer className="game-command-dock">
-        <div className="dock-resources"><button className="balance-command" aria-label="我的资产" title="我的资产" onClick={openAssets}><Wallet size={19} /><span><small>{me?.isBankrupt ? '观战中' : '我的现金'}</small><strong>{money(me?.cash ?? 0)}</strong></span><ChevronRight size={16} /></button><button className="inventory-command" title={game.currentPlayerId === playerId && game.itemUsedThisTurn ? '本回合道具额度已用完' : '查看和使用道具'} onClick={() => setPanel({ type: 'items' })} aria-label={`我的道具，共 ${me?.items.length ?? 0} 张`}><Backpack size={21} /><span>道具 {me?.items.length ?? 0}</span></button></div>
+        <div className="dock-resources"><button className="balance-command" aria-label="我的资产" title="我的资产" onClick={openAssets}><Wallet size={19} /><span><small>{me?.isBankrupt ? '观战中' : '我的现金'}</small><strong>{money(me?.cash ?? 0)}</strong></span><ChevronRight size={16} /></button>{game.stockMarket && <StockEntry market={game.stockMarket} playerId={playerId} onOpen={() => setPanel({ type: 'stocks' })} />}<button className="inventory-command" title={game.currentPlayerId === playerId && game.itemUsedThisTurn ? '本回合道具额度已用完' : '查看和使用道具'} onClick={() => setPanel({ type: 'items' })} aria-label={`我的道具，共 ${me?.items.length ?? 0} 张`}><Backpack size={21} /><span>道具 {me?.items.length ?? 0}</span></button></div>
         {game.phase === 'FINISHED' ? <button className="primary-command" onClick={() => setResultReviewed(false)}>查看本局结果</button> : <ActionPanel game={game} playerId={playerId} onCommand={onCommand} busy={isPlaying || commandPending || connectionStatus !== 'connected'} onManageAssets={openAssets} onWatch={decisionKey && !required ? () => setWatchedDecision(decisionKey) : undefined} onSkipToLive={isPlaying && connectionStatus === 'connected' ? skipToLive : undefined} waitingLabel={connectionStatus !== 'connected' ? '等待重连…' : commandPending ? '正在提交…' : '行动进行中…'} />}
       </footer>
 
       {panel?.type === 'items' && me && <ItemInventory game={game} playerId={playerId} available={available} onCommand={onCommand} onClose={() => setPanel(null)} />}
+      {panel?.type === 'stocks' && <StockMarketPanel game={game} playerId={playerId} available={!commandPending && connectionStatus === 'connected'} onCommand={onCommand} onClose={() => setPanel(null)} />}
       {panel?.type === 'tile' && <Modal label="地点详情" onDismiss={() => setPanel(null)}><button className="detail-backdrop" aria-label="关闭地点详情" onClick={() => setPanel(null)} /><TileDetail game={game} tileIndex={panel.index} playerId={playerId} onCommand={onCommand} onClose={() => setPanel(null)} /></Modal>}
               {connectionStatus !== 'connected' && (
         <div className="connection-banner"><span className="waiting-pulse" /> 连接断开，正在重连…</div>
       )}
       {leaveOpen && <Modal label="暂离房间" onDismiss={() => setLeaveOpen(false)}><div className="result-overlay"><section className="result-panel"><LogOut size={28} /><h2>暂离房间？</h2><p>{me?.isBankrupt || game.phase === 'FINISHED' ? '返回首页后，仍可重返这个房间。' : '对局会继续，超时由系统代操作。返回首页后可重返房间；投降才会结束参赛。'}</p><div><button autoFocus onClick={() => setLeaveOpen(false)}>留在房间</button><button className="primary-command" disabled={commandPending || connectionStatus !== 'connected'} onClick={onLeave}>暂离房间</button></div></section></div></Modal>}
-      {bankruptcyOpen && <Modal label="确认破产" onDismiss={() => setBankruptcyOpen(false)}><div className="result-overlay"><section className="result-panel"><HandCoins size={28} /><h2>放弃筹款，宣告破产？</h2><p>剩余现金用于清算，地产归还银行。本局无法继续参赛，但可以留下观战。</p><div><button autoFocus onClick={() => setBankruptcyOpen(false)}>继续筹款</button><button className="danger" disabled={commandPending || connectionStatus !== 'connected'} onClick={() => { setBankruptcyOpen(false); sendCommand({ type: 'DECLARE_BANKRUPTCY' }) }}>确认破产</button></div></section></div></Modal>}
+      {bankruptcyOpen && <Modal label="确认破产" onDismiss={() => setBankruptcyOpen(false)}><div className="result-overlay"><section className="result-panel"><HandCoins size={28} /><h2>放弃筹款，宣告破产？</h2><p>股票变现后的现金用于清算，地产归还银行。本局无法继续参赛，但可以留下观战。</p><div><button autoFocus onClick={() => setBankruptcyOpen(false)}>继续筹款</button><button className="danger" disabled={commandPending || connectionStatus !== 'connected'} onClick={() => { setBankruptcyOpen(false); sendCommand({ type: 'DECLARE_BANKRUPTCY' }) }}>确认破产</button></div></section></div></Modal>}
       {surrenderOpen && <Modal label="确认投降" onDismiss={() => { if (!surrenderRequested) setSurrenderOpen(false) }}><div className="result-overlay"><section className="result-panel"><Flag size={28} /><h2>确认投降？</h2><p>地产归还银行，本局无法重新参战。你将留在房间继续观战。</p><div><button disabled={surrenderRequested || commandPending || connectionStatus !== 'connected'} onClick={() => setSurrenderOpen(false)}>继续游玩</button><button className="danger" disabled={surrenderRequested || commandPending || connectionStatus !== 'connected'} onClick={() => { setSurrenderRequested(true); onCommand({ type: 'SURRENDER' }) }}>{surrenderRequested ? '正在投降…' : '投降并观战'}</button></div></section></div></Modal>}
 
       {game.phase === 'FINISHED' && !isPlaying && !resultReviewed && (

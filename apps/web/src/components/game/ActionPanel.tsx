@@ -55,10 +55,10 @@ export function ActionPanel({ game, playerId, onCommand, busy = false, waitingLa
     return (
       <div className="turn-action debt-action">
         <div className="action-heading"><HandCoins size={20} /><div><strong>需要支付 {money(game.pendingDebt.amount)}</strong><span>{game.pendingDebt.reason} · 收款：{game.players.find((player) => player.id === game.pendingDebt?.creditorId)?.name ?? '银行'}</span></div></div>
-        <p>{difference > 0 ? `还差 ${money(difference)}，可卖房或抵押筹款；超时未筹齐将破产` : '钱已凑齐，可以付款了'}</p>
+        <p>{difference > 0 ? `还差 ${money(difference)}，可卖股、卖房或抵押筹款` : '钱已凑齐，可以付款了'}</p>
         <div className="decision-buttons">
           <button className="accept" disabled={difference > 0} onClick={() => onCommand({ type: 'SETTLE_DEBT' })}><CircleDollarSign size={18} /> 支付欠款</button>
-          <button onClick={onManageAssets}><Building2 size={18} />卖房 / 抵押</button>
+          <button onClick={onManageAssets}><Building2 size={18} />筹款 / 管理资产</button>
           <button className="danger" onClick={() => onCommand({ type: 'DECLARE_BANKRUPTCY' })}>放弃筹款</button>
         </div>
       </div>

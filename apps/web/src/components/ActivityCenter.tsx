@@ -3,8 +3,9 @@ import { History } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { CARD_DECK_ART, CardDeckSymbol } from './CardDeckArt.js'
 
-const quietEvents = new Set(['DICE_ROLLED', 'TOKEN_MOVED', 'TURN_CHANGED', 'GAME_STARTED', 'AUCTION_BID', 'WHEEL_SPUN', 'EXTRA_MOVE_FINISHED'])
+const quietEvents = new Set(['DICE_ROLLED', 'TOKEN_MOVED', 'TURN_CHANGED', 'GAME_STARTED', 'AUCTION_BID', 'WHEEL_SPUN', 'EXTRA_MOVE_FINISHED', 'STOCK_TRADED'])
 const labels: Record<string, string> = {
+  STOCK_TRADED: '股票交易',
   ITEM_RECEIVED: '获得道具', ITEM_USED: '使用道具', HAZARD_TRIGGERED: '触发道具', EXTRA_MOVE_FINISHED: '额外行动完成', PLAYER_SENT_TO_HOSPITAL: '送往医院', PLAYER_LEFT_HOSPITAL: '离开医院',
   DICE_ROLLED: '掷骰结果', LANDING_RESOLVED: '到达地点', CARD_DRAWN: '抽卡', RENT_PAID: '游览费结算', MONEY_CHANGED: '现金变动', PASSED_START: '起点补助',
   PROPERTY_PURCHASED: '购买资产', PROPERTY_UPGRADED: '地产升级', ASSET_MORTGAGED: '抵押资产',

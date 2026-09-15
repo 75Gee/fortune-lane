@@ -1,6 +1,6 @@
 export * from './errors.js'
 export { publicGameState } from './publicState.js'
-import { BOARD, MAX_PROPERTY_LEVEL, TOKEN_IDS, type GameCommand, type GameEvent, type GameView, type TokenId } from '@fortune/game'
+import { BOARD, MAX_PROPERTY_LEVEL, STOCK_IDS, TOKEN_IDS, type GameCommand, type GameEvent, type GameView, type TokenId } from '@fortune/game'
 import { z } from 'zod'
 import type { RequestFailure } from './errors.js'
 
@@ -116,6 +116,7 @@ export const joinRoomSchema = z.object({
 export const readySchema = z.object({ ready: z.boolean() })
 
 export const gameCommandSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('TRADE_STOCK'), stockId: z.enum(STOCK_IDS), side: z.enum(['buy', 'sell']), quantity: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER), quoteRevision: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER) }),
   z.object({ type: z.literal('ROLL_DICE') }),
   z.object({ type: z.literal('ROLL_AGAIN') }),
   z.object({ type: z.literal('USE_TURTLE'), targetPlayerId: z.string().min(1).max(80) }),
@@ -139,7 +140,7 @@ export const gameCommandSchema = z.discriminatedUnion('type', [
     tileIndex: z.number().int().min(0).max(BOARD.length - 1),
     sellLevels: z.number().int().min(0).max(MAX_PROPERTY_LEVEL),
     mortgage: z.boolean(),
-  })).min(1).max(BOARD.length) }),
+  })).max(BOARD.length), stockSales: z.array(z.object({ stockId: z.enum(STOCK_IDS), quantity: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER) })).max(STOCK_IDS.length).optional(), quoteRevision: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER).optional() }),
   z.object({ type: z.literal('PAY_JAIL_FINE') }),
   z.object({ type: z.literal('USE_JAIL_CARD') }),
   z.object({ type: z.literal('TRY_JAIL_ROLL') }),

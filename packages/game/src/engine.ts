@@ -9,6 +9,8 @@ import { handleDetention } from './engine/commands/detention.js'
 import { handleItems } from './engine/commands/items.js'
 import { handleLiquidation } from './engine/commands/liquidation.js'
 import { handleWheel } from './engine/commands/wheel.js'
+import { handleStocks } from './engine/commands/stocks.js'
+import { advanceStockMarket, createStockMarket } from './stockMarket/model.js'
 import { isDetained } from './items.js'
 import { assetActionQuote, canRollAgain, type AssetAction } from './queries.js'
 import { PLAYER_COLORS, type CommandResult, type DiceRoll, type GameCommand, type GameEvent, type GamePlayerSetup, type GameState, type PlayerState, type RandomSource } from './types.js'
@@ -27,6 +29,7 @@ export function createGame(
   setups: readonly GamePlayerSetup[],
   random: RandomSource = Math.random,
   now = Date.now(),
+  marketRandom: RandomSource = random,
 ): GameState {
   if (setups.length < 2 || setups.length > 6) {
     throw new Error('Game requires 2 to 6 players')
@@ -83,6 +86,7 @@ export function createGame(
     actionLog: [],
     winnerPlayerId: null,
     statistics: createStatistics(players, now),
+    stockMarket: createStockMarket(players.map(player => player.id), 1, marketRandom),
   }
   const events: GameEvent[] = []
   addEvent(state, events, {
@@ -100,12 +104,14 @@ export function applyCommand(
   random: RandomSource = Math.random,
   now = Date.now(),
   automatic = false,
+  marketRandom: RandomSource = random,
 ): CommandResult {
   if (current.phase === 'FINISHED') return commandError(current, '游戏已经结束')
   if (!current.players.some((player) => player.id === playerId)) return commandError(current, '玩家不在本局中')
-  if (current.currentPlayerId !== playerId && command.type !== 'BID_AUCTION' && command.type !== 'SURRENDER') return commandError(current, '还没有轮到你')
+  if (current.currentPlayerId !== playerId && command.type !== 'BID_AUCTION' && command.type !== 'SURRENDER' && command.type !== 'TRADE_STOCK') return commandError(current, '还没有轮到你')
 
   const state = structuredClone(current)
+  state.stockMarket ??= createStockMarket(state.players.map(player => player.id), state.turnNumber, marketRandom)
   state.revision += 1
   const events: GameEvent[] = []
   const player = playerById(state, playerId)
@@ -117,6 +123,7 @@ export function applyCommand(
       SKIP_UPGRADE: '跳过加盖', CHOOSE_CARD: '选择第 1 张卡', SPIN_WHEEL: '启动转盘',
       CHOOSE_CARD_PROPERTY: '选择一处城市降级', CHOOSE_WHEEL_PROPERTY: '选择符合条件的地产', DECLARE_BANKRUPTCY: '放弃筹款并清算',
       END_TURN: '结束本次行动', SETTLE_DEBT: '支付已筹齐的欠款',
+      LIQUIDATE_ASSETS: '卖出股票并偿还欠款',
     }
     addEvent(state, events, { type: 'AUTO_PLAY', playerId, message: `${player.name} 操作超时，系统代为${actions[command.type] ?? '完成操作'}` })
   }
@@ -130,6 +137,9 @@ export function applyCommand(
   let rejection: CommandResult | undefined
   const context = { current, state, player, playerId, events, random, now }
   switch (command.type) {
+    case 'TRADE_STOCK':
+      rejection = handleStocks(context, command)
+      break
     case 'LIQUIDATE_ASSETS':
       rejection = handleLiquidation(context, command)
       break
@@ -236,6 +246,7 @@ export function applyCommand(
     if (!checkWinner(state, events)) advancePlayer(state, events)
   }
   if (state.phase === 'FINISHED' && state.statistics.finishedAt === null) state.statistics.finishedAt = now
+  if (state.turnNumber !== current.turnNumber) advanceStockMarket(state.stockMarket, state.turnNumber, marketRandom)
   updateNetWorthPeaks(state)
   return { ok: true, state, events }
 }

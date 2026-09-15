@@ -1,5 +1,7 @@
 import { getTile } from './board.js'
 import type { GameEvent, GameState, GameStatistics, PlayerState } from './types.js'
+import { stockPortfolioSummary } from './stockMarket/portfolio.js'
+import type { StockMarketView } from './stockMarket/types.js'
 
 export function createStatistics(players: readonly PlayerState[], now: number): GameStatistics {
   return {
@@ -12,10 +14,10 @@ export function createStatistics(players: readonly PlayerState[], now: number): 
   }
 }
 
-export function playerNetWorth(state: Pick<GameState, 'players' | 'tiles'>, playerId: string): number {
+export function playerNetWorth(state: Pick<GameState, 'players' | 'tiles'> & { stockMarket?: StockMarketView }, playerId: string): number {
   const player = state.players.find((entry) => entry.id === playerId)
   if (!player) return 0
-  return player.cash + state.tiles.reduce((total, asset, index) => {
+  return player.cash + stockPortfolioSummary(state.stockMarket, playerId).marketValue + state.tiles.reduce((total, asset, index) => {
     if (asset.ownerId !== playerId) return total
     const tile = getTile(index)
     return total + (asset.mortgaged ? (tile.mortgage ?? 0) : (tile.price ?? 0))

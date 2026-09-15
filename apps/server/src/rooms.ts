@@ -1,7 +1,7 @@
 import { applyCommand, createGame, eventPresentationDuration, WHEEL_SPIN_MS, type GameEvent, type GameState, type TokenId } from '@fortune/game'
 import type { GameCommandEnvelope, LobbyPlayer, RoomSnapshot, SavedRoomStatus, ServerState, SessionInfo } from '@fortune/protocol'
 import { publicGameState, type RequestErrorCode } from '@fortune/protocol'
-import { randomBytes } from 'node:crypto'
+import { randomBytes, randomInt } from 'node:crypto'
 import { decisionKey, decisionSeconds, timeoutCommand } from './turnPolicy.js'
 
 interface RoomPlayer extends Omit<LobbyPlayer, 'isHost'> {
@@ -31,6 +31,7 @@ export interface RoomActionResult {
 }
 
 const ROOM_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+const marketRandom = () => randomInt(0, 0x1_0000_0000) / 0x1_0000_0000
 
 
 function reconnectToken(): string {
@@ -171,6 +172,7 @@ export class RoomManager {
         token: player.token,
         connected: player.connected,
       })),
+      Math.random, Date.now(), marketRandom,
     )
     this.commit(room, game)
     return { ok: true, state: this.publicState(room), events: game.actionLog.slice(-1) }
@@ -203,9 +205,10 @@ export class RoomManager {
     const previousPlayerId = room.game.currentPlayerId
     const previousPhase = room.game.phase
     const now = Date.now()
-    const result = applyCommand(room.game, id, envelope.command, Math.random, now)
+    const result = applyCommand(room.game, id, envelope.command, Math.random, now, false, marketRandom)
     if (!result.ok) return { ok: false, error: result.error ?? '操作失败' }
-    const preserveDeadline = envelope.command.type === 'SURRENDER' && previousPlayerId !== id && previousPhase === result.state.phase
+    const preserveDeadline = envelope.command.type === 'TRADE_STOCK'
+      || (envelope.command.type === 'SURRENDER' && previousPlayerId !== id && previousPhase === result.state.phase)
     this.commit(room, result.state, now, result.events, preserveDeadline)
     seen.set(envelope.commandId, signature)
     if (seen.size > 100) {
@@ -222,7 +225,7 @@ export class RoomManager {
       const auction = room.game.pendingAuction
       if (auction) {
         if (now < auction.deadline) continue
-        const result = applyCommand(room.game, room.game.currentPlayerId, { type: 'RESOLVE_AUCTION', auctionId: auction.id }, Math.random, now)
+        const result = applyCommand(room.game, room.game.currentPlayerId, { type: 'RESOLVE_AUCTION', auctionId: auction.id }, Math.random, now, false, marketRandom)
         if (result.ok) {
           this.commit(room, result.state, now, result.events)
           expired.push({ roomCode: room.code, events: result.events })
@@ -231,7 +234,7 @@ export class RoomManager {
       }
       const wheel = room.game.pendingWheel
       if (wheel?.stage === 'spinning' && wheel.startedAt !== null && now >= wheel.startedAt + WHEEL_SPIN_MS) {
-        const result = applyCommand(room.game, wheel.playerId, { type: 'RESOLVE_WHEEL', wheelId: wheel.id }, Math.random, now)
+        const result = applyCommand(room.game, wheel.playerId, { type: 'RESOLVE_WHEEL', wheelId: wheel.id }, Math.random, now, false, marketRandom)
         if (result.ok) {
           this.commit(room, result.state, now, result.events)
           expired.push({ roomCode: room.code, events: result.events })
@@ -247,7 +250,7 @@ export class RoomManager {
         const command = timeoutCommand(room.game, rolled)
         if (!command) break
         if (command.type === 'ROLL_DICE' || command.type === 'TRY_JAIL_ROLL') rolled = true
-        const result = applyCommand(room.game, room.game.currentPlayerId, command, Math.random, now, true)
+        const result = applyCommand(room.game, room.game.currentPlayerId, command, Math.random, now, true, marketRandom)
         if (!result.ok) break
         this.commit(room, result.state, now, result.events)
         events.push(...result.events)

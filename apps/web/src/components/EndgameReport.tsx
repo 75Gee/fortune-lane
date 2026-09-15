@@ -1,9 +1,10 @@
-import { getTile, type GameView, type PlayerStatistics } from '@fortune/game'
+import { getTile, stockPortfolioSummary, type GameView, type PlayerStatistics } from '@fortune/game'
 import { Award, ChevronDown, Clock3, Crown, Flag, LogOut, MapPinned, RotateCcw, X } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import '../styles/endgame.css'
 import { Modal } from './Modal.js'
 import { TokenImage } from './TokenImage.js'
+import { stockProfit } from './stocks/format.js'
 
 const money = (value: number) => `¥${value.toLocaleString('zh-CN')}`
 const number = (value: number) => value.toLocaleString('zh-CN')
@@ -84,9 +85,11 @@ export function EndgameReport({ game, playerId, isHost, available, onClose, onHi
       const stats = game.statistics.players[player.id]!
       const award = titles[player.id]
       const elimination = game.statistics.eliminations.find((entry) => entry.playerId === player.id)
+      const stocks = stockPortfolioSummary(game.stockMarket, player.id)
       const measures = [
         ['最高身家', money(stats.peakNetWorth)], ['游览收入', money(stats.rentReceived)], ['游览支出', money(stats.rentPaid)],
         ['累计购入', `${stats.assetsAcquired} 项`], ['旅途步数', `${number(stats.steps)} 格`], ['使用道具', `${stats.itemUses} 次`],
+        ...(game.stockMarket ? [['股票累计盈亏', stockProfit(stocks.totalProfit)], ['期末股票市值', money(stocks.marketValue)]] : []),
       ]
       return <details className={`trip-player ${player.id === playerId ? 'is-me' : ''}`} key={player.id} style={{ '--traveler-color': player.color } as CSSProperties}>
         <summary><span className="trip-rank">{String(index + 1).padStart(2, '0')}</span><TokenImage className="trip-player-token" token={player.token} alt="" /><div className="trip-player-summary"><div><strong>{player.name}</strong>{player.id === playerId && <small>你</small>}{award && <span className="trip-award"><Award size={13} />{award.tied > 1 ? '并列·' : ''}{award.title}</span>}</div><p>{award ? award.describe(award.value) : personalMoment(game, stats)}</p></div><ChevronDown className="trip-expand" size={16} /></summary>

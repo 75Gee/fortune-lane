@@ -61,7 +61,7 @@ export function useGamePresentation(game: GameView, events: GameEvent[], soundEn
       }
       return hazards
     })
-    const audible = immediate.findLast(event => !['TURN_CHANGED', 'AUCTION_BID', 'EXTRA_MOVE_FINISHED'].includes(event.type))
+    const audible = immediate.findLast(event => !['TURN_CHANGED', 'AUCTION_BID', 'EXTRA_MOVE_FINISHED', 'STOCK_TRADED'].includes(event.type))
     if (audible) playEventSound(audible.type, latest.current.soundEnabled)
     setQueue(current => current.filter(event => !ids.has(event.id)))
   }, [queue])

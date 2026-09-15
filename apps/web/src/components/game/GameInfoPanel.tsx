@@ -6,6 +6,7 @@ import { CardLibrary } from '../CardLibrary.js'
 import { ItemCatalog } from '../ItemInventory.js'
 import { Modal } from '../Modal.js'
 import { TokenImage } from '../TokenImage.js'
+import { StockHoldings } from '../stocks/StockSummary.js'
 import { AssetActions } from './AssetActions.js'
 import { TileDetail } from './TileDetail.js'
 import { LiquidationPlanner } from './LiquidationPlanner.js'
@@ -48,7 +49,7 @@ export function GameInfoPanel({ game, playerId, roomCode, initialTab, initialOwn
                   >
                     <span className="rank">{rank + 1}</span>
                     <span className="player-token-small" style={{ borderColor: player.color }}><TokenImage token={player.token} />{player.turtleRollsRemaining > 0 && <span className="turtle-status-badge" title={`乌龟效果：剩余 ${player.turtleRollsRemaining} 次常规掷骰`}><img src={ITEMS.turtle.image} alt="乌龟效果" /><b>{player.turtleRollsRemaining}</b></span>}</span>
-                    <span className="player-copy"><strong>{player.name}{player.id === playerId ? ' · 你' : ''}</strong><small>{player.surrendered ? '已投降' : player.isBankrupt ? '已破产' : `${owned}项资产 · ${money(playerNetWorth(game, player.id))}净值`}</small></span>
+                    <span className="player-copy"><strong>{player.name}{player.id === playerId ? ' · 你' : ''}</strong><small>{player.surrendered ? '已投降' : player.isBankrupt ? '已破产' : `${owned}处地产 · ${money(playerNetWorth(game, player.id))}净值`}</small></span>
                     <span className="cash">{money(player.cash)}</span>
                     {!player.connected && <i className="offline-dot" title="已掉线" />}
                   </button>
@@ -63,7 +64,8 @@ export function GameInfoPanel({ game, playerId, roomCode, initialTab, initialOwn
             {!planningDebt && game.pendingDebt?.debtorId === assetOwner && <div className="portfolio-debt"><strong>待付 {money(game.pendingDebt.amount)} · {game.pendingDebt.reason}</strong><p>正在筹款</p></div>}
             <div hidden={planningDebt}>
             <div className="portfolio-cash"><span>可用现金</span><strong>{money(game.players.find(player => player.id === assetOwner)?.cash ?? 0)}</strong></div><div className="portfolio-total"><span>总身家（含现金）</span><strong>{money(playerNetWorth(game, assetOwner))}</strong></div>
-            {game.tiles.filter((tile) => tile.ownerId === assetOwner).length === 0 && <p className="empty-state"><Building2 size={32} />还没有持有的资产</p>}
+            <StockHoldings market={game.stockMarket} playerId={assetOwner} />
+            {game.tiles.filter((tile) => tile.ownerId === assetOwner).length === 0 && <p className="empty-state"><Building2 size={32} />还没有持有的地产</p>}
             {game.tiles.map((state, index) => {
               if (state.ownerId !== assetOwner) return null
               const tile = getTile(index)

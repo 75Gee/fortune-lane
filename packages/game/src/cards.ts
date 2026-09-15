@@ -1,4 +1,5 @@
 import { BOARD, getTileById } from './board.js'
+import { PASS_START_REWARD } from './economy.js'
 import type { CardDeckKind, DeckState, GameState, ItemKind, RandomSource } from './types.js'
 
 export type CardMood = 'good' | 'bad' | 'neutral'
@@ -43,7 +44,7 @@ export const CHANCE_CARDS: readonly GameCard[] = [
   chance('good', 'award', '城市创意奖', '你设计的游览路线获奖', '获得800元奖金', { type: 'money', amount: 800 }),
   chance('good', 'travel-fund', '旅途加油站', '旅行基金送来一份补助', '领取旅费', { type: 'cash_relief', threshold: 3000, amount: 800, otherwise: 200 }),
   chance('good', 'festival', '城市嘉年华', '名下旅行项目迎来节日客流', '获得活动收入', { type: 'asset_income', perAsset: 50, minimum: 200, cap: 500 }),
-  chance('good', 'go', '新的旅程', '下一段旅程即将启程', '前往起点领取1500元', { type: 'move_to', tileIndex: 0, collectStart: true }),
+  chance('good', 'go', '新的旅程', '下一段旅程即将启程', `前往起点领取${PASS_START_REWARD}元`, { type: 'move_to', tileIndex: 0, collectStart: true }),
   chance('good', 'relief', '小小旅行梦想', '城市计划支持你的旅行事业', '领取发展补助', { type: 'relief', threshold: 2, amount: 800, otherwise: 200 }),
   chance('good', 'free', '通行许可', '旅行服务站替你备好手续', '获得一次免费出狱或出院的许可', { type: 'get_out' }),
   chance('good', 'renovate', '城市焕新', '城市志愿者帮忙改善游览设施', '一处城市免费升一级', { type: 'renovate', fallback: 200 }),

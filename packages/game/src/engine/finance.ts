@@ -6,6 +6,8 @@ import { updateNetWorthPeaks } from '../statistics.js'
 import { addEvent, playerById } from './context.js'
 import { leaveDetention, moveBy } from './movement.js'
 import { transitionTo } from './transitions.js'
+import { stockPortfolioSummary } from '../stockMarket/portfolio.js'
+import { liquidateStockPortfolio } from './stockTrading.js'
 
 export function assetLiquidValue(state: GameState, playerId: string): number {
   return state.tiles.reduce((total, tileState, index) => {
@@ -17,7 +19,7 @@ export function assetLiquidValue(state: GameState, playerId: string): number {
     }
     if (!tileState.mortgaged) value += definition.mortgage ?? 0
     return total + value
-  }, 0)
+  }, stockPortfolioSummary(state.stockMarket, playerId).marketValue)
 }
 
 export function bankruptPlayer(
@@ -29,6 +31,7 @@ export function bankruptPlayer(
   rentTileIndex = state.pendingDebt?.tileIndex,
 ): void {
   updateNetWorthPeaks(state)
+  liquidateStockPortfolio(state, player, events)
   if (creditorId && player.cash > 0) {
     const paid = player.cash
     playerById(state, creditorId).cash += paid

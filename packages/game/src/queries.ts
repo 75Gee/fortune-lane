@@ -2,6 +2,8 @@ import { BOARD, MAX_PROPERTY_LEVEL, isOwnable } from './board.js'
 import { buildingSaleValue, redeemCost } from './economy.js'
 import { isDetained } from './items.js'
 import type { GameState, LiquidationSelection } from './types.js'
+import { stockLiquidationQuote } from './stockMarket/quotes.js'
+import type { StockMarketView, StockSaleSelection } from './stockMarket/types.js'
 
 type AssetState = Pick<GameState, 'phase' | 'currentPlayerId' | 'players' | 'tiles' | 'pendingDecision'>
 export type AssetAction = 'BUY_PROPERTY' | 'UPGRADE_PROPERTY' | 'MORTGAGE_ASSET' | 'REDEEM_ASSET' | 'SELL_BUILDING'
@@ -51,7 +53,7 @@ export function canRollAgain(state: Pick<GameState, 'phase' | 'currentPlayerId' 
     && state.phase === 'WAITING_FOR_END_TURN' && !!state.lastRoll?.isDouble
 }
 
-export function liquidationQuote(state: AssetState & Pick<GameState, 'pendingDebt'>, playerId: string, selections: readonly LiquidationSelection[]) {
+export function liquidationQuote(state: AssetState & Pick<GameState, 'pendingDebt' | 'pendingAuction'> & { stockMarket?: StockMarketView }, playerId: string, selections: readonly LiquidationSelection[], stockSales: readonly StockSaleSelection[] = [], quoteRevision?: number) {
   const player = state.players.find(entry => entry.id === playerId)
   const debt = state.pendingDebt
   let proceeds = 0, buildingLoss = 0
@@ -59,7 +61,10 @@ export function liquidationQuote(state: AssetState & Pick<GameState, 'pendingDeb
     cashAfter: (player?.cash ?? 0) + proceeds - (debt?.amount ?? 0),
     remaining: Math.max(0, (debt?.amount ?? 0) - (player?.cash ?? 0) - proceeds) })
   if (!player || !canManageAssets(state, playerId) || state.phase !== 'WAITING_FOR_DEBT' || debt?.debtorId !== playerId) return result('当前没有需要筹款的欠款')
-  if (!selections.length || selections.length > BOARD.length) return result('选择要出售或抵押的资产')
+  if ((!selections.length && !stockSales.length) || selections.length > BOARD.length) return result('选择要出售或抵押的资产')
+  const stocks = stockLiquidationQuote(state, playerId, stockSales, quoteRevision)
+  if (!stocks.allowed) return result(stocks.reason)
+  proceeds += stocks.proceeds
   const seen = new Set<number>()
   for (const selection of selections) {
     const { tileIndex, sellLevels, mortgage } = selection
@@ -74,5 +79,6 @@ export function liquidationQuote(state: AssetState & Pick<GameState, 'pendingDeb
     buildingLoss += sellLevels * ((tile.buildCost ?? 0) - buildingSaleValue(tileIndex))
   }
   const remaining = Math.max(0, debt.amount - player.cash - proceeds)
+  if (!Number.isSafeInteger(player.cash + proceeds)) return result('筹款金额超出可结算范围')
   return result(remaining ? `还需筹集 ¥${remaining.toLocaleString('zh-CN')}` : null)
 }

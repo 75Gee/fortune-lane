@@ -1,17 +1,19 @@
-import { applyCommand, CHANCE_CARDS, createGame, FATE_CARDS, getTileById, WHEEL_SPIN_MS, type GameCommand, type GameEvent } from '@fortune/game'
+import { advanceStockMarket, applyCommand, CHANCE_CARDS, createGame, FATE_CARDS, getTileById, STOCK_IDS, WHEEL_SPIN_MS, type GameCommand, type GameEvent } from '@fortune/game'
 import { publicGameState, type RoomSnapshot } from '@fortune/protocol'
 import { useEffect, useState } from 'react'
-import { CommandAvailabilityContext } from '../components/Modal.js'
+import { CommandAvailabilityContext, ModalErrorContext } from '../components/Modal.js'
 import { GamePage } from '../pages/GamePage.js'
 
 /** Local artwork scene using the real game UI; no server or saved rooms involved. */
 function previewGame() {
-  const game = createGame([
+  let marketSeed = 7509
+  const marketRandom = () => { marketSeed = (Math.imul(marketSeed, 1664525) + 1013904223) >>> 0; return marketSeed / 0x1_0000_0000 }
+  let game = createGame([
     { id: 'xiaoman', name: '小满', token: 'train' },
     { id: 'alan', name: '阿岚', token: 'camera' },
     { id: 'muzi', name: '木子', token: 'teapot' },
     { id: 'xiaoyu', name: '小雨', token: 'kite' },
-  ], () => .5)
+  ], () => .5, Date.now(), marketRandom)
   game.currentPlayerId = 'xiaoman'; game.turnNumber = 14; game.revision = 38
   const places = ['香港', '旧金山', '开罗', 'item-north'], cash = [14300, 10800, 12600, 9400]
   game.players.forEach((player, index) => { player.position = getTileById(places[index]!).index; player.cash = cash[index]! })
@@ -27,6 +29,16 @@ function previewGame() {
   ]
   game.actionLog = [{ id: 'preview-purchase', revision: 38, turnNumber: 14, type: 'PROPERTY_UPGRADED', playerId: 'xiaoman', tileIndex: getTileById('香港').index, amount: 1100, message: '小满完善香港的游览设施，城市升至 2 级。' }]
   const query = new URLSearchParams(location.search)
+  if (query.has('stocks')) {
+    // Isolated artwork fixture: deterministic history, real trade accounting.
+    for (const playerId of ['xiaoman', 'alan']) for (const stockId of STOCK_IDS) {
+      game = applyCommand(game, playerId, { type: 'TRADE_STOCK', stockId, side: 'buy', quantity: playerId === 'xiaoman' ? 15 : 8, quoteRevision: game.stockMarket!.quoteRevision }).state
+    }
+    for (let turn = 2; turn <= 121; turn++) advanceStockMarket(game.stockMarket!, turn, marketRandom)
+    game.turnNumber = 121
+    game = applyCommand(game, 'xiaoman', { type: 'TRADE_STOCK', stockId: 'tech', side: 'sell', quantity: 5, quoteRevision: game.stockMarket!.quoteRevision }).state
+    game.actionLog = []
+  }
   const decision = query.get('decision')
   if (decision === 'purchase' || decision === 'upgrade' || decision === 'auction') {
     const tileIndex = getTileById(decision === 'upgrade' ? '香港' : '维也纳').index
@@ -41,7 +53,7 @@ function previewGame() {
   if (decision === 'debt') {
     game.players[0]!.cash = 200
     game.phase = 'WAITING_FOR_DEBT'
-    game.pendingDebt = { debtorId: 'xiaoman', creditorId: 'alan', amount: 2000, reason: '纽约游览费用', tileIndex: getTileById('纽约').index, continuation: { type: 'READY_TO_END' } }
+    game.pendingDebt = { debtorId: 'xiaoman', creditorId: 'alan', amount: query.has('stocks') ? 7000 : 2000, reason: '纽约游览费用', tileIndex: getTileById('纽约').index, continuation: { type: 'READY_TO_END' } }
   }
   const requestedCard = [...CHANCE_CARDS, ...FATE_CARDS].find((card) => card.id === query.get('card'))
   const deckKind = requestedCard?.deck ?? query.get('deck')
@@ -83,6 +95,7 @@ function previewGame() {
 
 export default function GamePreview() {
   const [game, setGame] = useState(previewGame)
+  const [error, setError] = useState<string | null>(null)
   const [events, setEvents] = useState<GameEvent[]>(() => new URLSearchParams(location.search).has('card') ? game.actionLog.filter((event) => event.revision === game.revision) : [])
   const viewer = new URLSearchParams(location.search).get('viewer')
   const playerId = game.players.some((player) => player.id === viewer) ? viewer! : 'xiaoman'
@@ -93,7 +106,8 @@ export default function GamePreview() {
   }
   const command = (input: GameCommand) => {
     const result = applyCommand(game, playerId, input)
-    if (result.ok) { setGame(result.state); setEvents((current) => [...current, ...result.events].slice(-120)) }
+    if (result.ok) { setError(null); setGame(result.state); setEvents((current) => [...current, ...result.events].slice(-120)) }
+    else setError(result.error ?? '操作未完成')
   }
   useEffect(() => {
     const wheel = game.pendingWheel
@@ -104,5 +118,5 @@ export default function GamePreview() {
     }, Math.max(0, wheel.startedAt + WHEEL_SPIN_MS - Date.now()))
     return () => window.clearTimeout(timer)
   }, [game])
-  return <CommandAvailabilityContext.Provider value><GamePage game={publicGameState(game, playerId)} room={room} playerId={playerId} events={events} connectionStatus="connected" onCommand={command} onRestart={() => { setGame(previewGame()); setEvents([]) }} onLeave={() => location.assign('/')} /></CommandAvailabilityContext.Provider>
+  return <ModalErrorContext.Provider value={{ error, clear: () => setError(null) }}><CommandAvailabilityContext.Provider value><GamePage game={publicGameState(game, playerId)} room={room} playerId={playerId} events={events} connectionStatus="connected" onCommand={command} onRestart={() => { setGame(previewGame()); setEvents([]); setError(null) }} onLeave={() => location.assign('/')} /></CommandAvailabilityContext.Provider></ModalErrorContext.Provider>
 }

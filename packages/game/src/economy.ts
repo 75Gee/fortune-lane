@@ -2,7 +2,7 @@ import { BOARD, getTile, isOwnable } from './board.js'
 import type { GameState } from './types.js'
 
 export const STARTING_CASH = 15_000
-export const PASS_START_REWARD = 1_500
+export const PASS_START_REWARD = 2_000
 export const JAIL_FINE = 500
 export const RENT_GROWTH_START = 300
 export const AIRPORT_RENTS = [0, 300, 600, 1_000, 1_600] as const

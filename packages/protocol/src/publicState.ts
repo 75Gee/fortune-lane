@@ -1,4 +1,4 @@
-import type { GameState, GameView } from '@fortune/game'
+import { STOCK_IDS, type GameState, type GameView, type StockMarketView } from '@fortune/game'
 
 /** Allowlist the wire representation; adding private state never adds it to a broadcast. */
 export function publicGameState(state: GameState, viewerId?: string): GameView {
@@ -30,5 +30,14 @@ export function publicGameState(state: GameState, viewerId?: string): GameView {
     actionLog: state.actionLog,
     winnerPlayerId: state.winnerPlayerId,
     statistics: state.statistics,
+    ...(state.stockMarket ? { stockMarket: {
+      quoteRevision: state.stockMarket.quoteRevision,
+      updatedTurn: state.stockMarket.updatedTurn,
+      stocks: Object.fromEntries(STOCK_IDS.map(id => {
+        const quote = state.stockMarket!.stocks[id]
+        return [id, { priceCents: quote.priceCents, previousPriceCents: quote.previousPriceCents, history: quote.history }]
+      })) as StockMarketView['stocks'],
+      portfolios: state.stockMarket.portfolios,
+    } } : {}),
   })
 }

@@ -1,3 +1,5 @@
+import type { StockId, StockMarketState, StockMarketView, StockSaleSelection, StockSide, StockTrade } from './stockMarket/types.js'
+
 export const PLAYER_COLORS = [
   '#df3f48',
   '#1976a3',
@@ -222,6 +224,7 @@ export type GameEventType =
   | 'PLAYER_BANKRUPT'
   | 'TURN_CHANGED'
   | 'GAME_FINISHED'
+  | 'STOCK_TRADED'
 
 interface GameEventData {
   id: string
@@ -245,6 +248,9 @@ interface GameEventData {
   sourceCardId?: string
   cardIndex?: 0 | 1 | 2
   wheel?: PendingWheel
+  stockId?: StockId
+  stockSide?: StockSide
+  quantity?: number
 }
 
 /** Discriminated payloads require the data consumed by animation and result views. */
@@ -281,6 +287,8 @@ export interface GameState {
   actionLog: GameEvent[]
   winnerPlayerId: string | null
   statistics: GameStatistics
+  /** Optional for snapshots created before the stock market was introduced. */
+  stockMarket?: StockMarketState
 }
 
 /** Public data consumed by the UI. Deck order and unrevealed identities stay in GameState. */
@@ -292,6 +300,7 @@ export interface GameView extends Pick<GameState,
   chanceDeck: { remaining: number; discarded: number }
   fateDeck: { remaining: number; discarded: number }
   pendingCardChoice: Pick<PendingCardChoice, 'id' | 'playerId' | 'deck'> & { count: 3 } | null
+  stockMarket?: StockMarketView
 }
 
 export interface GamePlayerSetup {
@@ -308,6 +317,7 @@ export interface LiquidationSelection {
 }
 
 export type GameCommand =
+  | StockTrade
   | { type: 'ROLL_DICE' }
   | { type: 'ROLL_AGAIN' }
   | { type: 'USE_TURTLE'; targetPlayerId: string }
@@ -329,7 +339,7 @@ export type GameCommand =
   | { type: 'MORTGAGE_ASSET'; tileIndex: number }
   | { type: 'REDEEM_ASSET'; tileIndex: number }
   | { type: 'SELL_BUILDING'; tileIndex: number }
-  | { type: 'LIQUIDATE_ASSETS'; selections: LiquidationSelection[] }
+  | { type: 'LIQUIDATE_ASSETS'; selections: LiquidationSelection[]; stockSales?: StockSaleSelection[] | undefined; quoteRevision?: number | undefined }
   | { type: 'PAY_JAIL_FINE' }
   | { type: 'USE_JAIL_CARD' }
   | { type: 'TRY_JAIL_ROLL' }
