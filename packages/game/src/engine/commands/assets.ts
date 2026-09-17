@@ -1,10 +1,12 @@
 import { getTile, isOwnable, MAX_PROPERTY_LEVEL } from '../../board.js'
 import { auctionMinimumBid, buildingSaleValue, redeemCost } from '../../economy.js'
 import { canManageAssets } from '../../queries.js'
+import { stockPaymentCapacity } from '../../stockMarket/quotes.js'
 import { type CommandResult, type GameCommand } from '../../types.js'
 
 import { finishAuction } from '../auction.js'
 import { addEvent, commandError } from '../context.js'
+import { fundStockPayment } from '../stockTrading.js'
 import { transitionTo } from '../transitions.js'
 import { activePlayers } from '../turns.js'
 
@@ -20,7 +22,9 @@ export function handleAssets({ current, state, player, playerId, events, random,
       const tile = getTile(decision.tileIndex)
       const tileState = state.tiles[tile.index]
       if (!tileState || tileState.ownerId) return commandError(current, '该资产已经被购买')
-      if (!tile.price || player.cash < tile.price) return commandError(current, '现金不足')
+      if (!tile.price) return commandError(current, '该资产不能购买')
+      const fundingError = fundStockPayment(state, player, tile.price, command.stockFunding, events)
+      if (fundingError) return commandError(current, fundingError)
       player.cash -= tile.price
       tileState.ownerId = playerId
       transitionTo(state, { phase: 'WAITING_FOR_END_TURN' })
@@ -40,7 +44,7 @@ export function handleAssets({ current, state, player, playerId, events, random,
       const tileIndex = state.pendingDecision.tileIndex
       const participants = activePlayers(state).filter(candidate => candidate.id !== playerId)
       const minimum = auctionMinimumBid(tileIndex)
-      const bids = Object.fromEntries(participants.filter(candidate => candidate.cash < minimum).map(candidate => [candidate.id, 0]))
+      const bids = Object.fromEntries(participants.filter(candidate => stockPaymentCapacity(state, candidate.id) < minimum).map(candidate => [candidate.id, 0]))
       transitionTo(state, { phase: 'WAITING_FOR_AUCTION', pendingAuction: { id: `auction-${state.revision}`, tileIndex, initiatorId: playerId, participantIds: participants.map(candidate => candidate.id), bids, deadline: now + 30000 } })
       addEvent(state, events, { type: 'AUCTION_STARTED', playerId, tileIndex, message: `${player.name} 放弃购买 ${getTile(tileIndex).name}，其他玩家开始竞拍，底价为抵押金额 ${auctionMinimumBid(tileIndex)} 元` })
       finishAuction(state, random, events)
@@ -58,7 +62,8 @@ export function handleAssets({ current, state, player, playerId, events, random,
         return commandError(current, '不能升级该地产')
       }
       if (tileState.level >= MAX_PROPERTY_LEVEL || tileState.mortgaged) return commandError(current, '该地产不能继续升级')
-      if (player.cash < cost) return commandError(current, '现金不足')
+      const fundingError = fundStockPayment(state, player, cost, command.stockFunding, events)
+      if (fundingError) return commandError(current, fundingError)
       player.cash -= cost
       tileState.level += 1
       transitionTo(state, { phase: 'WAITING_FOR_END_TURN' })
@@ -107,7 +112,8 @@ export function handleAssets({ current, state, player, playerId, events, random,
         return commandError(current, '该资产未被抵押')
       }
       const amount = redeemCost(tile.index)
-      if (player.cash < amount) return commandError(current, '现金不足')
+      const fundingError = fundStockPayment(state, player, amount, command.stockFunding, events)
+      if (fundingError) return commandError(current, fundingError)
       player.cash -= amount
       tileState.mortgaged = false
       addEvent(state, events, {

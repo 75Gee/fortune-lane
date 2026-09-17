@@ -1,4 +1,4 @@
-import type { StockId, StockMarketState, StockMarketView, StockSaleSelection, StockSide, StockTrade } from './stockMarket/types.js'
+import type { StockFunding, StockId, StockMarketState, StockMarketView, StockSaleSelection, StockSide, StockTrade } from './stockMarket/types.js'
 
 export const PLAYER_COLORS = [
   '#df3f48',
@@ -324,12 +324,12 @@ export type GameCommand =
   | { type: 'USE_CHOSEN_DIE'; value: number }
   | { type: 'PLACE_ROADBLOCK'; tileIndex: number }
   | { type: 'PLACE_BOMB'; tileIndex: number }
-  | { type: 'BUY_PROPERTY' }
+  | { type: 'BUY_PROPERTY'; stockFunding?: StockFunding | undefined }
   | { type: 'SKIP_PURCHASE' }
   | { type: 'BID_AUCTION'; auctionId: string; amount: number }
   | { type: 'RESOLVE_AUCTION'; auctionId: string }
   | { type: 'SURRENDER' }
-  | { type: 'UPGRADE_PROPERTY' }
+  | { type: 'UPGRADE_PROPERTY'; stockFunding?: StockFunding | undefined }
   | { type: 'SKIP_UPGRADE' }
   | { type: 'CHOOSE_CARD'; choiceId: string; cardIndex: 0 | 1 | 2 }
   | { type: 'CHOOSE_CARD_PROPERTY'; choiceId: string; tileIndex: number }
@@ -337,10 +337,10 @@ export type GameCommand =
   | { type: 'RESOLVE_WHEEL'; wheelId: string }
   | { type: 'CHOOSE_WHEEL_PROPERTY'; wheelId: string; tileIndex: number }
   | { type: 'MORTGAGE_ASSET'; tileIndex: number }
-  | { type: 'REDEEM_ASSET'; tileIndex: number }
+  | { type: 'REDEEM_ASSET'; tileIndex: number; stockFunding?: StockFunding | undefined }
   | { type: 'SELL_BUILDING'; tileIndex: number }
   | { type: 'LIQUIDATE_ASSETS'; selections: LiquidationSelection[]; stockSales?: StockSaleSelection[] | undefined; quoteRevision?: number | undefined }
-  | { type: 'PAY_JAIL_FINE' }
+  | { type: 'PAY_JAIL_FINE'; stockFunding?: StockFunding | undefined }
   | { type: 'USE_JAIL_CARD' }
   | { type: 'TRY_JAIL_ROLL' }
   | { type: 'SETTLE_DEBT' }

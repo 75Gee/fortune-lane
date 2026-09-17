@@ -184,4 +184,5 @@ io.on('connection', (socket) => {
 setInterval(() => manager.removeStaleRooms(30 * 60 * 1000), 5 * 60 * 1000).unref()
 
 const port = Number(process.env.PORT ?? 3001)
-await app.listen({ host: '0.0.0.0', port })
+const host = process.env.HOST ?? '0.0.0.0'
+await app.listen({ host, port })

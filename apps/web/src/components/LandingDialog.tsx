@@ -8,6 +8,7 @@ import { CARD_DECK_ART, CardBack, CardDeckSymbol } from './CardDeckArt.js'
 import { needsDecision } from './decisionState.js'
 import { CommandAvailabilityContext, Modal } from './Modal.js'
 import { WheelDialog } from './WheelDialog.js'
+import { StockPaymentHint } from './stocks/StockPaymentHint.js'
 
 interface LandingDialogProps {
   game: GameView
@@ -44,7 +45,7 @@ function LandingContent({ game, playerId, decisionsReady, onCommand, clockOffset
     return <Modal label="选择降级地产" onDismiss={close}><div className="landing-overlay"><section className={`landing-dialog card-property-dialog deck-${card.deck}`}>
       {!required && <button className="decision-close icon-command" aria-label="关闭查看" onClick={onDismiss}><X size={18} /></button>}<header className="landing-dialog-head"><span><CardDeckSymbol deck={card.deck} size={24} /></span><div><small>{actor?.name} · {CARD_DECK_ART[card.deck].name}卡</small><h2>{card.title}</h2></div><TurnClock deadline={deadline} offset={clockOffset} /></header>
       <p>{isMyTurn ? '选择一处城市降一级，不返还建造费。' : `等待 ${actor?.name} 选择一处城市降级。`}</p>
-      <div className="wheel-properties">{cardPropertyCandidates(game, pending.playerId).map((tile) => <button key={tile.index} disabled={!isMyTurn || !available} onClick={() => onCommand({ type: 'CHOOSE_CARD_PROPERTY', choiceId: pending.id, tileIndex: tile.index })}><Landmark size={18} /><strong>{tile.name}</strong><span>{game.tiles[tile.index]!.level} → {game.tiles[tile.index]!.level - 1} 级</span></button>)}</div>
+      <div className="wheel-properties">{cardPropertyCandidates(game, pending.playerId).map((tile) => <button key={tile.index} disabled={!isMyTurn || !available} onClick={() => onCommand({ type: 'CHOOSE_CARD_PROPERTY', choiceId: pending.id, tileIndex: tile.index })}><Landmark size={18} /><strong>{tile.name}</strong><span>{game.tiles[tile.index]!.level} → {game.tiles[tile.index]!.level - 1} 级<small>降级后游览费 {money(scaleRent(tile.rents?.[game.tiles[tile.index]!.level - 1] ?? 0, game.turnNumber))}</small></span></button>)}</div>
       {isMyTurn && deadline !== null && <p className="choice-hint">超时选择建造费最低的城市</p>}
     </section></div></Modal>
   }
@@ -102,12 +103,8 @@ function LandingContent({ game, playerId, decisionsReady, onCommand, clockOffset
         ? `${money(rentForTile(game, tile.index, 1, decision.playerId))}–${money(rentForTile(game, tile.index, 12, decision.playerId))}`
         : money(nextRent)
 
-    if (required) return <section className="property-preview" aria-label={`${tile.name}地产信息`}>
-      <header><div><small>{isPurchase ? '可以买下这处地产' : '可以加盖一级'}</small><h2>{tile.name}</h2></div><strong>{money(actionCost)}</strong></header>
-      <div className="property-preview-values"><div><span>{feeLabel}</span><strong>{feeValue}</strong></div><div><span>{canAfford ? '支付后余额' : '还差'}</span><strong>{money(Math.abs((player?.cash ?? 0) - actionCost))}</strong></div></div>
-      {tile.kind === 'property' && <details className="deed-rates"><summary>查看各等级游览费</summary><div className="landing-rent-track">{tile.rents?.map((rent, level) => <div key={level}><span>{level === 0 ? '空地' : level === MAX_PROPERTY_LEVEL ? '旅馆' : `${level} 级`}</span><strong>{money(scaleRent(rent, game.turnNumber))}</strong></div>)}</div></details>}
-      <p>{isPurchase ? '超时交由其他玩家竞拍' : '超时暂不升级'}</p>
-    </section>
+    // The active player's decision lives with its controls in the command dock.
+    if (required) return null
 
     return (
       <Modal label={`${tile.name}地产决策`} onDismiss={close}><div className="landing-overlay">
@@ -129,8 +126,9 @@ function LandingContent({ game, playerId, decisionsReady, onCommand, clockOffset
             <div><span>地产等级</span><strong>{isPurchase ? '待购入' : `${currentLevel}级地产`}</strong></div>
             <div><span>{feeLabel}</span><strong>{feeValue}</strong></div>
             <div><span>抵押价值</span><strong>{money(tile.mortgage ?? 0)}</strong></div>
-            <div><span>{canAfford ? '支付后余额' : '还差'}</span><strong>{money(Math.abs((player?.cash ?? 0) - actionCost))}</strong></div>
+            <div><span>{canAfford ? '支付后余额' : '还差'}</span><strong>{money(canAfford ? quote.balanceAfter : quote.payment.remaining)}</strong></div>
           </div>
+          <StockPaymentHint payment={quote.payment} />
 
           {tile.kind === 'property' && (
             <details className="deed-rates"><summary>查看各等级游览费</summary><div className="landing-rent-track">
@@ -150,10 +148,10 @@ function LandingContent({ game, playerId, decisionsReady, onCommand, clockOffset
               <button
                 className="accept"
                 disabled={!canAfford || !available}
-                onClick={() => onCommand({ type: isPurchase ? 'BUY_PROPERTY' : 'UPGRADE_PROPERTY' })}
+                onClick={() => onCommand({ type: isPurchase ? 'BUY_PROPERTY' : 'UPGRADE_PROPERTY', stockFunding: quote.payment.stockFunding })}
               >
                 {isPurchase ? <Check size={19} /> : currentLevel >= MAX_PROPERTY_LEVEL - 1 ? <Hotel size={19} /> : <Building2 size={19} />}
-                {!canAfford ? '现金不足' : isPurchase ? '购买地产' : currentLevel >= MAX_PROPERTY_LEVEL - 1 ? '升级一级' : '升级一级'}
+                {!canAfford ? '资金不足' : `${quote.payment.stockFunding ? '卖股并' : ''}${isPurchase ? '购买地产' : '升级一级'}`}
               </button>
               <button disabled={!available} onClick={() => onCommand({ type: isPurchase ? 'SKIP_PURCHASE' : 'SKIP_UPGRADE' })}>
                 {isPurchase ? '让其他人竞拍' : '暂不升级'}

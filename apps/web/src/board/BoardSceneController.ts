@@ -4,6 +4,7 @@ import { bombExplosion } from './BombExplosion.js'
 import { contactShadows } from './ContactShadows.js'
 import { hazardModel } from './ItemModels.js'
 import { optimizeStaticModel } from './optimizeStaticModel.js'
+import { ownershipMarkers } from './OwnershipMarkers.js'
 import { BOMB_EXPLOSION_MS } from './presentationTimings.js'
 import { propertyBuildings } from './PropertyBuildings.js'
 import { sceneRenderLoop } from './SceneRenderLoop.js'
@@ -77,7 +78,7 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
       })
       const name = new THREE.Mesh(nameGeometry, new THREE.MeshBasicMaterial({ map: nameTexture, transparent: true, depthWrite: false, toneMapped: false }))
       const inward = inwardAt(tile.index), corner = tile.index % BOARD_SIDE_STEPS === 0
-      name.position.copy(worldPosition(tile.index)).addScaledVector(inward, corner ? .8 : TILE_SIZE * .3)
+      name.position.copy(worldPosition(tile.index)).addScaledVector(inward, corner ? .8 : TILE_SIZE * (tile.price ? .24 : .3))
       name.position.y = TILE_TOP + .012
       // The bottom of the text faces the reader on the inside of each board edge.
       name.rotation.set(-Math.PI / 2, 0, Math.atan2(inward.x, inward.z))
@@ -94,6 +95,7 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
         }))
       }
     }
+    const ownership = ownershipMarkers(scene, () => loop?.invalidate())
     const tokens = new Map<string, THREE.Group>()
     const marker = new THREE.Group()
     marker.scale.setScalar(1.5)
@@ -107,6 +109,7 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
     const buildingStates = new Map<number, string>()
     const update = () => {
       const { game, selectedTile } = getProps()
+      ownership.update(game)
       for (const [id, model] of hazardModels) {
         if (game.hazards.some((hazard) => hazard.id === id)) continue
         scene.remove(model); disposeScene(model); hazardModels.delete(id)
@@ -158,7 +161,7 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
       }
       cameraMode = action; zoom = 1
     }
-    const unbindInput = bindBoardInput(container, renderer.domElement, camera, () => [...tiles, ...landscape.lots, ...landscape.models, ...hazardModels.values()], index => getProps().onSelectTile(index))
+    const unbindInput = bindBoardInput(container, renderer.domElement, camera, () => [...tiles, ...ownership.objects.filter(object => object.visible), ...landscape.lots, ...landscape.models, ...hazardModels.values()], index => getProps().onSelectTile(index))
     const resize = () => {
       const w = container.clientWidth, h = container.clientHeight; if (!w || !h) return
       compact = w < 700; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix()
@@ -218,6 +221,7 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
       else { camera.position.copy(desiredCamera); cameraTarget.copy(desired) }
       camera.lookAt(cameraTarget); initialized = true
       camera.updateMatrixWorld()
+      ownership.resize(camera, container.clientHeight)
       const renderStart = profile ? performance.now() : 0
       scene.updateMatrixWorld(true)
       renderer.render(scene, camera)
@@ -235,7 +239,7 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
     const dispose = () => {
       loop?.dispose(); observer.disconnect()
       unbindInput(); renderer.domElement.removeEventListener('webglcontextlost', lost)
-      disposeScene(scene); renderer.dispose(); renderer.domElement.remove()
+      ownership.dispose(); disposeScene(scene); renderer.dispose(); renderer.domElement.remove()
     }
     return { update, setView, setEnabled, dispose }
 }

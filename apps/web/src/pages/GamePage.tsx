@@ -27,7 +27,7 @@ interface GamePageProps {
   onLeave: () => void
 }
 
-import { decisionId, needsDecision } from '../components/decisionState.js'
+import { actionDescription, decisionId, needsDecision } from '../components/decisionState.js'
 import { ActionPanel } from '../components/game/ActionPanel.js'
 import { GameInfoPanel, type InfoTab } from '../components/game/GameInfoPanel.js'
 import { RouteView } from '../components/game/RouteView.js'
@@ -118,7 +118,7 @@ export function GamePage({ room, game, playerId, events, connectionStatus, comma
       <div className="game-layout">
         <section className="board-region">
           <div className="board-toolbar">
-            <div className="turn-summary"><div><strong>第 {game.turnNumber} 回合</strong><TurnClock deadline={room.turnDeadline} offset={clockOffset} /></div>{game.turnNumber > RENT_GROWTH_START && <span>游览费 ×{rentMultiplier(game.turnNumber).toFixed(2)}</span>}</div>
+            <div className="turn-summary"><div><strong>{game.phase === 'FINISHED' ? '本局结束' : game.pendingAuction ? '正在竞拍' : `${current?.id === playerId ? '轮到你' : current?.name ?? '当前玩家'} · ${actionDescription(game)}`}</strong><TurnClock deadline={game.pendingAuction?.deadline ?? room.turnDeadline} offset={clockOffset} /></div><span>第 {game.turnNumber} 回合{game.turnNumber > RENT_GROWTH_START ? ` · 游览费 ×${rentMultiplier(game.turnNumber).toFixed(2)}` : ''}</span></div>
             <div className="game-player-strip" aria-label="玩家现金与当前回合">
               {game.players.map(player => <button key={player.id} className={`${player.id === game.currentPlayerId ? 'is-current' : ''} ${player.isBankrupt ? 'is-bankrupt' : ''}`} title={`${player.name} · ${player.isBankrupt ? '观战中' : money(player.cash)}`} aria-label={`查看${player.name}的资产`} onClick={() => openInfo('assets', player.id)}>
                 <span className="player-token-small" style={{ borderColor: player.color }}><TokenImage token={player.token} />{player.turtleRollsRemaining > 0 && <span className="turtle-status-badge" title={`乌龟效果：剩余 ${player.turtleRollsRemaining} 次常规掷骰`}><img src={ITEMS.turtle.image} alt="乌龟效果" /><b>{player.turtleRollsRemaining}</b></span>}</span>
@@ -148,7 +148,7 @@ export function GamePage({ room, game, playerId, events, connectionStatus, comma
           <LandingDialog game={game} playerId={playerId} decisionsReady={!isPlaying} clockOffset={clockOffset} soundEnabled={soundEnabled} onCommand={onCommand} deadline={room.turnDeadline} watching={!!decisionKey && watchedDecision === decisionKey && !panel} onDismiss={() => setWatchedDecision(null)} />
         </section>
 
-        {panel?.type === 'info' && <GameInfoPanel game={game} playerId={playerId} roomCode={room.roomCode} initialTab={panel.tab} initialOwner={panel.owner} onCommand={onCommand} onClose={() => setPanel(null)} />}
+        {panel?.type === 'info' && <GameInfoPanel key={`${panel.tab}:${panel.owner}`} game={game} playerId={playerId} roomCode={room.roomCode} initialTab={panel.tab} initialOwner={panel.owner} onCommand={onCommand} onClose={() => setPanel(null)} />}
 
       </div>
 

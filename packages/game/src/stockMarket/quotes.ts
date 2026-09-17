@@ -1,8 +1,33 @@
 import type { GameView } from '../types.js'
-import { STOCK_IDS, type StockSaleSelection, type StockTrade } from './types.js'
-import { stockCashValue } from './portfolio.js'
+import { STOCK_IDS, type StockFunding, type StockSaleSelection, type StockTrade } from './types.js'
+import { stockCashValue, stockPortfolioSummary, stockPositionValue, suggestStockSales } from './portfolio.js'
 
 type MarketContext = Pick<GameView, 'phase' | 'players' | 'pendingAuction' | 'pendingDebt' | 'stockMarket'>
+type PaymentContext = Pick<GameView, 'players' | 'stockMarket'>
+
+/** Use the same per-position integer proceeds as an actual portfolio sale. */
+export function stockPaymentCapacity(state: PaymentContext, playerId: string): number {
+  const player = state.players.find(entry => entry.id === playerId)
+  if (!player || player.isBankrupt) return 0
+  return player.cash + stockPortfolioSummary(state.stockMarket, playerId).marketValue
+}
+
+/** Preview a cash-first payment, selling only enough whole shares to cover the gap. */
+export function stockPaymentQuote(state: PaymentContext, playerId: string, amount: number) {
+  const player = state.players.find(entry => entry.id === playerId)
+  const cash = player?.cash ?? 0
+  const availableFunds = stockPaymentCapacity(state, playerId)
+  const validAmount = Number.isSafeInteger(amount) && amount >= 0
+  const sales = validAmount ? suggestStockSales(state.stockMarket, playerId, amount - cash) : []
+  const proceeds = sales.reduce((total, sale) => total + stockCashValue(state.stockMarket!.stocks[sale.stockId].priceCents, sale.quantity), 0)
+  const balanceAfter = cash + proceeds - amount
+  const remaining = Math.max(0, amount - availableFunds)
+  const reason = !player || player.isBankrupt ? '当前不能付款'
+    : !validAmount || !Number.isSafeInteger(cash + proceeds) ? '付款金额超出可结算范围'
+    : balanceAfter < 0 ? `现金与持股不足，还差 ¥${remaining.toLocaleString('zh-CN')}` : null
+  const stockFunding: StockFunding | undefined = sales.length ? { stockSales: sales, quoteRevision: state.stockMarket!.quoteRevision } : undefined
+  return { allowed: reason === null, reason, cash, amount, availableFunds, proceeds, balanceAfter, remaining, stockFunding }
+}
 
 export function stockAvailableCash(state: MarketContext, playerId: string): number {
   const cash = state.players.find(player => player.id === playerId)?.cash ?? 0
@@ -31,6 +56,12 @@ export function stockTradeQuote(state: MarketContext, playerId: string, trade: S
   } else {
     if ((position?.quantity ?? 0) < trade.quantity) return result('持有股数不足')
     if (!Number.isSafeInteger(player.cash + amount)) return result('到账金额超出可结算范围')
+    // Splitting a sale can lose one yuan to rounding. Even that must not spend
+    // funds already committed to a sealed bid.
+    const reserved = Math.max(0, state.pendingAuction?.bids[playerId] ?? 0)
+    const fundsAfter = stockPaymentCapacity(state, playerId) - stockPositionValue(market, playerId, trade.stockId)
+      + stockCashValue(market.stocks[trade.stockId].priceCents, (position?.quantity ?? 0) - trade.quantity) + amount
+    if (fundsAfter < reserved) return result('卖出后资金不足以支付已提交的竞拍报价，请调整股数')
   }
   return result(null)
 }

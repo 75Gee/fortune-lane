@@ -1,0 +1,1276 @@
+{
+  "modelVersion": 8,
+  "runsPerStock": 50000,
+  "updatesPerPath": 70,
+  "playerHandoffs": 350,
+  "startPrice": 100,
+  "random": "Mulberry32",
+  "firstSeed": 2026291700,
+  "lastSeed": 2026341699,
+  "sourceHashes": {
+    "model.ts": "7effaeb3194a64089e4a5db4bad32fe7159d573b7ad195b41d39f0ec7a2dac4b",
+    "parameters.ts": "2d38502399ca96ff9f1728d6db02673c79bb92cdaa377d8c0ceeacd0c6740b9f",
+    "portfolio.ts": "fd1409e2c4c2902fa126c5bf6facc35295d126e7261fa9e6db9153234f6cbb45"
+  },
+  "methodology": "50k is the final default; CLI may override for disjoint development runs. Each market generates four correlated paths. Buy and hold uses 100 shares per stock (10000 yuan); equal weight buys 100 of each (40000 yuan), no rebalancing. Strategies each start with 10000 yuan, trade whole shares all-in/all-out using actual integer settlement, no proportional fees. Signals observe quote t and trade at t, before update t+1. No future data, no hidden states. All sell at final quote. Projects use only currently published probability. 95/105 holds its position between strict thresholds; momentum means 3-period cumulative gain; moving averages wait for 20 quotes. No property cash needs or game-winning utility included.",
+  "confidenceMethod": "Mean ± 1.96 sample standard error; excess is paired against hold on the same path. These intervals do not describe individual outcomes or correct for multiple strategy comparisons.",
+  "statistics": [
+    {
+      "id": "civic",
+      "name": "城市公用",
+      "meanReturnPercent": 2.1365538000000086,
+      "meanReturnCI95": [
+        2.0907688039651466,
+        2.1823387960348706
+      ],
+      "medianReturnPercent": 2.0000000000000018,
+      "outcomeRange90": [
+        -6.270499999999995,
+        10.929999999999996
+      ],
+      "positivePercent": 65.048,
+      "doubledPercent": 0,
+      "halvedPercent": 0,
+      "observedRange": [
+        -17.259999999999998,
+        26.160000000000004
+      ],
+      "returnStdDevPercent": 5.223385892015781,
+      "meanPathLowPrice": 97.12597060000051,
+      "meanPathHighPrice": 105.10977219999947,
+      "meanPerPeriodVolatilityPercent": 0.6704620313421992,
+      "medianMaxDrawdownPercent": 4.567098990425766
+    },
+    {
+      "id": "transit",
+      "name": "环球交通",
+      "meanReturnPercent": 2.8992999999999767,
+      "meanReturnCI95": [
+        2.7602013673278925,
+        3.038398632672061
+      ],
+      "medianReturnPercent": 1.7900000000000027,
+      "outcomeRange90": [
+        -21.040000000000003,
+        30.780499999999964
+      ],
+      "positivePercent": 54.52,
+      "doubledPercent": 0,
+      "halvedPercent": 0,
+      "observedRange": [
+        -44.68,
+        92.97999999999999
+      ],
+      "returnStdDevPercent": 15.869081542451692,
+      "meanPathLowPrice": 89.77848440000007,
+      "meanPathHighPrice": 114.25421540000022,
+      "meanPerPeriodVolatilityPercent": 2.070704253433856,
+      "medianMaxDrawdownPercent": 15.446901961470605
+    },
+    {
+      "id": "travel",
+      "name": "海岛文旅",
+      "meanReturnPercent": 3.378423399999981,
+      "meanReturnCI95": [
+        3.149911194087881,
+        3.606935605912081
+      ],
+      "medianReturnPercent": 0.29999999999998916,
+      "outcomeRange90": [
+        -33.379999999999995,
+        50.66
+      ],
+      "positivePercent": 50.486,
+      "doubledPercent": 0.298,
+      "halvedPercent": 0.25,
+      "observedRange": [
+        -66.78,
+        203.27
+      ],
+      "returnStdDevPercent": 26.06983806672884,
+      "meanPathLowPrice": 83.81443479999959,
+      "meanPathHighPrice": 122.22277820000109,
+      "meanPerPeriodVolatilityPercent": 3.1406955096702864,
+      "medianMaxDrawdownPercent": 23.30892104725153
+    },
+    {
+      "id": "tech",
+      "name": "奇趣科技",
+      "meanReturnPercent": 4.481350200000029,
+      "meanReturnCI95": [
+        4.05379301889526,
+        4.908907381104798
+      ],
+      "medianReturnPercent": -5.410000000000004,
+      "outcomeRange90": [
+        -55.370000000000005,
+        98.37
+      ],
+      "positivePercent": 45.269999999999996,
+      "doubledPercent": 4.816,
+      "halvedPercent": 8.278,
+      "observedRange": [
+        -83.67,
+        362.95000000000005
+      ],
+      "returnStdDevPercent": 48.77790414379853,
+      "meanPathLowPrice": 73.07820479999985,
+      "meanPathHighPrice": 138.77376400000009,
+      "meanPerPeriodVolatilityPercent": 5.300873786078798,
+      "medianMaxDrawdownPercent": 37.5399981178242
+    },
+    {
+      "id": "equal_weight",
+      "name": "四股等额组合",
+      "meanReturnPercent": 3.223906849999999,
+      "meanReturnCI95": [
+        3.0950063539842447,
+        3.3528073460157537
+      ],
+      "medianReturnPercent": 1.277499999999998,
+      "outcomeRange90": [
+        -17.202624999999998,
+        30.09762499999999
+      ],
+      "positivePercent": 53.76,
+      "doubledPercent": 0,
+      "halvedPercent": 0,
+      "observedRange": [
+        -37.6325,
+        99.7025
+      ],
+      "returnStdDevPercent": 14.705626093095306,
+      "meanPathLowPrice": 91.9236107999999,
+      "meanPathHighPrice": 112.80920179999836,
+      "meanPerPeriodVolatilityPercent": 1.6834292696779027,
+      "medianMaxDrawdownPercent": 12.827662450034122
+    }
+  ],
+  "strategies": [
+    {
+      "id": "civic",
+      "strategy": "hold",
+      "meanReturnPercent": 2.1365538000000086,
+      "meanReturnCI95": [
+        2.0907688039651466,
+        2.1823387960348706
+      ],
+      "medianReturnPercent": 2.0000000000000018,
+      "outcomeRange90": [
+        -6.270499999999995,
+        10.929999999999996
+      ],
+      "positivePercent": 65.048,
+      "doubledPercent": 0,
+      "halvedPercent": 0,
+      "observedRange": [
+        -17.259999999999998,
+        26.160000000000004
+      ],
+      "returnStdDevPercent": 5.223385892015781,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": 0,
+        "meanReturnCI95": [
+          0,
+          0
+        ],
+        "medianReturnPercent": 0,
+        "outcomeRange90": [
+          0,
+          0
+        ],
+        "positivePercent": 0,
+        "doubledPercent": 0,
+        "halvedPercent": 0,
+        "observedRange": [
+          0,
+          0
+        ],
+        "returnStdDevPercent": 0
+      },
+      "medianMaxDrawdownPercent": 4.567098990425766,
+      "meanTrades": 2,
+      "meanExposurePercent": 100
+    },
+    {
+      "id": "civic",
+      "strategy": "band_95_105",
+      "meanReturnPercent": 0.2112803999999995,
+      "meanReturnCI95": [
+        0.19725268487141137,
+        0.22530811512858764
+      ],
+      "medianReturnPercent": 0,
+      "outcomeRange90": [
+        -0.9499999999999953,
+        2.9900000000000038
+      ],
+      "positivePercent": 11.404,
+      "doubledPercent": 0,
+      "halvedPercent": 0,
+      "observedRange": [
+        -12.660000000000004,
+        12.339999999999996
+      ],
+      "returnStdDevPercent": 1.6003532957410864,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -1.9252733999999525,
+        "meanReturnCI95": [
+          -1.9717092341573,
+          -1.878837565842605
+        ],
+        "medianReturnPercent": -1.8799999999999928,
+        "outcomeRange90": [
+          -10.929999999999996,
+          5.570000000000008
+        ],
+        "positivePercent": 36.84,
+        "doubledPercent": 0,
+        "halvedPercent": 0,
+        "observedRange": [
+          -26.160000000000004,
+          11.330000000000005
+        ],
+        "returnStdDevPercent": 5.297636824884456
+      },
+      "medianMaxDrawdownPercent": 0,
+      "meanTrades": 0.37168,
+      "meanExposurePercent": 8.579771428571426
+    },
+    {
+      "id": "civic",
+      "strategy": "momentum_3",
+      "meanReturnPercent": 0.2612087999999729,
+      "meanReturnCI95": [
+        0.22710910645681334,
+        0.2953084935431324
+      ],
+      "medianReturnPercent": 0,
+      "outcomeRange90": [
+        -5.640000000000001,
+        7.050000000000001
+      ],
+      "positivePercent": 49.924,
+      "doubledPercent": 0,
+      "halvedPercent": 0,
+      "observedRange": [
+        -13.490000000000002,
+        23.350000000000005
+      ],
+      "returnStdDevPercent": 3.8902669782864976,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -1.8753449999999992,
+        "meanReturnCI95": [
+          -1.907559625368445,
+          -1.8431303746315533
+        ],
+        "medianReturnPercent": -1.980000000000004,
+        "outcomeRange90": [
+          -7.729999999999992,
+          4.379999999999996
+        ],
+        "positivePercent": 29.792,
+        "doubledPercent": 0,
+        "halvedPercent": 0,
+        "observedRange": [
+          -14.72,
+          16.199999999999992
+        ],
+        "returnStdDevPercent": 3.675208785384396
+      },
+      "medianMaxDrawdownPercent": 3.5848497092702436,
+      "meanTrades": 19.38724,
+      "meanExposurePercent": 50.57377142857083
+    },
+    {
+      "id": "civic",
+      "strategy": "contrarian_3",
+      "meanReturnPercent": 1.6169827999999953,
+      "meanReturnCI95": [
+        1.586533525513339,
+        1.6474320744866515
+      ],
+      "medianReturnPercent": 1.7300000000000093,
+      "outcomeRange90": [
+        -4.310000000000002,
+        7.129999999999992
+      ],
+      "positivePercent": 68.92200000000001,
+      "doubledPercent": 0,
+      "halvedPercent": 0,
+      "observedRange": [
+        -16.369999999999997,
+        14.339999999999996
+      ],
+      "returnStdDevPercent": 3.4738085519241593,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -0.5195709999999977,
+        "meanReturnCI95": [
+          -0.5558487078574249,
+          -0.48329329214257044
+        ],
+        "medianReturnPercent": -0.24999999999999467,
+        "outcomeRange90": [
+          -7.749999999999992,
+          5.820000000000005
+        ],
+        "positivePercent": 47.618,
+        "doubledPercent": 0,
+        "halvedPercent": 0,
+        "observedRange": [
+          -21.2,
+          15.71
+        ],
+        "returnStdDevPercent": 4.138745961075792
+      },
+      "medianMaxDrawdownPercent": 2.873143655067217,
+      "meanTrades": 19.25268,
+      "meanExposurePercent": 44.807571428571364
+    },
+    {
+      "id": "civic",
+      "strategy": "contrarian_1",
+      "meanReturnPercent": 1.5051153999999922,
+      "meanReturnCI95": [
+        1.47329937630056,
+        1.5369314236994245
+      ],
+      "medianReturnPercent": 1.550000000000007,
+      "outcomeRange90": [
+        -4.569999999999997,
+        7.400499999999963
+      ],
+      "positivePercent": 66.44200000000001,
+      "doubledPercent": 0,
+      "halvedPercent": 0,
+      "observedRange": [
+        -14.280000000000005,
+        17.32
+      ],
+      "returnStdDevPercent": 3.629734273758916,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -0.6314383999999966,
+        "meanReturnCI95": [
+          -0.6668631440652473,
+          -0.596013655934746
+        ],
+        "medianReturnPercent": -0.44000000000000705,
+        "outcomeRange90": [
+          -7.570500000000007,
+          5.659999999999998
+        ],
+        "positivePercent": 45.688,
+        "doubledPercent": 0,
+        "halvedPercent": 0,
+        "observedRange": [
+          -24.52000000000001,
+          13.510000000000012
+        ],
+        "returnStdDevPercent": 4.041435500787377
+      },
+      "medianMaxDrawdownPercent": 3.0299999999999994,
+      "meanTrades": 35.64488,
+      "meanExposurePercent": 47.35139999999996
+    },
+    {
+      "id": "civic",
+      "strategy": "ma_5_20",
+      "meanReturnPercent": 0.6512443999999986,
+      "meanReturnCI95": [
+        0.6194547831083758,
+        0.6830340168916215
+      ],
+      "medianReturnPercent": 0.08999999999999009,
+      "outcomeRange90": [
+        -4.400000000000004,
+        7.420000000000004
+      ],
+      "positivePercent": 50.978,
+      "doubledPercent": 0,
+      "halvedPercent": 0,
+      "observedRange": [
+        -10.229999999999995,
+        20.629999999999992
+      ],
+      "returnStdDevPercent": 3.626721650425731,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -1.4853093999999822,
+        "meanReturnCI95": [
+          -1.5189000511070527,
+          -1.4517187488929117
+        ],
+        "medianReturnPercent": -1.6800000000000148,
+        "outcomeRange90": [
+          -7.440000000000002,
+          5.179999999999996
+        ],
+        "positivePercent": 32.872,
+        "doubledPercent": 0,
+        "halvedPercent": 0,
+        "observedRange": [
+          -17.110000000000003,
+          16.659999999999997
+        ],
+        "returnStdDevPercent": 3.8321928206065436
+      },
+      "medianMaxDrawdownPercent": 2.9771636929656733,
+      "meanTrades": 4.38488,
+      "meanExposurePercent": 41.5194857142852
+    },
+    {
+      "id": "transit",
+      "strategy": "hold",
+      "meanReturnPercent": 2.8992999999999767,
+      "meanReturnCI95": [
+        2.7602013673278925,
+        3.038398632672061
+      ],
+      "medianReturnPercent": 1.7900000000000027,
+      "outcomeRange90": [
+        -21.040000000000003,
+        30.780499999999964
+      ],
+      "positivePercent": 54.52,
+      "doubledPercent": 0,
+      "halvedPercent": 0,
+      "observedRange": [
+        -44.68,
+        92.97999999999999
+      ],
+      "returnStdDevPercent": 15.869081542451692,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": 0,
+        "meanReturnCI95": [
+          0,
+          0
+        ],
+        "medianReturnPercent": 0,
+        "outcomeRange90": [
+          0,
+          0
+        ],
+        "positivePercent": 0,
+        "doubledPercent": 0,
+        "halvedPercent": 0,
+        "observedRange": [
+          0,
+          0
+        ],
+        "returnStdDevPercent": 0
+      },
+      "medianMaxDrawdownPercent": 15.446901961470605,
+      "meanTrades": 2,
+      "meanExposurePercent": 100
+    },
+    {
+      "id": "transit",
+      "strategy": "band_95_105",
+      "meanReturnPercent": 2.4093847999999976,
+      "meanReturnCI95": [
+        2.3203438382784043,
+        2.498425761721591
+      ],
+      "medianReturnPercent": 0,
+      "outcomeRange90": [
+        -15.5905,
+        16.21999999999999
+      ],
+      "positivePercent": 42.964,
+      "doubledPercent": 0,
+      "halvedPercent": 0,
+      "observedRange": [
+        -40.76,
+        47.44999999999999
+      ],
+      "returnStdDevPercent": 10.158247101604067,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -0.48991520000007915,
+        "meanReturnCI95": [
+          -0.615584349456497,
+          -0.3642460505436613
+        ],
+        "medianReturnPercent": 5.0000000000000036,
+        "outcomeRange90": [
+          -29.109999999999992,
+          18.659999999999986
+        ],
+        "positivePercent": 64.286,
+        "doubledPercent": 0,
+        "halvedPercent": 0.538,
+        "observedRange": [
+          -92.97999999999999,
+          46.03999999999999
+        ],
+        "returnStdDevPercent": 14.33697759485362
+      },
+      "medianMaxDrawdownPercent": 6.2942037410809455,
+      "meanTrades": 1.57088,
+      "meanExposurePercent": 39.89185714285707
+    },
+    {
+      "id": "transit",
+      "strategy": "momentum_3",
+      "meanReturnPercent": 2.226320000000026,
+      "meanReturnCI95": [
+        2.1207937463524402,
+        2.331846253647612
+      ],
+      "medianReturnPercent": 0.9400000000000075,
+      "outcomeRange90": [
+        -15.3005,
+        23.629999999999995
+      ],
+      "positivePercent": 53.36,
+      "doubledPercent": 0,
+      "halvedPercent": 0,
+      "observedRange": [
+        -34.34,
+        77.85
+      ],
+      "returnStdDevPercent": 12.038973294228956,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -0.672979999999981,
+        "meanReturnCI95": [
+          -0.7772261835666044,
+          -0.5687338164333576
+        ],
+        "medianReturnPercent": -0.6099999999999994,
+        "outcomeRange90": [
+          -20.33049999999999,
+          18.810000000000002
+        ],
+        "positivePercent": 47.96,
+        "doubledPercent": 0,
+        "halvedPercent": 0,
+        "observedRange": [
+          -49.19000000000001,
+          46.83999999999999
+        ],
+        "returnStdDevPercent": 11.892936369892421
+      },
+      "medianMaxDrawdownPercent": 10.125370848885062,
+      "meanTrades": 18.4454,
+      "meanExposurePercent": 48.55488571428574
+    },
+    {
+      "id": "transit",
+      "strategy": "contrarian_3",
+      "meanReturnPercent": 0.5499104000000199,
+      "meanReturnCI95": [
+        0.45200144996478414,
+        0.6478193500352556
+      ],
+      "medianReturnPercent": 0.37000000000000366,
+      "outcomeRange90": [
+        -17.53,
+        19.22999999999999
+      ],
+      "positivePercent": 51.358000000000004,
+      "doubledPercent": 0,
+      "halvedPercent": 0,
+      "observedRange": [
+        -42.15,
+        54.2
+      ],
+      "returnStdDevPercent": 11.16995244308253,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -2.3493896000000274,
+        "meanReturnCI95": [
+          -2.460588335510411,
+          -2.2381908644896438
+        ],
+        "medianReturnPercent": -1.1900000000000028,
+        "outcomeRange90": [
+          -24.8005,
+          16.480000000000004
+        ],
+        "positivePercent": 46.086,
+        "doubledPercent": 0,
+        "halvedPercent": 0.16999999999999998,
+        "observedRange": [
+          -81.25,
+          39.31
+        ],
+        "returnStdDevPercent": 12.686118959859074
+      },
+      "medianMaxDrawdownPercent": 10.774679964018496,
+      "meanTrades": 18.40372,
+      "meanExposurePercent": 47.05405714285715
+    },
+    {
+      "id": "transit",
+      "strategy": "contrarian_1",
+      "meanReturnPercent": 0.848776400000031,
+      "meanReturnCI95": [
+        0.748806538659592,
+        0.9487462613404699
+      ],
+      "medianReturnPercent": 0.44999999999999485,
+      "outcomeRange90": [
+        -17.210000000000004,
+        20.21999999999999
+      ],
+      "positivePercent": 51.554,
+      "doubledPercent": 0,
+      "halvedPercent": 0,
+      "observedRange": [
+        -42.34,
+        68.02999999999999
+      ],
+      "returnStdDevPercent": 11.405071717267838,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -2.0505236000000653,
+        "meanReturnCI95": [
+          -2.1588922692131693,
+          -1.9421549307869612
+        ],
+        "medianReturnPercent": -1.1500000000000066,
+        "outcomeRange90": [
+          -23.79,
+          16.659999999999997
+        ],
+        "positivePercent": 45.938,
+        "doubledPercent": 0,
+        "halvedPercent": 0.126,
+        "observedRange": [
+          -71.22,
+          40.67
+        ],
+        "returnStdDevPercent": 12.363250560800472
+      },
+      "medianMaxDrawdownPercent": 10.857742455986795,
+      "meanTrades": 34.81524,
+      "meanExposurePercent": 48.73820000000063
+    },
+    {
+      "id": "transit",
+      "strategy": "ma_5_20",
+      "meanReturnPercent": -0.6185449999999708,
+      "meanReturnCI95": [
+        -0.7084390130110881,
+        -0.5286509869888535
+      ],
+      "medianReturnPercent": -2.2299999999999986,
+      "outcomeRange90": [
+        -14.41,
+        18.72049999999996
+      ],
+      "positivePercent": 40.111999999999995,
+      "doubledPercent": 0,
+      "halvedPercent": 0,
+      "observedRange": [
+        -28.500000000000004,
+        70.58
+      ],
+      "returnStdDevPercent": 10.255567544036165,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -3.517845000000053,
+        "meanReturnCI95": [
+          -3.6246732413024345,
+          -3.411016758697672
+        ],
+        "medianReturnPercent": -3.7499999999999867,
+        "outcomeRange90": [
+          -23.279999999999987,
+          16.869999999999997
+        ],
+        "positivePercent": 37.976,
+        "doubledPercent": 0,
+        "halvedPercent": 0.012,
+        "observedRange": [
+          -63.110000000000014,
+          43.57
+        ],
+        "returnStdDevPercent": 12.18751068718752
+      },
+      "medianMaxDrawdownPercent": 9.715767198845164,
+      "meanTrades": 4.43552,
+      "meanExposurePercent": 37.55719999999979
+    },
+    {
+      "id": "travel",
+      "strategy": "hold",
+      "meanReturnPercent": 3.378423399999981,
+      "meanReturnCI95": [
+        3.149911194087881,
+        3.606935605912081
+      ],
+      "medianReturnPercent": 0.29999999999998916,
+      "outcomeRange90": [
+        -33.379999999999995,
+        50.66
+      ],
+      "positivePercent": 50.486,
+      "doubledPercent": 0.298,
+      "halvedPercent": 0.25,
+      "observedRange": [
+        -66.78,
+        203.27
+      ],
+      "returnStdDevPercent": 26.06983806672884,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": 0,
+        "meanReturnCI95": [
+          0,
+          0
+        ],
+        "medianReturnPercent": 0,
+        "outcomeRange90": [
+          0,
+          0
+        ],
+        "positivePercent": 0,
+        "doubledPercent": 0,
+        "halvedPercent": 0,
+        "observedRange": [
+          0,
+          0
+        ],
+        "returnStdDevPercent": 0
+      },
+      "medianMaxDrawdownPercent": 23.30892104725153,
+      "meanTrades": 2,
+      "meanExposurePercent": 100
+    },
+    {
+      "id": "travel",
+      "strategy": "band_95_105",
+      "meanReturnPercent": 2.559241199999987,
+      "meanReturnCI95": [
+        2.415477111168557,
+        2.7030052888314167
+      ],
+      "medianReturnPercent": 0,
+      "outcomeRange90": [
+        -27.71,
+        28.810000000000002
+      ],
+      "positivePercent": 48.408,
+      "doubledPercent": 0,
+      "halvedPercent": 0.078,
+      "observedRange": [
+        -64.33,
+        87.41000000000001
+      ],
+      "returnStdDevPercent": 16.401340579101827,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -0.8191821999999933,
+        "meanReturnCI95": [
+          -1.015227254666382,
+          -0.6231371453336045
+        ],
+        "medianReturnPercent": 5.260000000000009,
+        "outcomeRange90": [
+          -46.331,
+          24.880000000000003
+        ],
+        "positivePercent": 67.392,
+        "doubledPercent": 0,
+        "halvedPercent": 4.124,
+        "observedRange": [
+          -203.27,
+          75.47000000000001
+        ],
+        "returnStdDevPercent": 22.365819841158554
+      },
+      "medianMaxDrawdownPercent": 11.99284471796086,
+      "meanTrades": 2.05104,
+      "meanExposurePercent": 45.98914285714336
+    },
+    {
+      "id": "travel",
+      "strategy": "momentum_3",
+      "meanReturnPercent": 1.7635504000000086,
+      "meanReturnCI95": [
+        1.6001208079434242,
+        1.926979992056593
+      ],
+      "medianReturnPercent": -0.7099999999999995,
+      "outcomeRange90": [
+        -24.039999999999996,
+        35.95099999999991
+      ],
+      "positivePercent": 48.348,
+      "doubledPercent": 0.03,
+      "halvedPercent": 0,
+      "observedRange": [
+        -46.51,
+        132.05
+      ],
+      "returnStdDevPercent": 18.64488149865216,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -1.6148730000001033,
+        "meanReturnCI95": [
+          -1.7779657629151682,
+          -1.4517802370850383
+        ],
+        "medianReturnPercent": -0.9899999999999967,
+        "outcomeRange90": [
+          -33.1005,
+          27.66049999999996
+        ],
+        "positivePercent": 47.97,
+        "doubledPercent": 0,
+        "halvedPercent": 0.83,
+        "observedRange": [
+          -110.09000000000002,
+          69.11
+        ],
+        "returnStdDevPercent": 18.60645431205826
+      },
+      "medianMaxDrawdownPercent": 15.656718127218483,
+      "meanTrades": 18.63612,
+      "meanExposurePercent": 47.87791428571476
+    },
+    {
+      "id": "travel",
+      "strategy": "contrarian_3",
+      "meanReturnPercent": 1.4605606000000215,
+      "meanReturnCI95": [
+        1.3073475561842516,
+        1.6137736438157915
+      ],
+      "medianReturnPercent": 0.7800000000000029,
+      "outcomeRange90": [
+        -26.090000000000003,
+        31.52049999999995
+      ],
+      "positivePercent": 51.775999999999996,
+      "doubledPercent": 0,
+      "halvedPercent": 0.03,
+      "observedRange": [
+        -58.79,
+        78.21000000000001
+      ],
+      "returnStdDevPercent": 17.47932556182221,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -1.9178628000000466,
+        "meanReturnCI95": [
+          -2.095729879342471,
+          -1.7399957206576226
+        ],
+        "medianReturnPercent": 0.6099999999999994,
+        "outcomeRange90": [
+          -38.59000000000002,
+          26.520499999999956
+        ],
+        "positivePercent": 51.370000000000005,
+        "doubledPercent": 0,
+        "halvedPercent": 2.36,
+        "observedRange": [
+          -170.98,
+          67.99
+        ],
+        "returnStdDevPercent": 20.291983692296363
+      },
+      "medianMaxDrawdownPercent": 15.92537459897203,
+      "meanTrades": 18.62824,
+      "meanExposurePercent": 47.766857142856956
+    },
+    {
+      "id": "travel",
+      "strategy": "contrarian_1",
+      "meanReturnPercent": 1.131294800000023,
+      "meanReturnCI95": [
+        0.9740744505934107,
+        1.2885151494066351
+      ],
+      "medianReturnPercent": 0.019999999999997797,
+      "outcomeRange90": [
+        -26.529999999999998,
+        32.489999999999995
+      ],
+      "positivePercent": 50.044,
+      "doubledPercent": 0.002,
+      "halvedPercent": 0.026,
+      "observedRange": [
+        -56.3,
+        114.23
+      ],
+      "returnStdDevPercent": 17.936499424461918,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -2.247128600000074,
+        "meanReturnCI95": [
+          -2.4208856024905416,
+          -2.0733715975096065
+        ],
+        "medianReturnPercent": -0.21000000000000085,
+        "outcomeRange90": [
+          -37.660500000000006,
+          26.340000000000007
+        ],
+        "positivePercent": 49.547999999999995,
+        "doubledPercent": 0,
+        "halvedPercent": 2.1239999999999997,
+        "observedRange": [
+          -176.21,
+          69.49000000000001
+        ],
+        "returnStdDevPercent": 19.823085159963576
+      },
+      "medianMaxDrawdownPercent": 16.34196461520883,
+      "meanTrades": 34.90796,
+      "meanExposurePercent": 49.17939999999964
+    },
+    {
+      "id": "travel",
+      "strategy": "ma_5_20",
+      "meanReturnPercent": 0.6375940000000878,
+      "meanReturnCI95": [
+        0.4925833460283809,
+        0.7826046539717948
+      ],
+      "medianReturnPercent": -2.485000000000004,
+      "outcomeRange90": [
+        -20.26,
+        32.440000000000005
+      ],
+      "positivePercent": 42.230000000000004,
+      "doubledPercent": 0.026,
+      "halvedPercent": 0,
+      "observedRange": [
+        -40.75,
+        124.77999999999997
+      ],
+      "returnStdDevPercent": 16.543555088899826,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -2.740829399999989,
+        "meanReturnCI95": [
+          -2.9141458345444162,
+          -2.5675129654555615
+        ],
+        "medianReturnPercent": -2.3249999999999975,
+        "outcomeRange90": [
+          -36.03049999999999,
+          28.870499999999964
+        ],
+        "positivePercent": 45.368,
+        "doubledPercent": 0,
+        "halvedPercent": 1.166,
+        "observedRange": [
+          -104.08000000000003,
+          66.78
+        ],
+        "returnStdDevPercent": 19.7728229213894
+      },
+      "medianMaxDrawdownPercent": 13.622406194418451,
+      "meanTrades": 4.24204,
+      "meanExposurePercent": 36.33945714285689
+    },
+    {
+      "id": "tech",
+      "strategy": "hold",
+      "meanReturnPercent": 4.481350200000029,
+      "meanReturnCI95": [
+        4.05379301889526,
+        4.908907381104798
+      ],
+      "medianReturnPercent": -5.410000000000004,
+      "outcomeRange90": [
+        -55.370000000000005,
+        98.37
+      ],
+      "positivePercent": 45.269999999999996,
+      "doubledPercent": 4.816,
+      "halvedPercent": 8.278,
+      "observedRange": [
+        -83.67,
+        362.95000000000005
+      ],
+      "returnStdDevPercent": 48.77790414379853,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": 0,
+        "meanReturnCI95": [
+          0,
+          0
+        ],
+        "medianReturnPercent": 0,
+        "outcomeRange90": [
+          0,
+          0
+        ],
+        "positivePercent": 0,
+        "doubledPercent": 0,
+        "halvedPercent": 0,
+        "observedRange": [
+          0,
+          0
+        ],
+        "returnStdDevPercent": 0
+      },
+      "medianMaxDrawdownPercent": 37.5399981178242,
+      "meanTrades": 2,
+      "meanExposurePercent": 100
+    },
+    {
+      "id": "tech",
+      "strategy": "band_95_105",
+      "meanReturnPercent": 1.9448476000000365,
+      "meanReturnCI95": [
+        1.6854609295893557,
+        2.2042342704107174
+      ],
+      "medianReturnPercent": 0,
+      "outcomeRange90": [
+        -49.62049999999999,
+        48.99
+      ],
+      "positivePercent": 48.815999999999995,
+      "doubledPercent": 0.13,
+      "halvedPercent": 4.854,
+      "observedRange": [
+        -82.17999999999999,
+        154.40999999999997
+      ],
+      "returnStdDevPercent": 29.592154464062023,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -2.5365026000001567,
+        "meanReturnCI95": [
+          -2.902551371409737,
+          -2.1704538285905763
+        ],
+        "medianReturnPercent": 5.729999999999991,
+        "outcomeRange90": [
+          -89.05050000000001,
+          45.56
+        ],
+        "positivePercent": 70.084,
+        "doubledPercent": 0.084,
+        "halvedPercent": 11.63,
+        "observedRange": [
+          -345.98,
+          128.58
+        ],
+        "returnStdDevPercent": 41.76071101796446
+      },
+      "medianMaxDrawdownPercent": 20.69366109142392,
+      "meanTrades": 2.40632,
+      "meanExposurePercent": 48.39900000000009
+    },
+    {
+      "id": "tech",
+      "strategy": "momentum_3",
+      "meanReturnPercent": 2.2895274000000208,
+      "meanReturnCI95": [
+        1.9961238135682775,
+        2.582930986431764
+      ],
+      "medianReturnPercent": -3.1299999999999994,
+      "outcomeRange90": [
+        -41.53,
+        64.80149999999986
+      ],
+      "positivePercent": 45.918,
+      "doubledPercent": 1.256,
+      "halvedPercent": 1.5559999999999998,
+      "observedRange": [
+        -73.98,
+        295.10999999999996
+      ],
+      "returnStdDevPercent": 33.47297776038842,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -2.1918227999999957,
+        "meanReturnCI95": [
+          -2.4877210759283,
+          -1.8959245240716913
+        ],
+        "medianReturnPercent": 1.4700000000000095,
+        "outcomeRange90": [
+          -63.290000000000006,
+          46.18999999999999
+        ],
+        "positivePercent": 51.824000000000005,
+        "doubledPercent": 0.004,
+        "halvedPercent": 8.437999999999999,
+        "observedRange": [
+          -229.70999999999995,
+          104.34000000000002
+        ],
+        "returnStdDevPercent": 33.75758466329993
+      },
+      "medianMaxDrawdownPercent": 24.373599687715924,
+      "meanTrades": 18.07168,
+      "meanExposurePercent": 48.02388571428527
+    },
+    {
+      "id": "tech",
+      "strategy": "contrarian_3",
+      "meanReturnPercent": 1.8360932000000565,
+      "meanReturnCI95": [
+        1.5561128984816732,
+        2.1160735015184398
+      ],
+      "medianReturnPercent": -1.639999999999997,
+      "outcomeRange90": [
+        -44.089999999999996,
+        58.94999999999999
+      ],
+      "positivePercent": 47.924,
+      "doubledPercent": 0.654,
+      "halvedPercent": 2.504,
+      "observedRange": [
+        -78.38000000000001,
+        200.49
+      ],
+      "returnStdDevPercent": 31.941580946734312,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -2.6452570000000355,
+        "meanReturnCI95": [
+          -2.970496829290808,
+          -2.320017170709263
+        ],
+        "medianReturnPercent": 2.839999999999999,
+        "outcomeRange90": [
+          -70.6905,
+          46.99099999999992
+        ],
+        "positivePercent": 54.052,
+        "doubledPercent": 0.084,
+        "halvedPercent": 9.53,
+        "observedRange": [
+          -347.82000000000005,
+          139.57999999999998
+        ],
+        "returnStdDevPercent": 37.10501873900992
+      },
+      "medianMaxDrawdownPercent": 25.55008923432771,
+      "meanTrades": 18.06196,
+      "meanExposurePercent": 47.6309714285711
+    },
+    {
+      "id": "tech",
+      "strategy": "contrarian_1",
+      "meanReturnPercent": 1.9718468000000786,
+      "meanReturnCI95": [
+        1.6904887705909122,
+        2.253204829409245
+      ],
+      "medianReturnPercent": -1.6900000000000026,
+      "outcomeRange90": [
+        -43.84,
+        60.12
+      ],
+      "positivePercent": 47.82,
+      "doubledPercent": 0.69,
+      "halvedPercent": 2.426,
+      "observedRange": [
+        -79.32000000000001,
+        218.22
+      ],
+      "returnStdDevPercent": 32.0987591721572,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -2.509503400000163,
+        "meanReturnCI95": [
+          -2.829162151023684,
+          -2.1898446489766417
+        ],
+        "medianReturnPercent": 2.70999999999999,
+        "outcomeRange90": [
+          -69.80050000000003,
+          46.719999999999985
+        ],
+        "positivePercent": 53.762,
+        "doubledPercent": 0.046,
+        "halvedPercent": 9.212,
+        "observedRange": [
+          -354.92,
+          153.74999999999997
+        ],
+        "returnStdDevPercent": 36.46830086179969
+      },
+      "medianMaxDrawdownPercent": 25.21212793559298,
+      "meanTrades": 35.01608,
+      "meanExposurePercent": 49.02322857142858
+    },
+    {
+      "id": "tech",
+      "strategy": "ma_5_20",
+      "meanReturnPercent": 1.7004203999999317,
+      "meanReturnCI95": [
+        1.4401069819189813,
+        1.960733818080882
+      ],
+      "medianReturnPercent": -3.9349999999999996,
+      "outcomeRange90": [
+        -33.9,
+        58.86
+      ],
+      "positivePercent": 41.5,
+      "doubledPercent": 1.192,
+      "halvedPercent": 0.27599999999999997,
+      "observedRange": [
+        -65.01,
+        265.98
+      ],
+      "returnStdDevPercent": 29.697882565526918,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -2.780929799999983,
+        "meanReturnCI95": [
+          -3.0943250645622804,
+          -2.467534535437686
+        ],
+        "medianReturnPercent": 0.46999999999999176,
+        "outcomeRange90": [
+          -66.67049999999998,
+          49.899999999999984
+        ],
+        "positivePercent": 50.544,
+        "doubledPercent": 0.002,
+        "halvedPercent": 10.038,
+        "observedRange": [
+          -223.92000000000002,
+          101.34
+        ],
+        "returnStdDevPercent": 35.75373037692999
+      },
+      "medianMaxDrawdownPercent": 19.956410193359694,
+      "meanTrades": 3.60436,
+      "meanExposurePercent": 35.40974285714264
+    },
+    {
+      "id": "tech",
+      "strategy": "project_good_news",
+      "meanReturnPercent": 0.5218652000000067,
+      "meanReturnCI95": [
+        0.3567180933755656,
+        0.6870123066244478
+      ],
+      "medianReturnPercent": 0,
+      "outcomeRange90": [
+        -29.779999999999994,
+        32.830000000000005
+      ],
+      "positivePercent": 44.01,
+      "doubledPercent": 0.026,
+      "halvedPercent": 0.234,
+      "observedRange": [
+        -66.14,
+        137.29
+      ],
+      "returnStdDevPercent": 18.840824321411027,
+      "pairedExcessOverHold": {
+        "meanReturnPercent": -3.9594849999997916,
+        "meanReturnCI95": [
+          -4.346501428121619,
+          -3.5724685718779643
+        ],
+        "medianReturnPercent": 4.004999999999999,
+        "outcomeRange90": [
+          -87.99999999999999,
+          52.16
+        ],
+        "positivePercent": 53.992,
+        "doubledPercent": 0,
+        "halvedPercent": 13.655999999999999,
+        "observedRange": [
+          -343.9100000000001,
+          98.30000000000001
+        ],
+        "returnStdDevPercent": 44.1528082494677
+      },
+      "medianMaxDrawdownPercent": 7.587927207475221,
+      "meanTrades": 4.01384,
+      "meanExposurePercent": 9.976714285713438
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import { TOKEN_IDS, type TokenId } from '@fortune/game'
 import type { RoomSnapshot } from '@fortune/protocol'
 import { ArrowRight, DoorOpen, Plus, Users } from 'lucide-react'
-import { lazy, Suspense, useState, type FormEvent } from 'react'
+import { lazy, Suspense, useLayoutEffect, useState, type FormEvent } from 'react'
 import { Brand } from '../components/Brand.js'
 import { SavedRoomsList } from '../components/SavedRoomsList.js'
 import { TokenImage } from '../components/TokenImage.js'
@@ -29,13 +29,15 @@ function inviteRoomCode(): string {
 }
 
 export function HomePage({ connected, onCreate, onJoin, pending = false, savedRooms = [], savedRoomsStatus, removedRoomCount, onResume, onRemoveSavedRooms, onUndoRemoveSavedRooms }: HomePageProps) {
+  useLayoutEffect(() => { window.scrollTo(0, 0) }, [])
   const initialRoomCode = inviteRoomCode()
   const [mode, setMode] = useState<'create' | 'join'>(initialRoomCode ? 'join' : 'create')
   const [name, setName] = useState('')
   const [roomCode, setRoomCode] = useState(initialRoomCode)
   const [token, setToken] = useState<TokenId>('suitcase')
   const [submitting, setSubmitting] = useState(false)
-  const [showEntry, setShowEntry] = useState(() => !!initialRoomCode || savedRooms.length === 0)
+  const hasActiveRoom = savedRooms.some(room => room.phase !== 'finished')
+  const [showEntry, setShowEntry] = useState(() => !!initialRoomCode || !hasActiveRoom)
   const [debugOpen, setDebugOpen] = useState(false)
 
   const submit = async (event: FormEvent) => {
@@ -76,10 +78,9 @@ export function HomePage({ connected, onCreate, onJoin, pending = false, savedRo
         <form className="entry-form" onSubmit={submit}>
           <SavedRoomsList rooms={savedRooms} connected={connected} pending={pending || submitting} status={savedRoomsStatus} removedCount={removedRoomCount} onResume={onResume} onRemove={onRemoveSavedRooms} onUndoRemove={onUndoRemoveSavedRooms} />
           {pending && !submitting && <p className="copy-feedback" role="status">正在连接房间…</p>}
-          {savedRooms.length > 0 && <button className="entry-alternative" type="button" aria-expanded={showEntry} onClick={() => setShowEntry(value => !value)}>{showEntry ? '收起房间操作' : '创建或加入其他房间'}</button>}
-          <div className="entry-fields" hidden={savedRooms.length > 0 && !showEntry}><div className="entry-title">
+          {hasActiveRoom && !showEntry && <div className="entry-new-room"><span>开始新的对局</span><div><button type="button" onClick={() => { setMode('create'); setShowEntry(true) }}><Plus size={17} />创建房间</button><button type="button" onClick={() => { setMode('join'); setShowEntry(true) }}><DoorOpen size={17} />加入房间</button></div></div>}
+          <div className="entry-fields" hidden={hasActiveRoom && !showEntry}><div className="entry-title">
             <span className="eyebrow"><Users size={15} /> 2–6 位玩家</span>
-            <h2>{mode === 'create' ? '创建房间' : '加入好友房间'}</h2>
           </div>
 
           <div className="segmented" role="group" aria-label="房间操作">
@@ -130,7 +131,6 @@ export function HomePage({ connected, onCreate, onJoin, pending = false, savedRo
                 >
                   <TokenImage token={id} />
                   <span>{TOKEN_META[id].name}</span>
-                  <small>{TOKEN_META[id].city}</small>
                 </button>
               ))}
             </div>

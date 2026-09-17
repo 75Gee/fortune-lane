@@ -38,6 +38,16 @@ export function publicGameState(state: GameState, viewerId?: string): GameView {
         return [id, { priceCents: quote.priceCents, previousPriceCents: quote.previousPriceCents, history: quote.history }]
       })) as StockMarketView['stocks'],
       portfolios: state.stockMarket.portfolios,
+      project: state.stockMarket.project ? {
+        probability: state.stockMarket.project.probability,
+        exposure: state.stockMarket.project.exposure,
+        revealTurn: state.stockMarket.project.revealTurn,
+      } : null,
+      projectNews: state.stockMarket.projectNews ? {
+        turn: state.stockMarket.projectNews.turn,
+        kind: state.stockMarket.projectNews.kind,
+        probability: state.stockMarket.projectNews.probability,
+      } : null,
     } } : {}),
   })
 }

@@ -10,3 +10,11 @@ dist
 
 # Local production operations record
 docs/deployment.md
+
+# Generated UI reviews and stock development previews
+/docs/previews/ui-*/
+/docs/previews/stock-v*/development-*/
+/docs/previews/stock-v*/*-5x70.png
+/docs/previews/stock-v*/*.csv
+/docs/previews/stock-v*/simulation.json
+/docs/previews/stock-v*/*/terminal-returns.csv

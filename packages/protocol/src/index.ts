@@ -115,6 +115,11 @@ export const joinRoomSchema = z.object({
 
 export const readySchema = z.object({ ready: z.boolean() })
 
+const stockFundingSchema = z.object({
+  stockSales: z.array(z.object({ stockId: z.enum(STOCK_IDS), quantity: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER) })).min(1).max(STOCK_IDS.length),
+  quoteRevision: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
+})
+
 export const gameCommandSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('TRADE_STOCK'), stockId: z.enum(STOCK_IDS), side: z.enum(['buy', 'sell']), quantity: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER), quoteRevision: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER) }),
   z.object({ type: z.literal('ROLL_DICE') }),
@@ -123,25 +128,25 @@ export const gameCommandSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('USE_CHOSEN_DIE'), value: z.number().int().min(1).max(6) }),
   z.object({ type: z.literal('PLACE_ROADBLOCK'), tileIndex: z.number().int().min(0).max(BOARD.length - 1) }),
   z.object({ type: z.literal('PLACE_BOMB'), tileIndex: z.number().int().min(0).max(BOARD.length - 1) }),
-  z.object({ type: z.literal('BUY_PROPERTY') }),
+  z.object({ type: z.literal('BUY_PROPERTY'), stockFunding: stockFundingSchema.optional() }),
   z.object({ type: z.literal('SKIP_PURCHASE') }),
   z.object({ type: z.literal('BID_AUCTION'), auctionId: z.string().min(1).max(80), amount: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER) }),
   z.object({ type: z.literal('SURRENDER') }),
-  z.object({ type: z.literal('UPGRADE_PROPERTY') }),
+  z.object({ type: z.literal('UPGRADE_PROPERTY'), stockFunding: stockFundingSchema.optional() }),
   z.object({ type: z.literal('SKIP_UPGRADE') }),
   z.object({ type: z.literal('CHOOSE_CARD'), choiceId: z.string().min(1).max(100), cardIndex: z.union([z.literal(0), z.literal(1), z.literal(2)]) }),
   z.object({ type: z.literal('CHOOSE_CARD_PROPERTY'), choiceId: z.string().min(1).max(80), tileIndex: z.number().int().min(0).max(BOARD.length - 1) }),
   z.object({ type: z.literal('SPIN_WHEEL'), wheelId: z.string().min(1).max(80) }),
   z.object({ type: z.literal('CHOOSE_WHEEL_PROPERTY'), wheelId: z.string().min(1).max(80), tileIndex: z.number().int().min(0).max(BOARD.length - 1) }),
   z.object({ type: z.literal('MORTGAGE_ASSET'), tileIndex: z.number().int().min(0).max(BOARD.length - 1) }),
-  z.object({ type: z.literal('REDEEM_ASSET'), tileIndex: z.number().int().min(0).max(BOARD.length - 1) }),
+  z.object({ type: z.literal('REDEEM_ASSET'), tileIndex: z.number().int().min(0).max(BOARD.length - 1), stockFunding: stockFundingSchema.optional() }),
   z.object({ type: z.literal('SELL_BUILDING'), tileIndex: z.number().int().min(0).max(BOARD.length - 1) }),
   z.object({ type: z.literal('LIQUIDATE_ASSETS'), selections: z.array(z.object({
     tileIndex: z.number().int().min(0).max(BOARD.length - 1),
     sellLevels: z.number().int().min(0).max(MAX_PROPERTY_LEVEL),
     mortgage: z.boolean(),
   })).max(BOARD.length), stockSales: z.array(z.object({ stockId: z.enum(STOCK_IDS), quantity: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER) })).max(STOCK_IDS.length).optional(), quoteRevision: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER).optional() }),
-  z.object({ type: z.literal('PAY_JAIL_FINE') }),
+  z.object({ type: z.literal('PAY_JAIL_FINE'), stockFunding: stockFundingSchema.optional() }),
   z.object({ type: z.literal('USE_JAIL_CARD') }),
   z.object({ type: z.literal('TRY_JAIL_ROLL') }),
   z.object({ type: z.literal('SETTLE_DEBT') }),

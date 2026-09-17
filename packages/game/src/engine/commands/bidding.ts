@@ -1,4 +1,5 @@
 import { auctionMinimumBid } from '../../economy.js'
+import { stockPaymentCapacity } from '../../stockMarket/quotes.js'
 import { type CommandResult, type GameCommand } from '../../types.js'
 
 import { finishAuction } from '../auction.js'
@@ -14,7 +15,7 @@ export function handleBidding({ current, state, player, playerId, events, random
       if (now >= auction.deadline) return commandError(current, '竞拍已截止')
       if (Object.hasOwn(auction.bids, playerId)) return commandError(current, '已经提交，不能修改出价')
       const minimumBid = auctionMinimumBid(auction.tileIndex)
-      if (!Number.isSafeInteger(command.amount) || (command.amount !== 0 && command.amount < minimumBid) || command.amount < 0 || command.amount > player.cash) return commandError(current, `出价须为不低于 ${minimumBid} 元的整数，且不能超过现金；也可放弃竞拍`)
+      if (!Number.isSafeInteger(command.amount) || (command.amount !== 0 && command.amount < minimumBid) || command.amount < 0 || command.amount > stockPaymentCapacity(state, playerId)) return commandError(current, `出价须为不低于 ${minimumBid} 元的整数，且不能超过现金与持股可变现额；也可放弃竞拍`)
       auction.bids[playerId] = command.amount
       addEvent(state, events, { type: 'AUCTION_BID', playerId, message: `${player.name} 已提交竞拍选择` })
       finishAuction(state, random, events)

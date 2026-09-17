@@ -4,7 +4,6 @@ The six city souvenir SVG player pieces under `tokens/` are original project art
 Beijing opera mask, Tokyo maneki-neko, Paris croissant, London double-decker bus,
 New York yellow taxi, and Venice gondola.
 `world-tour.svg` is original project artwork for the room setup and game board.
-`world-tour-cats.png` is a user-provided project asset.
 
 The four PNGs under `items/` are cropped from the user-provided four-panel artwork
 `ChatGPT Image 2026年9月11日 14_08_45.png` (1254×1254). Each crop is 611×611,

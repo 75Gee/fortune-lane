@@ -8,6 +8,7 @@ import { addEvent, playerById, roll } from './context.js'
 import { createDebt } from './finance.js'
 import { leaveDetention, moveBy, moveTo, sendToDetention, sendToJail } from './movement.js'
 import { transitionTo } from './transitions.js'
+import { stockPaymentCapacity } from '../stockMarket/quotes.js'
 
 export function finishLanding(state: GameState): void {
   if (state.phase === 'FINISHED' || state.pendingDecision || state.pendingCardChoice || state.pendingCardProperty || state.pendingWheel || state.pendingDebt || state.pendingAuction) return
@@ -201,12 +202,12 @@ export function resolveLanding(
         tile.kind === 'property' &&
         !tileState.mortgaged &&
         tileState.level < MAX_PROPERTY_LEVEL &&
-        player.cash >= (tile.buildCost ?? Number.POSITIVE_INFINITY)
+        stockPaymentCapacity(state, player.id) >= (tile.buildCost ?? Number.POSITIVE_INFINITY)
       ) {
         transitionTo(state, { phase: 'WAITING_FOR_UPGRADE', pendingDecision: { type: 'upgrade', playerId: player.id, tileIndex: tile.index } })
         return
       }
-      addEvent(state, events, { type: 'LANDING_RESOLVED', playerId: player.id, tileIndex: tile.index, message: `${player.name} 回到自己的 ${tile.name}，${tileState.mortgaged ? '已抵押，不能加盖' : tile.kind !== 'property' ? '无需付费' : tileState.level >= MAX_PROPERTY_LEVEL ? '已达到最高等级' : '现金不足，本次不加盖'}` })
+      addEvent(state, events, { type: 'LANDING_RESOLVED', playerId: player.id, tileIndex: tile.index, message: `${player.name} 回到自己的 ${tile.name}，${tileState.mortgaged ? '已抵押，不能加盖' : tile.kind !== 'property' ? '无需付费' : tileState.level >= MAX_PROPERTY_LEVEL ? '已达到最高等级' : '现金与持股可变现额不足，本次不加盖'}` })
       finishLanding(state)
       return
     }

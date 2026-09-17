@@ -6,18 +6,21 @@ import { addEvent, commandError, roll } from '../context.js'
 import { createDebt } from '../finance.js'
 import { resolveLanding } from '../landing.js'
 import { leaveDetention, moveBy } from '../movement.js'
+import { fundStockPayment } from '../stockTrading.js'
 import { advancePlayer } from '../turns.js'
 
 import type { CommandContext } from './context.js'
 
 export function handleDetention({ current, state, player, playerId, events, random, now }: CommandContext, command: Extract<GameCommand, { type: 'PAY_JAIL_FINE' | 'USE_JAIL_CARD' | 'TRY_JAIL_ROLL' }>): CommandResult | undefined {
   switch (command.type) {
-    case 'PAY_JAIL_FINE':
+    case 'PAY_JAIL_FINE': {
       if (state.phase !== 'WAITING_FOR_ROLL' || !isDetained(player)) return commandError(current, '当前不需要缴纳出狱或出院费用')
-      if (player.cash < JAIL_FINE) return commandError(current, '现金不足，请先抵押资产')
+      const fundingError = fundStockPayment(state, player, JAIL_FINE, command.stockFunding, events)
+      if (fundingError) return commandError(current, fundingError)
       player.cash -= JAIL_FINE
       leaveDetention(state, player, events, `缴纳 ${JAIL_FINE} 元后`, JAIL_FINE)
       return
+    }
     case 'USE_JAIL_CARD': {
       if (state.phase !== 'WAITING_FOR_ROLL' || !isDetained(player)) return commandError(current, '当前不能使用通行许可')
       const held = player.heldCards.shift()

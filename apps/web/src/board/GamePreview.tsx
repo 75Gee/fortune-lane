@@ -39,6 +39,8 @@ function previewGame() {
     game = applyCommand(game, 'xiaoman', { type: 'TRADE_STOCK', stockId: 'tech', side: 'sell', quantity: 5, quoteRevision: game.stockMarket!.quoteRevision }).state
     game.actionLog = []
   }
+  const previewCash = Number(query.get('cash'))
+  if (query.has('cash') && Number.isSafeInteger(previewCash) && previewCash >= 0) game.players[0]!.cash = previewCash
   const decision = query.get('decision')
   if (decision === 'purchase' || decision === 'upgrade' || decision === 'auction') {
     const tileIndex = getTileById(decision === 'upgrade' ? '香港' : '维也纳').index

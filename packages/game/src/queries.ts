@@ -2,12 +2,12 @@ import { BOARD, MAX_PROPERTY_LEVEL, isOwnable } from './board.js'
 import { buildingSaleValue, redeemCost } from './economy.js'
 import { isDetained } from './items.js'
 import type { GameState, LiquidationSelection } from './types.js'
-import { stockLiquidationQuote } from './stockMarket/quotes.js'
+import { stockLiquidationQuote, stockPaymentQuote } from './stockMarket/quotes.js'
 import type { StockMarketView, StockSaleSelection } from './stockMarket/types.js'
 
-type AssetState = Pick<GameState, 'phase' | 'currentPlayerId' | 'players' | 'tiles' | 'pendingDecision'>
+type AssetState = Pick<GameState, 'phase' | 'currentPlayerId' | 'players' | 'tiles' | 'pendingDecision'> & { stockMarket?: StockMarketView }
 export type AssetAction = 'BUY_PROPERTY' | 'UPGRADE_PROPERTY' | 'MORTGAGE_ASSET' | 'REDEEM_ASSET' | 'SELL_BUILDING'
-export interface ActionQuote { allowed: boolean; reason: string | null; amount: number; balanceAfter: number }
+export interface ActionQuote { allowed: boolean; reason: string | null; amount: number; balanceAfter: number; payment: ReturnType<typeof stockPaymentQuote> }
 
 export function canManageAssets(state: Pick<AssetState, 'phase' | 'currentPlayerId' | 'players'>, playerId: string): boolean {
   return state.currentPlayerId === playerId
@@ -23,7 +23,9 @@ export function assetActionQuote(state: AssetState, playerId: string, tileIndex:
     : action === 'UPGRADE_PROPERTY' ? tile.buildCost ?? 0
     : action === 'REDEEM_ASSET' ? redeemCost(tileIndex)
     : action === 'SELL_BUILDING' ? -buildingSaleValue(tileIndex) : -(tile.mortgage ?? 0)
-  const result = (reason: string | null): ActionQuote => ({ allowed: reason === null, reason, amount, balanceAfter: (player?.cash ?? 0) - amount })
+  const payment = stockPaymentQuote(state, playerId, Math.max(0, amount))
+  const result = (reason: string | null): ActionQuote => ({ allowed: reason === null, reason, amount,
+    balanceAfter: amount > 0 ? payment.balanceAfter : (player?.cash ?? 0) - amount, payment })
   if (!player || player.isBankrupt || state.phase === 'FINISHED') return result('观战时不能管理资产')
   if (state.currentPlayerId !== playerId) return result('轮到你时可以操作')
   if (!tile || !asset || !isOwnable(tile)) return result('此处不是可管理的资产')
@@ -43,7 +45,7 @@ export function assetActionQuote(state: AssetState, playerId: string, tileIndex:
     if (action === 'UPGRADE_PROPERTY' && (tile.kind !== 'property' || asset.level >= MAX_PROPERTY_LEVEL || asset.mortgaged)) return result('该地产不能继续升级')
     if (action === 'SELL_BUILDING' && (tile.kind !== 'property' || asset.level <= 0)) return result('没有可出售的建筑')
   }
-  if (amount > player.cash) return result(`现金不足，还差 ¥${(amount - player.cash).toLocaleString('zh-CN')}`)
+  if (amount > 0 && !payment.allowed) return result(payment.reason)
   return result(null)
 }
 
