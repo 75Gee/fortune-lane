@@ -129,7 +129,7 @@ export function LobbyPage({ room, playerId, onReady, onStart, onLeave, pending =
         </div>
 
         <details className="lobby-rules"><summary>玩法与限时</summary><ol>
-          <li>轮到你时掷骰，落地后买地、加盖、付费或抽卡；成为最后未破产的玩家即可获胜。</li>
+          <li>轮到你时掷骰，落地后买地、加盖、付费或抽卡；总资产（现金、地产与建筑、股票市值）率先达到 10 万元，或成为最后未破产的玩家，即可获胜。</li>
           <li>不用集齐同色地产；回到自己的地产才能升级。放弃购买后，其他玩家可密封竞拍。</li>
           <li>普通操作限时 {room.settings.turnSeconds} 秒，竞拍 30 秒，筹款 90 秒。超时由系统代操作；筹款超时会先尝试卖股还款，仍不足则破产。</li>
           <li>每回合可使用一张道具。行动结果可在“动态”回看；暂离后对局继续，可从首页重返。</li>

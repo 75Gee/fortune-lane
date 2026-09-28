@@ -1,4 +1,4 @@
-import { getTile, stockPortfolioSummary, type GameView, type PlayerStatistics } from '@fortune/game'
+import { getTile, playerNetWorth, stockPortfolioSummary, type GameView, type PlayerStatistics } from '@fortune/game'
 import { Award, ChevronDown, Clock3, Crown, Flag, LogOut, MapPinned, RotateCcw, X } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import '../styles/endgame.css'
@@ -65,8 +65,13 @@ export function EndgameReport({ game, playerId, isHost, available, onClose, onHi
   onClose: () => void; onHistory: () => void; onRestart: () => void; onLeave: () => void
 }) {
   const winner = game.players.find((player) => player.id === game.winnerPlayerId)
-  const order = [game.winnerPlayerId, ...[...game.statistics.eliminations].reverse().map((entry) => entry.playerId)]
+  const finishMessage = game.actionLog.findLast(event => event.type === 'GAME_FINISHED')?.message
+  const order = [...game.statistics.eliminations].reverse().map((entry) => entry.playerId)
   const ranked = [...game.players].sort((a, b) => {
+    if (a.id === game.winnerPlayerId) return -1
+    if (b.id === game.winnerPlayerId) return 1
+    if (a.isBankrupt !== b.isBankrupt) return Number(a.isBankrupt) - Number(b.isBankrupt)
+    if (!a.isBankrupt) return playerNetWorth(game, b.id) - playerNetWorth(game, a.id)
     const aRank = order.indexOf(a.id), bRank = order.indexOf(b.id)
     return (aRank < 0 ? game.players.length : aRank) - (bRank < 0 ? game.players.length : bRank)
   })
@@ -78,7 +83,7 @@ export function EndgameReport({ game, playerId, isHost, available, onClose, onHi
     <header className="trip-report-header"><span><MapPinned size={18} />本局结果</span><button className="icon-command" onClick={onClose} aria-label="关闭本局结果"><X size={19} /></button></header>
     <div className="trip-winner">
       <div className="trip-winner-token">{winner && <TokenImage token={winner.token} alt="" />}<Crown size={24} /></div>
-      <div><small>本局赢家</small><h2>{winner?.name ?? '旅途结束'}</h2></div>
+      <div className="trip-winner-copy"><small>本局赢家</small><h2>{winner?.name ?? '旅途结束'}</h2>{finishMessage && <p>{finishMessage}</p>}</div>
       <span className="trip-duration"><Clock3 size={14} />{durationLabel}<span>第 {game.turnNumber} 回合</span></span>
     </div>
     <div className="trip-rankings">{ranked.map((player, index) => {
@@ -87,6 +92,7 @@ export function EndgameReport({ game, playerId, isHost, available, onClose, onHi
       const elimination = game.statistics.eliminations.find((entry) => entry.playerId === player.id)
       const stocks = stockPortfolioSummary(game.stockMarket, player.id)
       const measures = [
+        ['期末总资产', money(playerNetWorth(game, player.id))],
         ['最高身家', money(stats.peakNetWorth)], ['游览收入', money(stats.rentReceived)], ['游览支出', money(stats.rentPaid)],
         ['累计购入', `${stats.assetsAcquired} 项`], ['旅途步数', `${number(stats.steps)} 格`], ['使用道具', `${stats.itemUses} 次`],
         ...(game.stockMarket ? [['股票累计盈亏', stockProfit(stocks.totalProfit)], ['期末股票市值', money(stocks.marketValue)]] : []),

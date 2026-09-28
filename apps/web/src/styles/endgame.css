@@ -4,6 +4,7 @@
 .trip-report-header > span { display: flex; align-items: center; gap: 9px; color: var(--green); font-size: 14px; font-weight: 750; }
 .trip-report-header .icon-command { width: 32px; height: 32px; border: 0; }
 .trip-winner { display: flex; align-items: center; gap: 20px; margin: 0 24px; padding: 25px 0; }
+.trip-winner-copy { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .trip-winner-token { position: relative; flex-shrink: 0; display: grid; place-items: center; width: 88px; height: 88px; border-radius: 50%; background: #f7edcd; }
 .trip-winner-token img { width: 76px; height: 76px; object-fit: contain; }
 .trip-winner-token > svg { position: absolute; right: -1px; top: -6px; color: #c89832; fill: #fce8a7; transform: rotate(16deg); }

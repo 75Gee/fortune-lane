@@ -232,6 +232,7 @@ export function applyCommand(
       break
   }
   if (rejection) return rejection
+  checkWinner(state, events)
 
   if (state.extraMove && state.phase === 'WAITING_FOR_END_TURN'
       && !state.pendingDecision && !state.pendingCardChoice && !state.pendingCardProperty && !state.pendingWheel && !state.pendingAuction && !state.pendingDebt) {
@@ -245,8 +246,11 @@ export function applyCommand(
   if (playerById(state, state.currentPlayerId).isBankrupt && state.phase !== 'FINISHED' && !state.pendingAuction) {
     if (!checkWinner(state, events)) advancePlayer(state, events)
   }
+  if (state.phase !== 'FINISHED' && state.turnNumber !== current.turnNumber) {
+    advanceStockMarket(state.stockMarket, state.turnNumber, marketRandom)
+    checkWinner(state, events)
+  }
   if (state.phase === 'FINISHED' && state.statistics.finishedAt === null) state.statistics.finishedAt = now
-  if (state.turnNumber !== current.turnNumber) advanceStockMarket(state.stockMarket, state.turnNumber, marketRandom)
   updateNetWorthPeaks(state)
   return { ok: true, state, events }
 }
