@@ -5,17 +5,16 @@ import '../styles/endgame.css'
 import { Modal } from './Modal.js'
 import { TokenImage } from './TokenImage.js'
 import { stockProfit } from './stocks/format.js'
+import { formatMoney, formatCount } from '../lib/format.js'
 
-const money = (value: number) => `¥${value.toLocaleString('zh-CN')}`
-const number = (value: number) => value.toLocaleString('zh-CN')
 type AwardMetric = 'rentReceived' | 'rentPaid' | 'steps' | 'doubles' | 'bestAuctionSaving' | 'trapHits'
 const awards: { metric: AwardMetric; title: string; describe: (value: number) => string }[] = [
   { metric: 'trapHits', title: '整活大师', describe: (n) => `路障和炸弹让旅伴中招 ${n} 次` },
-  { metric: 'bestAuctionSaving', title: '捡漏高手', describe: (n) => `最划算的一次竞拍，省下 ${money(n)}` },
+  { metric: 'bestAuctionSaving', title: '捡漏高手', describe: (n) => `最划算的一次竞拍，省下 ${formatMoney(n)}` },
   { metric: 'doubles', title: '对子达人', describe: (n) => `常规掷骰出现了 ${n} 次对子` },
-  { metric: 'rentReceived', title: '人气城主', describe: (n) => `旅行版图累计带来 ${money(n)} 收入` },
-  { metric: 'steps', title: '旅行达人', describe: (n) => `一路走过 ${number(n)} 格风景` },
-  { metric: 'rentPaid', title: '豪爽游客', describe: (n) => `沿途游览累计花费 ${money(n)}` },
+  { metric: 'rentReceived', title: '人气城主', describe: (n) => `旅行版图累计带来 ${formatMoney(n)} 收入` },
+  { metric: 'steps', title: '旅行达人', describe: (n) => `一路走过 ${formatCount(n)} 格风景` },
+  { metric: 'rentPaid', title: '豪爽游客', describe: (n) => `沿途游览累计花费 ${formatMoney(n)}` },
 ]
 
 function representativeAwards(game: GameView) {
@@ -41,14 +40,14 @@ function personalMoment(game: GameView, stats: PlayerStatistics): string {
     .filter(([index, amount]) => getTile(Number(index)).kind === 'property' && amount > 0)
     .sort((a, b) => b[1] - a[1])
   if (cities[0])
-    return `${getTile(Number(cities[0][0])).name}带来 ${money(cities[0][1])} 游览收入，是你的${cities[1]?.[1] === cities[0][1] ? '人气城市之一' : '人气城市'}。`
+    return `${getTile(Number(cities[0][0])).name}带来 ${formatMoney(cities[0][1])} 游览收入，是你的${cities[1]?.[1] === cities[0][1] ? '人气城市之一' : '人气城市'}。`
   const travelers = Object.entries(stats.receivedFrom)
     .filter(([, amount]) => amount > 0)
     .sort((a, b) => b[1] - a[1])
   if (travelers[0])
-    return `${game.players.find((player) => player.id === travelers[0]![0])?.name ?? '旅伴'}在你的旅行版图累计消费 ${money(travelers[0][1])}。`
+    return `${game.players.find((player) => player.id === travelers[0]![0])?.name ?? '旅伴'}在你的旅行版图累计消费 ${formatMoney(travelers[0][1])}。`
   if (stats.assetsAcquired) return `这一程，将 ${stats.assetsAcquired} 项资产收入了旅行版图。`
-  if (stats.steps) return `这一程走过 ${number(stats.steps)} 格，沿途都是你的足迹。`
+  if (stats.steps) return `这一程走过 ${formatCount(stats.steps)} 格，沿途都是你的足迹。`
   return '下一程，换个方向看看风景。'
 }
 
@@ -59,13 +58,13 @@ function tripHighlights(game: GameView) {
   if (payment && payment.amount > 0)
     result.push({
       title: '最难忘的一站',
-      text: `${name(payment.payerId)} 到访${getTile(payment.tileIndex).name}，一次支付 ${money(payment.amount)} 给 ${name(payment.receiverId)}。`,
+      text: `${name(payment.payerId)} 到访${getTile(payment.tileIndex).name}，一次支付 ${formatMoney(payment.amount)} 给 ${name(payment.receiverId)}。`,
     })
   const auction = game.statistics.bestAuction
   if (auction && auction.saving > 0)
     result.push({
       title: '好价不等人',
-      text: `${name(auction.playerId)} 用 ${money(auction.amount)} 竞得${getTile(auction.tileIndex).name}，比原价省了 ${money(auction.saving)}。`,
+      text: `${name(auction.playerId)} 用 ${formatMoney(auction.amount)} 竞得${getTile(auction.tileIndex).name}，比原价省了 ${formatMoney(auction.saving)}。`,
     })
   const totals = new Map<number, number>()
   for (const player of game.players)
@@ -78,7 +77,7 @@ function tripHighlights(game: GameView) {
   if (city)
     result.push({
       title: cities[1]?.[1] === city[1] ? '并列人气城市' : '人气城市',
-      text: `${getTile(city[0]).name}在本局累计带来 ${money(city[1])} 游览收入。`,
+      text: `${getTile(city[0]).name}在本局累计带来 ${formatMoney(city[1])} 游览收入。`,
     })
   return result.slice(0, 3)
 }
@@ -162,17 +161,17 @@ export function EndgameReport({
               const elimination = game.statistics.eliminations.find((entry) => entry.playerId === player.id)
               const stocks = stockPortfolioSummary(game.stockMarket, player.id)
               const measures = [
-                ['期末总资产', money(playerNetWorth(game, player.id))],
-                ['最高身家', money(stats.peakNetWorth)],
-                ['游览收入', money(stats.rentReceived)],
-                ['游览支出', money(stats.rentPaid)],
+                ['期末总资产', formatMoney(playerNetWorth(game, player.id))],
+                ['最高身家', formatMoney(stats.peakNetWorth)],
+                ['游览收入', formatMoney(stats.rentReceived)],
+                ['游览支出', formatMoney(stats.rentPaid)],
                 ['累计购入', `${stats.assetsAcquired} 项`],
-                ['旅途步数', `${number(stats.steps)} 格`],
+                ['旅途步数', `${formatCount(stats.steps)} 格`],
                 ['使用道具', `${stats.itemUses} 次`],
                 ...(game.stockMarket
                   ? [
                       ['股票累计盈亏', stockProfit(stocks.totalProfit)],
-                      ['期末股票市值', money(stocks.marketValue)],
+                      ['期末股票市值', formatMoney(stocks.marketValue)],
                     ]
                   : []),
               ]
@@ -218,7 +217,7 @@ export function EndgameReport({
                           .sort((a, b) => b[1] - a[1])
                           .map(
                             ([id, amount]) =>
-                              `${game.players.find((entry) => entry.id === id)?.name ?? '旅伴'} ${money(amount)}`,
+                              `${game.players.find((entry) => entry.id === id)?.name ?? '旅伴'} ${formatMoney(amount)}`,
                           )
                           .join(' · ')}
                       </p>

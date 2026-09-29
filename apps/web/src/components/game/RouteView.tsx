@@ -1,7 +1,7 @@
 import { BOARD, ITEMS, rentForTile, type GameEvent, type GameView } from '@fortune/game'
 import { ChevronRight } from 'lucide-react'
 import { TokenImage } from '../TokenImage.js'
-const money = (value: number) => `¥${value.toLocaleString('zh-CN')}`
+import { formatMoney } from '../../lib/format.js'
 export function RouteView({
   game,
   displayPositions,
@@ -45,11 +45,11 @@ export function RouteView({
               <small>
                 {offset === 0 ? '当前位置 · ' : ''}
                 {owner
-                  ? `${owner.name} · ${state?.mortgaged ? '已抵押' : tile.kind === 'utility' ? '按骰点付费' : `游览费 ${money(rentForTile(game, tile.index, 0))}`}`
+                  ? `${owner.name} · ${state?.mortgaged ? '已抵押' : tile.kind === 'utility' ? '按骰点付费' : `游览费 ${formatMoney(rentForTile(game, tile.index, 0))}`}`
                   : tile.price
-                    ? `售价 ${money(tile.price)}`
+                    ? `售价 ${formatMoney(tile.price)}`
                     : tile.taxAmount
-                      ? `缴税 ${money(tile.taxAmount)}`
+                      ? `缴税 ${formatMoney(tile.taxAmount)}`
                       : tile.kind === 'item'
                         ? '随机获得一张道具'
                         : '特殊地点'}

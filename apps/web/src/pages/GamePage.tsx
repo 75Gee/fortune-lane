@@ -56,6 +56,7 @@ import { ActionPanel } from '../components/game/ActionPanel.js'
 import { GameInfoPanel, type InfoTab } from '../components/game/GameInfoPanel.js'
 import { RouteView } from '../components/game/RouteView.js'
 import { TileDetail } from '../components/game/TileDetail.js'
+import { formatMoney } from '../lib/format.js'
 type Panel =
   | { type: 'info'; tab: InfoTab; owner: string }
   | { type: 'tile'; index: number }
@@ -69,7 +70,6 @@ function readPreference(key: string): boolean {
     return true
   }
 }
-const money = (value: number) => `¥${value.toLocaleString('zh-CN')}`
 export function GamePage({
   room,
   game,
@@ -259,7 +259,7 @@ export function GamePage({
                   <button
                     key={player.id}
                     className={`${player.id === game.currentPlayerId ? 'is-current' : ''} ${player.isBankrupt ? 'is-bankrupt' : ''}`}
-                    title={`${player.name} · ${player.isBankrupt ? '观战中' : money(player.cash)}`}
+                    title={`${player.name} · ${player.isBankrupt ? '观战中' : formatMoney(player.cash)}`}
                     aria-label={`查看${player.name}的资产`}
                     onClick={() => openInfo('assets', player.id)}
                   >
@@ -283,7 +283,7 @@ export function GamePage({
                       <small>
                         {player.isBankrupt
                           ? '观战'
-                          : `${money(player.cash)}${!player.connected ? ' · 离线' : player.isInHospital ? ' · 住院' : player.isInJail ? ' · 服刑' : ''}`}
+                          : `${formatMoney(player.cash)}${!player.connected ? ' · 离线' : player.isInHospital ? ' · 住院' : player.isInJail ? ' · 服刑' : ''}`}
                       </small>
                     </span>
                   </button>
@@ -375,7 +375,7 @@ export function GamePage({
               <Wallet size={19} />
               <span>
                 <small>{me?.isBankrupt ? '观战中' : '我的现金'}</small>
-                <strong>{money(me?.cash ?? 0)}</strong>
+                <strong>{formatMoney(me?.cash ?? 0)}</strong>
               </span>
               <ChevronRight size={16} />
             </button>

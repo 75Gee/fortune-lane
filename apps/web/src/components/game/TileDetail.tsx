@@ -21,7 +21,7 @@ import { CardLibrary } from '../CardLibrary.js'
 import { ItemCatalog } from '../ItemInventory.js'
 import { AssetActions } from './AssetActions.js'
 import { CityImage } from '../CityImage.js'
-const money = (value: number) => `¥${value.toLocaleString('zh-CN')}`
+import { formatMoney } from '../../lib/format.js'
 const ownable = (tile: TileDefinition) => ['property', 'airport', 'utility'].includes(tile.kind)
 export function TileDetail({
   game,
@@ -44,8 +44,8 @@ export function TileDetail({
   const rentOwner = owner?.id ?? playerId
   const rent =
     tile.kind === 'utility'
-      ? `${money(rentForTile(game, tileIndex, 1, rentOwner))}–${money(rentForTile(game, tileIndex, 12, rentOwner))}`
-      : money(rentForTile(game, tileIndex, 0, rentOwner))
+      ? `${formatMoney(rentForTile(game, tileIndex, 1, rentOwner))}–${formatMoney(rentForTile(game, tileIndex, 12, rentOwner))}`
+      : formatMoney(rentForTile(game, tileIndex, 0, rentOwner))
   const subtitle = ownable(tile)
     ? `${owner?.name ?? '银行'} · ${state?.mortgaged ? '已抵押' : tile.kind === 'property' ? `${state?.level ?? 0} 级` : tile.kind === 'airport' ? '机场' : '公用事业'}`
     : '棋盘格'
@@ -84,11 +84,11 @@ export function TileDetail({
             </div>
             <div>
               <dt>购买价</dt>
-              <dd>{money(tile.price ?? 0)}</dd>
+              <dd>{formatMoney(tile.price ?? 0)}</dd>
             </div>
             <div>
               <dt>抵押价</dt>
-              <dd>{money(tile.mortgage ?? 0)}</dd>
+              <dd>{formatMoney(tile.mortgage ?? 0)}</dd>
             </div>
           </dl>
           {tile.kind === 'utility' && !state?.mortgaged && <p className="deed-note">按到达时骰点计费</p>}
@@ -101,7 +101,7 @@ export function TileDetail({
                   <dt>
                     升级费用<small>再次到达时可升级</small>
                   </dt>
-                  <dd>{money(tile.buildCost ?? 0)}</dd>
+                  <dd>{formatMoney(tile.buildCost ?? 0)}</dd>
                 </div>
               </dl>
             )}
@@ -122,7 +122,7 @@ export function TileDetail({
                   {(tile.kind === 'property' ? tile.rents : AIRPORT_RENTS.slice(1))?.map((rent, index) => (
                     <tr className={tile.kind === 'property' && state?.level === index ? 'current' : ''} key={index}>
                       <td>{tile.kind === 'airport' ? `${index + 1} 座` : index === 0 ? '空地' : `${index} 级`}</td>
-                      <td>{money(scaleRent(rent, game.turnNumber, game.players.length))}</td>
+                      <td>{formatMoney(scaleRent(rent, game.turnNumber, game.players.length))}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -134,8 +134,8 @@ export function TileDetail({
                   <p key={index}>
                     <span>持有 {index + 1} 家</span>
                     <strong>
-                      {money(scaleRent(1 * multiplier, game.turnNumber, game.players.length))}–
-                      {money(scaleRent(12 * multiplier, game.turnNumber, game.players.length))}
+                      {formatMoney(scaleRent(1 * multiplier, game.turnNumber, game.players.length))}–
+                      {formatMoney(scaleRent(12 * multiplier, game.turnNumber, game.players.length))}
                     </strong>
                   </p>
                 ))}
@@ -157,9 +157,9 @@ export function TileDetail({
               : tile.kind === 'go_to_jail'
                 ? '到达后立即移动至监狱，并结束回合。'
                 : tile.kind === 'go'
-                  ? `正向经过或到达时领取补助，每圈一次。首次 ${money(PASS_START_REWARD)}，个人每领取一次减少 ${money(PASS_START_DECREMENT)}，最低 ${money(PASS_START_MINIMUM)}。你下次可领取 ${money(passStartReward(game.players.find((player) => player.id === playerId)?.startRewardReceipts ?? 0))}。`
+                  ? `正向经过或到达时领取补助，每圈一次。首次 ${formatMoney(PASS_START_REWARD)}，个人每领取一次减少 ${formatMoney(PASS_START_DECREMENT)}，最低 ${formatMoney(PASS_START_MINIMUM)}。你下次可领取 ${formatMoney(passStartReward(game.players.find((player) => player.id === playerId)?.startRewardReceipts ?? 0))}。`
                   : tile.kind === 'tax'
-                    ? `到达后向银行支付 ${money(tile.taxAmount ?? 0)}，不受游览费涨幅影响。`
+                    ? `到达后向银行支付 ${formatMoney(tile.taxAmount ?? 0)}，不受游览费涨幅影响。`
                     : '到达后立即执行该格效果。'}
         </p>
       )}

@@ -1,4 +1,6 @@
-export const stockMoney = (value: number) => `¥${value.toLocaleString('zh-CN')}`
+import { formatMoney } from '../../lib/format.js'
+
+export const stockMoney = formatMoney
 export const stockPrice = (cents: number) =>
   `¥${(cents / 100).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 export const stockPercent = (rate: number | null) =>

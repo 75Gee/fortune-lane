@@ -21,6 +21,7 @@ import { needsDecision } from './decisionState.js'
 import { CommandAvailabilityContext, Modal } from './Modal.js'
 import { WheelDialog } from './WheelDialog.js'
 import { StockPaymentHint } from './stocks/StockPaymentHint.js'
+import { formatMoney } from '../lib/format.js'
 
 interface LandingDialogProps {
   game: GameView
@@ -33,7 +34,6 @@ interface LandingDialogProps {
   watching: boolean
   onDismiss: () => void
 }
-const money = (value: number) => `¥${value.toLocaleString('zh-CN')}`
 
 export function LandingDialog(props: LandingDialogProps) {
   const required = needsDecision(props.game, props.playerId)
@@ -124,7 +124,7 @@ function LandingContent({
                     {game.tiles[tile.index]!.level} → {game.tiles[tile.index]!.level - 1} 级
                     <small>
                       降级后游览费{' '}
-                      {money(
+                      {formatMoney(
                         scaleRent(
                           tile.rents?.[game.tiles[tile.index]!.level - 1] ?? 0,
                           game.turnNumber,
@@ -212,10 +212,10 @@ function LandingContent({
     const feeLabel = tile.kind === 'property' ? (isPurchase ? '购入后游览费' : '升级后游览费') : '购入后游览费'
     const feeValue =
       tile.kind === 'airport'
-        ? money(rentForTile(game, tile.index, 0, decision.playerId))
+        ? formatMoney(rentForTile(game, tile.index, 0, decision.playerId))
         : tile.kind === 'utility'
-          ? `${money(rentForTile(game, tile.index, 1, decision.playerId))}–${money(rentForTile(game, tile.index, 12, decision.playerId))}`
-          : money(nextRent)
+          ? `${formatMoney(rentForTile(game, tile.index, 1, decision.playerId))}–${formatMoney(rentForTile(game, tile.index, 12, decision.playerId))}`
+          : formatMoney(nextRent)
 
     // The active player's decision lives with its controls in the command dock.
     if (required) return null
@@ -242,7 +242,7 @@ function LandingContent({
                 <small>{isPurchase ? '这项资产还没有主人' : '回到自己的地产'}</small>
                 <h2>{tile.name}</h2>
               </div>
-              <strong className="landing-price">{money(actionCost)}</strong>
+              <strong className="landing-price">{formatMoney(actionCost)}</strong>
             </header>
 
             {game.turnNumber >= rentGrowthStart(game.players.length) && (
@@ -266,11 +266,11 @@ function LandingContent({
               </div>
               <div>
                 <span>抵押价值</span>
-                <strong>{money(tile.mortgage ?? 0)}</strong>
+                <strong>{formatMoney(tile.mortgage ?? 0)}</strong>
               </div>
               <div>
                 <span>{canAfford ? '支付后余额' : '还差'}</span>
-                <strong>{money(canAfford ? quote.balanceAfter : quote.payment.remaining)}</strong>
+                <strong>{formatMoney(canAfford ? quote.balanceAfter : quote.payment.remaining)}</strong>
               </div>
             </div>
             <StockPaymentHint payment={quote.payment} />
@@ -289,7 +289,7 @@ function LandingContent({
                       <span className="rent-tier-label">
                         {level === 0 ? '空地' : <BuildingIcons level={level} size={18} />}
                       </span>
-                      <strong>{money(scaleRent(rent, game.turnNumber, game.players.length))}</strong>
+                      <strong>{formatMoney(scaleRent(rent, game.turnNumber, game.players.length))}</strong>
                     </div>
                   ))}
                 </div>

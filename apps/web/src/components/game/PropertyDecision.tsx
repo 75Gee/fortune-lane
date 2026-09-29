@@ -9,8 +9,7 @@ import {
 } from '@fortune/game'
 import { StockPaymentHint } from '../stocks/StockPaymentHint.js'
 import { CityImage, cityImageSource } from '../CityImage.js'
-
-const money = (value: number) => `¥${value.toLocaleString('zh-CN')}`
+import { formatMoney } from '../../lib/format.js'
 
 export function PropertyDecision({
   game,
@@ -29,8 +28,8 @@ export function PropertyDecision({
   const quote = assetActionQuote(game, playerId, tile.index, action)
   const fee =
     tile.kind === 'utility'
-      ? `${money(rentForTile(game, tile.index, 1, playerId))}–${money(rentForTile(game, tile.index, 12, playerId))}`
-      : money(
+      ? `${formatMoney(rentForTile(game, tile.index, 1, playerId))}–${formatMoney(rentForTile(game, tile.index, 12, playerId))}`
+      : formatMoney(
           tile.kind === 'airport'
             ? rentForTile(game, tile.index, 0, playerId)
             : scaleRent(tile.rents?.[purchase ? 0 : level + 1] ?? 0, game.turnNumber, game.players.length),
@@ -44,7 +43,7 @@ export function PropertyDecision({
           <strong>{tile.name}</strong>
           <span>{purchase ? '购入地产' : `${level} → ${level + 1} 级`}</span>
         </div>
-        <strong>{money(quote.amount)}</strong>
+        <strong>{formatMoney(quote.amount)}</strong>
       </div>
       <div className="property-decision-body">
         <dl className="decision-figures">
@@ -54,7 +53,7 @@ export function PropertyDecision({
           </div>
           <div>
             <dt>{quote.allowed ? '付款后现金' : '资金还差'}</dt>
-            <dd>{money(quote.allowed ? quote.balanceAfter : quote.payment.remaining)}</dd>
+            <dd>{formatMoney(quote.allowed ? quote.balanceAfter : quote.payment.remaining)}</dd>
           </div>
         </dl>
         <div className="property-commands">
@@ -86,7 +85,7 @@ export function PropertyDecision({
               {tile.rents?.map((rent, tier) => (
                 <div key={tier}>
                   <span>{tier === 0 ? '空地' : tier === MAX_PROPERTY_LEVEL ? '旅馆' : `${tier} 级`}</span>
-                  <strong>{money(scaleRent(rent, game.turnNumber, game.players.length))}</strong>
+                  <strong>{formatMoney(scaleRent(rent, game.turnNumber, game.players.length))}</strong>
                 </div>
               ))}
             </div>

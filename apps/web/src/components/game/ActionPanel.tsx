@@ -13,7 +13,7 @@ import {
 import { actionDescription } from '../decisionState.js'
 import { StockPaymentHint } from '../stocks/StockPaymentHint.js'
 import { PropertyDecision } from './PropertyDecision.js'
-const money = (value: number) => `¥${value.toLocaleString('zh-CN')}`
+import { formatMoney } from '../../lib/format.js'
 
 export function ActionPanel({
   game,
@@ -99,7 +99,7 @@ export function ActionPanel({
               <strong>准备{me.isInHospital ? '出院' : '出狱'}</strong>
               <span>
                 {me.jailTurns >= 2
-                  ? `第3次未掷出对子，将支付 ${money(JAIL_FINE)}`
+                  ? `第3次未掷出对子，将支付 ${formatMoney(JAIL_FINE)}`
                   : `掷骰机会：第 ${me.jailTurns + 1}/3 次`}
               </span>
             </div>
@@ -114,7 +114,7 @@ export function ActionPanel({
               onClick={() => onCommand({ type: 'PAY_JAIL_FINE', stockFunding: payment.stockFunding })}
             >
               <Banknote size={18} /> {payment.stockFunding && payment.allowed ? '卖股并支付' : '支付'}{' '}
-              {money(JAIL_FINE)}
+              {formatMoney(JAIL_FINE)}
             </button>
             <button disabled={!me.heldCards.length} onClick={() => onCommand({ type: 'USE_JAIL_CARD' })}>
               <ShieldCheck size={18} />
@@ -146,7 +146,7 @@ export function ActionPanel({
         <div className="action-heading">
           <HandCoins size={20} />
           <div>
-            <strong>需要支付 {money(game.pendingDebt.amount)}</strong>
+            <strong>需要支付 {formatMoney(game.pendingDebt.amount)}</strong>
             <span>
               {game.pendingDebt.reason} · 收款：
               {game.players.find((player) => player.id === game.pendingDebt?.creditorId)?.name ?? '银行'}
@@ -156,7 +156,7 @@ export function ActionPanel({
         {payment.allowed && payment.stockFunding ? (
           <StockPaymentHint payment={payment} />
         ) : (
-          <p>{difference > 0 ? `还差 ${money(difference)}，可卖股、卖房或抵押筹款` : '钱已凑齐，可以付款了'}</p>
+          <p>{difference > 0 ? `还差 ${formatMoney(difference)}，可卖股、卖房或抵押筹款` : '钱已凑齐，可以付款了'}</p>
         )}
         <div className="decision-buttons">
           <button

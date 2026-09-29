@@ -15,7 +15,7 @@ import { useContext, useState } from 'react'
 import { CommandAvailabilityContext } from '../Modal.js'
 import { stockPrice } from '../stocks/format.js'
 import { StockQuantitySlider } from '../stocks/StockQuantitySlider.js'
-const money = (value: number) => `¥${value.toLocaleString('zh-CN')}`
+import { formatMoney } from '../../lib/format.js'
 
 export function LiquidationPlanner({
   game,
@@ -59,9 +59,9 @@ export function LiquidationPlanner({
   return (
     <section className="liquidation-planner" aria-label="筹款方案">
       <div className="portfolio-debt">
-        <strong>待付 {money(debt.amount)}</strong>
+        <strong>待付 {formatMoney(debt.amount)}</strong>
         <p>
-          {debt.reason} · 现金 {money(player.cash)}
+          {debt.reason} · 现金 {formatMoney(player.cash)}
         </p>
       </div>
       {!cashEnough && holdings && Object.values(holdings).some((position) => position && position.quantity > 0) && (
@@ -87,7 +87,7 @@ export function LiquidationPlanner({
                   </small>
                 </div>
                 <span className="liquidation-stock-proceeds">
-                  {Number.isSafeInteger(proceeds) ? `+${money(proceeds)}` : '请输入整数股数'}
+                  {Number.isSafeInteger(proceeds) ? `+${formatMoney(proceeds)}` : '请输入整数股数'}
                 </span>
                 <StockQuantitySlider
                   stockName={stock.name}
@@ -109,7 +109,7 @@ export function LiquidationPlanner({
           open={assetsOpen}
           onToggle={(event) => setAssetsOpen(event.currentTarget.open)}
         >
-          <summary>房产筹款{propertyProceeds > 0 && <span>+{money(propertyProceeds)}</span>}</summary>
+          <summary>房产筹款{propertyProceeds > 0 && <span>+{formatMoney(propertyProceeds)}</span>}</summary>
           {!game.tiles.some((asset) => asset.ownerId === playerId && !asset.mortgaged) && (
             <p className="empty-state">没有可用于筹款的房产</p>
           )}
@@ -146,12 +146,12 @@ export function LiquidationPlanner({
                   <option value="0">保留</option>
                   {Array.from({ length: asset.level }, (_, index) => index + 1).map((value) => (
                     <option key={value} value={value}>
-                      出售 {value} 级建筑 · +{money(value * buildingSaleValue(tileIndex))}
+                      出售 {value} 级建筑 · +{formatMoney(value * buildingSaleValue(tileIndex))}
                     </option>
                   ))}
                   <option value="mortgage">
                     {asset.level > 0 ? `出售 ${asset.level} 级并抵押` : '抵押'} · +
-                    {money(asset.level * buildingSaleValue(tileIndex) + (tile.mortgage ?? 0))}
+                    {formatMoney(asset.level * buildingSaleValue(tileIndex) + (tile.mortgage ?? 0))}
                   </option>
                 </select>
                 {proceeds > 0 && (
@@ -170,22 +170,22 @@ export function LiquidationPlanner({
         {!cashEnough && (
           <div>
             <span>本次筹得</span>
-            <strong>{money(quote.proceeds)}</strong>
+            <strong>{formatMoney(quote.proceeds)}</strong>
           </div>
         )}
         {quote.buildingLoss > 0 && (
           <div>
             <span>建筑折价损失</span>
-            <span>{money(quote.buildingLoss)}</span>
+            <span>{formatMoney(quote.buildingLoss)}</span>
           </div>
         )}
         <div>
           <span>{quote.remaining > 0 ? '还差' : '付款后余额'}</span>
-          <strong>{money(quote.remaining > 0 ? quote.remaining : quote.cashAfter)}</strong>
+          <strong>{formatMoney(quote.remaining > 0 ? quote.remaining : quote.cashAfter)}</strong>
         </div>
         {!cashEnough &&
           !quote.allowed &&
-          quote.reason !== `还需筹集 ${money(quote.remaining)}` &&
+          quote.reason !== `还需筹集 ${formatMoney(quote.remaining)}` &&
           (selections.length > 0 || stockSales.length > 0) && <p>{quote.reason}</p>}
         <button
           className="primary-command"
@@ -202,7 +202,7 @@ export function LiquidationPlanner({
             )
           }
         >
-          {cashEnough ? `支付 ${money(debt.amount)}` : `筹款并支付 ${money(debt.amount)}`}
+          {cashEnough ? `支付 ${formatMoney(debt.amount)}` : `筹款并支付 ${formatMoney(debt.amount)}`}
         </button>
       </div>
     </section>

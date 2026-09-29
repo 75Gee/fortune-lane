@@ -12,8 +12,7 @@ import { useContext, useEffect, useState } from 'react'
 import { CommandAvailabilityContext, Modal } from './Modal.js'
 import { StockPaymentHint } from './stocks/StockPaymentHint.js'
 import { CityImage } from './CityImage.js'
-
-const money = (value: number) => `¥${value.toLocaleString('zh-CN')}`
+import { formatMoney } from '../lib/format.js'
 
 export function AuctionDialog({
   game,
@@ -82,13 +81,13 @@ export function AuctionDialog({
           <div className="auction-content">
             <div className="auction-summary">
               <span>
-                起拍价<strong>{money(minimumBid)}</strong>
-                <small>标价 {money(getTile(auction.tileIndex).price ?? 0)} · 底价即抵押价值</small>
+                起拍价<strong>{formatMoney(minimumBid)}</strong>
+                <small>标价 {formatMoney(getTile(auction.tileIndex).price ?? 0)} · 底价即抵押价值</small>
               </span>
               <span>
-                我的可用资金<strong>{money(funds)}</strong>
+                我的可用资金<strong>{formatMoney(funds)}</strong>
                 <small>
-                  现金 {money(cash)} ＋ 持股 {money(Math.max(0, funds - cash))}
+                  现金 {formatMoney(cash)} ＋ 持股 {formatMoney(Math.max(0, funds - cash))}
                 </small>
               </span>
             </div>
@@ -115,13 +114,13 @@ export function AuctionDialog({
                 </label>
                 {amount && !valid && funds >= minimumBid && (
                   <p className="auction-input-error" role="status">
-                    {bid > funds ? '出价超过了现金与持股可变现额' : `出价至少 ${money(minimumBid)}，须为整数`}
+                    {bid > funds ? '出价超过了现金与持股可变现额' : `出价至少 ${formatMoney(minimumBid)}，须为整数`}
                   </p>
                 )}
                 {valid && <StockPaymentHint payment={payment} onWin />}
                 <p className="auction-rule">
                   {funds < minimumBid
-                    ? `现金与持股不足，还差 ${money(minimumBid - funds)}`
+                    ? `现金与持股不足，还差 ${formatMoney(minimumBid - funds)}`
                     : '出价不可修改，超时放弃。'}
                 </p>
                 <div className="decision-buttons">
@@ -165,7 +164,7 @@ export function AuctionDialog({
                       {id === playerId ? ' · 你' : ''}
                     </span>
                     <strong className="auction-player-cash">
-                      {player ? money(stockPaymentCapacity(game, id)) : '—'}
+                      {player ? formatMoney(stockPaymentCapacity(game, id)) : '—'}
                     </strong>
                     <small>
                       {Object.hasOwn(auction.bids, id) ? (

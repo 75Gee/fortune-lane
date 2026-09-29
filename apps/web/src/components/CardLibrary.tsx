@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { CARD_DECK_ART, CardDeckSymbol } from './CardDeckArt.js'
+import { formatMoney } from '../lib/format.js'
 
 function effectLabel(effect: CardEffect): string {
   switch (effect.type) {
@@ -61,20 +62,19 @@ function effectLabel(effect: CardEffect): string {
 }
 
 function effectDetails(effect: CardEffect): string | null {
-  const money = (amount: number) => `¥${amount.toLocaleString('zh-CN')}`
   switch (effect.type) {
     case 'cash_relief':
-      return `现金不超过 ${money(effect.threshold)} 时领取 ${money(effect.amount)}，否则领取 ${money(effect.otherwise)}。`
+      return `现金不超过 ${formatMoney(effect.threshold)} 时领取 ${formatMoney(effect.amount)}，否则领取 ${formatMoney(effect.otherwise)}。`
     case 'relief':
-      return `持有不超过 ${effect.threshold} 处地产时领取 ${money(effect.amount)}，否则领取 ${money(effect.otherwise)}；已抵押地产也计入。`
+      return `持有不超过 ${effect.threshold} 处地产时领取 ${formatMoney(effect.amount)}，否则领取 ${formatMoney(effect.otherwise)}；已抵押地产也计入。`
     case 'asset_income':
-      return `每处地产收入 ${money(effect.perAsset)}，至少 ${money(effect.minimum)}、最多 ${money(effect.cap)}；已抵押地产也计入。`
+      return `每处地产收入 ${formatMoney(effect.perAsset)}，至少 ${formatMoney(effect.minimum)}、最多 ${formatMoney(effect.cap)}；已抵押地产也计入。`
     case 'assessment':
-      return `每处地产缴纳 ${money(effect.perAsset)}，最多 ${money(effect.cap)}；已抵押地产也计入。`
+      return `每处地产缴纳 ${formatMoney(effect.perAsset)}，最多 ${formatMoney(effect.cap)}；已抵押地产也计入。`
     case 'repairs':
-      return `未抵押地产的 1–${MAX_PROPERTY_LEVEL - 1} 级建筑每级缴纳 ${money(effect.perHouse)}；${MAX_PROPERTY_LEVEL} 级地产每处缴纳 ${money((MAX_PROPERTY_LEVEL - 1) * effect.perHouse + effect.perHotel)}。合计最多 ${money(effect.cap)}。`
+      return `未抵押地产的 1–${MAX_PROPERTY_LEVEL - 1} 级建筑每级缴纳 ${formatMoney(effect.perHouse)}；${MAX_PROPERTY_LEVEL} 级地产每处缴纳 ${formatMoney((MAX_PROPERTY_LEVEL - 1) * effect.perHouse + effect.perHotel)}。合计最多 ${formatMoney(effect.cap)}。`
     case 'renovate':
-      return `自动升级名下未抵押、未满级且等级最低的地产；同级时优先购买价较低的地产。没有可升级地产时领取 ${money(effect.fallback)}。`
+      return `自动升级名下未抵押、未满级且等级最低的地产；同级时优先购买价较低的地产。没有可升级地产时领取 ${formatMoney(effect.fallback)}。`
     case 'downgrade':
       return '选择名下一处有建筑且未抵押的地产降一级，不返还建造费；没有符合条件的地产时不发生变化。'
     default:

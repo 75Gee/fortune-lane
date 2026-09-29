@@ -209,19 +209,17 @@ export function useGameConnection() {
           if (cancelled || !socket.connected) return
           const batch = snapshot.slice(start, start + SAVED_ROOM_CHECK_BATCH_SIZE)
           const response = await new Promise<Ack<SavedRoomStatus[]> | null>((resolve) => {
-            socket
-              .timeout(8000)
-              .emit(
-                'room:saved-status',
-                {
-                  rooms: batch.map(({ roomCode, playerId, reconnectToken }) => ({
-                    roomCode,
-                    playerId,
-                    reconnectToken,
-                  })),
-                },
-                (error, result) => resolve(error ? null : result),
-              )
+            socket.timeout(8000).emit(
+              'room:saved-status',
+              {
+                rooms: batch.map(({ roomCode, playerId, reconnectToken }) => ({
+                  roomCode,
+                  playerId,
+                  reconnectToken,
+                })),
+              },
+              (error, result) => resolve(error ? null : result),
+            )
           })
           if (cancelled) return
           if (!response?.ok) {

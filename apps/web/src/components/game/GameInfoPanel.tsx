@@ -18,7 +18,7 @@ import { TokenImage } from '../TokenImage.js'
 import { StockHoldings } from '../stocks/StockSummary.js'
 import { TileDetail } from './TileDetail.js'
 import { LiquidationPlanner } from './LiquidationPlanner.js'
-const money = (value: number) => `¥${value.toLocaleString('zh-CN')}`
+import { formatMoney } from '../../lib/format.js'
 
 export type InfoTab = 'players' | 'assets' | 'activity' | 'cards'
 export function GameInfoPanel({
@@ -127,7 +127,7 @@ export function GameInfoPanel({
                 const owned = game.tiles.filter((tile) => tile.ownerId === player.id).length
                 return (
                   <button
-                    aria-label={`查看${player.name}的资产，总身家${money(playerNetWorth(game, player.id))}${player.surrendered ? '，已投降' : player.isBankrupt ? '，已破产' : `，现金${money(player.cash)}，${owned}处地产`}`}
+                    aria-label={`查看${player.name}的资产，总身家${formatMoney(playerNetWorth(game, player.id))}${player.surrendered ? '，已投降' : player.isBankrupt ? '，已破产' : `，现金${formatMoney(player.cash)}，${owned}处地产`}`}
                     className={`player-row ${player.id === game.currentPlayerId ? 'is-current' : ''} ${player.id === playerId ? 'is-me' : ''} ${player.isBankrupt ? 'is-bankrupt' : ''}`}
                     key={player.id}
                     onClick={() => {
@@ -158,11 +158,11 @@ export function GameInfoPanel({
                           ? '已投降'
                           : player.isBankrupt
                             ? '已破产'
-                            : `${owned} 处地产 · 现金 ${money(player.cash)}`}
+                            : `${owned} 处地产 · 现金 ${formatMoney(player.cash)}`}
                       </small>
                     </span>
                     <span className="player-worth">
-                      <strong>{money(playerNetWorth(game, player.id))}</strong>
+                      <strong>{formatMoney(playerNetWorth(game, player.id))}</strong>
                     </span>
                     {!player.connected && <i className="offline-dot" title="已掉线" />}
                   </button>
@@ -196,7 +196,7 @@ export function GameInfoPanel({
             {!planningDebt && game.pendingDebt?.debtorId === assetOwner && (
               <div className="portfolio-debt">
                 <strong>
-                  待付 {money(game.pendingDebt.amount)} · {game.pendingDebt.reason}
+                  待付 {formatMoney(game.pendingDebt.amount)} · {game.pendingDebt.reason}
                 </strong>
                 <p>正在筹款</p>
               </div>
@@ -205,15 +205,15 @@ export function GameInfoPanel({
               <dl className="portfolio-overview">
                 <div>
                   <dt>现金</dt>
-                  <dd>{money(owner?.cash ?? 0)}</dd>
+                  <dd>{formatMoney(owner?.cash ?? 0)}</dd>
                 </div>
                 <div>
                   <dt>股票市值</dt>
-                  <dd>{money(stockValue)}</dd>
+                  <dd>{formatMoney(stockValue)}</dd>
                 </div>
                 <div>
                   <dt>总身家</dt>
-                  <dd>{money(playerNetWorth(game, assetOwner))}</dd>
+                  <dd>{formatMoney(playerNetWorth(game, assetOwner))}</dd>
                 </div>
               </dl>
               {game.stockMarket && (
@@ -248,7 +248,7 @@ export function GameInfoPanel({
                         <small>
                           {state.mortgaged
                             ? '已抵押 · 暂不收费'
-                            : `${tile.kind === 'property' ? `${state.level} 级 · ` : ''}游览费 ${tile.kind === 'utility' ? '按骰点计费' : money(rentForTile(game, index, 0))}`}
+                            : `${tile.kind === 'property' ? `${state.level} 级 · ` : ''}游览费 ${tile.kind === 'utility' ? '按骰点计费' : formatMoney(rentForTile(game, index, 0))}`}
                         </small>
                       </span>
                       <ChevronRight size={17} />

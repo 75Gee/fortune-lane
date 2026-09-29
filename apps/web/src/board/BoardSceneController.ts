@@ -340,16 +340,14 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
         if (model.position.distanceToSquared(target) > 0.0001) animating = true
         else model.position.copy(target)
       }
-      tokenGrounding
-        .get(player.id)
-        ?.set({
-          x: model.position.x,
-          z: model.position.z,
-          width: model.userData.footprintWidth * model.scale.x,
-          depth: model.userData.footprintDepth * model.scale.z,
-          rotation: model.rotation.y,
-          opacity: player.isBankrupt ? 0 : 0.23,
-        })
+      tokenGrounding.get(player.id)?.set({
+        x: model.position.x,
+        z: model.position.z,
+        width: model.userData.footprintWidth * model.scale.x,
+        depth: model.userData.footprintDepth * model.scale.z,
+        rotation: model.rotation.y,
+        opacity: player.isBankrupt ? 0 : 0.23,
+      })
       if (player.id === actorId && !player.isBankrupt) {
         marker.position.copy(model.position)
         marker.position.y += model.userData.tokenHeight * model.scale.y + 0.35

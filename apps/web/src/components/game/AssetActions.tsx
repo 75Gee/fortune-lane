@@ -2,7 +2,7 @@ import { assetActionQuote, type GameCommand, type GameView } from '@fortune/game
 import { useContext } from 'react'
 import { CommandAvailabilityContext } from '../Modal.js'
 import { StockPaymentHint } from '../stocks/StockPaymentHint.js'
-const money = (value: number) => `¥${value.toLocaleString('zh-CN')}`
+import { formatMoney } from '../../lib/format.js'
 export function AssetActions({
   game,
   tileIndex,
@@ -24,7 +24,7 @@ export function AssetActions({
     (action === 'MORTGAGE_ASSET'
       ? '抵押后暂停收费'
       : action === 'REDEEM_ASSET'
-        ? `赎回后现金 ${money(quote.balanceAfter)}`
+        ? `赎回后现金 ${formatMoney(quote.balanceAfter)}`
         : null)
   return (
     <div className="asset-actions">
@@ -50,7 +50,7 @@ export function AssetActions({
         </span>
         <strong>
           {quote.amount > 0 ? '−' : '+'}
-          {money(Math.abs(quote.amount))}
+          {formatMoney(Math.abs(quote.amount))}
         </strong>
       </button>
       {hint && <small>{hint}</small>}
