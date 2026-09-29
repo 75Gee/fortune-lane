@@ -57,6 +57,7 @@ import { GameInfoPanel, type InfoTab } from '../components/game/GameInfoPanel.js
 import { RouteView } from '../components/game/RouteView.js'
 import { TileDetail } from '../components/game/TileDetail.js'
 import { formatMoney } from '../lib/format.js'
+import { ConfirmDialog } from '../ui/index.js'
 type Panel =
   | { type: 'info'; tab: InfoTab; owner: string }
   | { type: 'tile'; index: number }
@@ -450,91 +451,53 @@ export function GamePage({
           </div>
         )}
         {leaveOpen && (
-          <Modal label="暂离房间" onDismiss={() => setLeaveOpen(false)}>
-            <div className="result-overlay">
-              <section className="result-panel">
-                <LogOut size={28} />
-                <h2>暂离房间？</h2>
-                <p>
-                  {me?.isBankrupt || game.phase === 'FINISHED'
-                    ? '返回首页后，仍可重返这个房间。'
-                    : '对局会继续，超时由系统代操作。返回首页后可重返房间；投降才会结束参赛。'}
-                </p>
-                <div>
-                  <button autoFocus onClick={() => setLeaveOpen(false)}>
-                    留在房间
-                  </button>
-                  <button
-                    className="primary-command"
-                    disabled={commandPending || connectionStatus !== 'connected'}
-                    onClick={onLeave}
-                  >
-                    暂离房间
-                  </button>
-                </div>
-              </section>
-            </div>
-          </Modal>
+          <ConfirmDialog
+            icon={<LogOut size={28} />}
+            title="暂离房间？"
+            description={
+              me?.isBankrupt || game.phase === 'FINISHED'
+                ? '返回首页后，仍可重返这个房间。'
+                : '对局会继续，超时由系统代操作。返回首页后可重返房间；投降才会结束参赛。'
+            }
+            cancelLabel="留在房间"
+            confirmLabel="暂离房间"
+            confirmDisabled={commandPending || connectionStatus !== 'connected'}
+            onCancel={() => setLeaveOpen(false)}
+            onConfirm={onLeave}
+          />
         )}
         {bankruptcyOpen && (
-          <Modal label="确认破产" onDismiss={() => setBankruptcyOpen(false)}>
-            <div className="result-overlay">
-              <section className="result-panel">
-                <HandCoins size={28} />
-                <h2>放弃筹款，宣告破产？</h2>
-                <p>股票变现后的现金用于清算，地产归还银行。本局无法继续参赛，但可以留下观战。</p>
-                <div>
-                  <button autoFocus onClick={() => setBankruptcyOpen(false)}>
-                    继续筹款
-                  </button>
-                  <button
-                    className="danger"
-                    disabled={commandPending || connectionStatus !== 'connected'}
-                    onClick={() => {
-                      setBankruptcyOpen(false)
-                      sendCommand({ type: 'DECLARE_BANKRUPTCY' })
-                    }}
-                  >
-                    确认破产
-                  </button>
-                </div>
-              </section>
-            </div>
-          </Modal>
+          <ConfirmDialog
+            tone="danger"
+            icon={<HandCoins size={28} />}
+            title="放弃筹款，宣告破产？"
+            description="股票变现后的现金用于清算，地产归还银行。本局无法继续参赛，但可以留下观战。"
+            cancelLabel="继续筹款"
+            confirmLabel="确认破产"
+            confirmDisabled={commandPending || connectionStatus !== 'connected'}
+            onCancel={() => setBankruptcyOpen(false)}
+            onConfirm={() => {
+              setBankruptcyOpen(false)
+              sendCommand({ type: 'DECLARE_BANKRUPTCY' })
+            }}
+          />
         )}
         {surrenderOpen && (
-          <Modal
-            label="确认投降"
-            onDismiss={() => {
-              if (!surrenderRequested) setSurrenderOpen(false)
+          <ConfirmDialog
+            tone="danger"
+            icon={<Flag size={28} />}
+            title="确认投降？"
+            description="地产归还银行，本局无法重新参战。你将留在房间继续观战。"
+            cancelLabel="继续游玩"
+            confirmLabel={surrenderRequested ? '正在投降…' : '投降并观战'}
+            confirmDisabled={commandPending || connectionStatus !== 'connected'}
+            locked={surrenderRequested}
+            onCancel={() => setSurrenderOpen(false)}
+            onConfirm={() => {
+              setSurrenderRequested(true)
+              onCommand({ type: 'SURRENDER' })
             }}
-          >
-            <div className="result-overlay">
-              <section className="result-panel">
-                <Flag size={28} />
-                <h2>确认投降？</h2>
-                <p>地产归还银行，本局无法重新参战。你将留在房间继续观战。</p>
-                <div>
-                  <button
-                    disabled={surrenderRequested || commandPending || connectionStatus !== 'connected'}
-                    onClick={() => setSurrenderOpen(false)}
-                  >
-                    继续游玩
-                  </button>
-                  <button
-                    className="danger"
-                    disabled={surrenderRequested || commandPending || connectionStatus !== 'connected'}
-                    onClick={() => {
-                      setSurrenderRequested(true)
-                      onCommand({ type: 'SURRENDER' })
-                    }}
-                  >
-                    {surrenderRequested ? '正在投降…' : '投降并观战'}
-                  </button>
-                </div>
-              </section>
-            </div>
-          </Modal>
+          />
         )}
 
         {game.phase === 'FINISHED' && !isPlaying && !resultReviewed && (

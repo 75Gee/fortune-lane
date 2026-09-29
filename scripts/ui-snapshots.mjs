@@ -32,6 +32,8 @@ const scenes = [
   { name: 'game-items', url: game, click: ['.inventory-command'] },
   { name: 'game-stocks', url: `${game}&stocks`, click: ['.stock-entry'] },
   { name: 'game-leave', url: game, click: ['[aria-label="对局设置"]', 'text=暂离房间'] },
+  { name: 'game-surrender', url: game, click: ['[aria-label="对局设置"]', 'text=投降并观战'] },
+  { name: 'debt-bankruptcy', url: `${game}&decision=debt`, click: ['.debt-give-up'] },
   { name: 'decision-purchase', url: `${game}&decision=purchase` },
   { name: 'decision-upgrade', url: `${game}&decision=upgrade` },
   { name: 'decision-auction', url: `${game}&decision=auction` },
