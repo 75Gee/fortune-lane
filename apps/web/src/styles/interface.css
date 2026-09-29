@@ -687,10 +687,6 @@
   background: var(--surface);
   padding-block: 10px;
 }
-.trip-player-detail dt,
-.trip-player-summary p {
-  color: var(--ui-muted);
-}
 
 @media (min-width: 801px) {
   .lobby-table {

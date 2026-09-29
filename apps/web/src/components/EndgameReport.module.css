@@ -1,0 +1,382 @@
+/* End-of-game report as an open passport: winner page left, travellers page right. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  background: color-mix(in srgb, var(--surface-ink) 60%, transparent);
+  backdrop-filter: blur(3px);
+}
+
+.passport {
+  position: relative;
+  display: grid;
+  grid-template-columns: 380px minmax(0, 1fr);
+  width: min(1100px, 100%);
+  max-height: calc(100dvh - 48px);
+  padding: 10px;
+  border-radius: 18px;
+  background: var(--surface-ink);
+  box-shadow: 0 30px 80px #0a101e80;
+}
+.close {
+  position: absolute;
+  z-index: 2;
+  top: 22px;
+  right: 22px;
+}
+
+/* ---------- Winner page ---------- */
+
+.winnerPage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 36px 28px;
+  border-right: 1px solid var(--line-strong);
+  border-radius: 12px 4px 4px 12px;
+  background: var(--surface);
+  text-align: center;
+}
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.2em;
+  color: var(--text-subtle);
+}
+.tokenWrap {
+  position: relative;
+}
+.winnerToken {
+  display: grid;
+  place-items: center;
+  width: 150px;
+  height: 150px;
+  border: 4px solid var(--accent);
+  border-radius: 50%;
+  background: #fff;
+}
+.winnerToken img {
+  width: 100px;
+  height: 100px;
+}
+.winnerCopy small {
+  font-size: var(--text-base);
+  color: var(--text-muted);
+}
+.winnerCopy h2 {
+  margin: 4px 0 0;
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 900;
+  line-height: 1.05;
+}
+.winnerCopy p {
+  max-width: 300px;
+  margin: 10px auto 0;
+  color: var(--text-secondary);
+  font-size: var(--text-md);
+  line-height: 1.6;
+}
+.duration {
+  display: flex;
+  gap: 18px;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+}
+.duration span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.championStamp {
+  position: absolute;
+  top: -6px;
+  right: -86px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 98px;
+  height: 98px;
+  border: 3px solid var(--accent);
+  border-radius: 50%;
+  color: var(--accent);
+  transform: rotate(14deg);
+}
+.championStamp small {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+}
+.championStamp strong {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 900;
+}
+
+/* ---------- Travellers page ---------- */
+
+.rankPage {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 28px 30px 24px;
+  overflow-y: auto;
+  border-radius: 4px 12px 12px 4px;
+  background: var(--surface);
+}
+.rankPage:focus {
+  outline: none;
+}
+.rankTitle {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 900;
+}
+.rankings {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 2px solid var(--line-ink);
+}
+.rankings > li {
+  border-bottom: 1px solid var(--line);
+}
+.player summary {
+  display: grid;
+  grid-template-columns: 36px 44px minmax(0, 1fr) auto 20px;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  cursor: pointer;
+  list-style: none;
+}
+.player summary::-webkit-details-marker {
+  display: none;
+}
+.player.me summary {
+  background: var(--surface-raised);
+}
+.rank {
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.rank.first {
+  color: var(--accent);
+}
+.playerToken {
+  width: 40px;
+  height: 40px;
+}
+.playerSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.playerSummary strong {
+  font-size: var(--text-lg);
+}
+.playerSummary span {
+  color: var(--text-muted);
+  font-size: var(--text-md);
+}
+.award {
+  padding: 3px 10px;
+  border: 1.5px solid var(--gold);
+  border-radius: var(--radius-xs);
+  color: var(--gold-ink);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  white-space: nowrap;
+}
+.expand {
+  color: var(--text-muted);
+  transition: transform var(--duration-fast);
+}
+.player[open] .expand {
+  transform: rotate(180deg);
+}
+.detail {
+  padding: 0 0 14px 92px;
+  color: var(--text-secondary);
+  font-size: var(--text-md);
+}
+.detail dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 16px;
+  margin: 0 0 10px;
+}
+.detail dt {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+.detail dd {
+  margin: 2px 0 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--text);
+}
+.detail p {
+  margin: 6px 0 0;
+  line-height: 1.6;
+}
+.elimination {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  color: var(--danger);
+}
+
+.highlights {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+}
+.highlights summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+  list-style: none;
+}
+.highlights summary::-webkit-details-marker {
+  display: none;
+}
+.highlights summary small {
+  margin-left: auto;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+.highlights[open] summary svg {
+  transform: rotate(180deg);
+}
+.highlights article {
+  margin-top: 10px;
+}
+.highlights h4 {
+  margin: 0;
+  font-size: var(--text-md);
+}
+.highlights p {
+  margin: 2px 0 0;
+  color: var(--text-secondary);
+  font-size: var(--text-md);
+  line-height: 1.6;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 20px;
+}
+.actions > * {
+  flex: 1;
+}
+.actions > :nth-child(2):not(:last-child) {
+  flex: 1.4;
+}
+
+@media (max-width: 800px) {
+  .overlay {
+    padding: 0;
+    place-items: end stretch;
+  }
+  .passport {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+    max-height: 94dvh;
+    padding: 6px 6px 0;
+    border-radius: 18px 18px 0 0;
+  }
+  .close {
+    top: 14px;
+    right: 14px;
+  }
+  .winnerPage {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 14px;
+    padding: 16px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line-strong);
+    border-radius: 14px 14px 4px 4px;
+    text-align: left;
+  }
+  .eyebrow,
+  .duration,
+  .winnerCopy p {
+    display: none;
+  }
+  .winnerToken {
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    border-width: 3px;
+  }
+  .winnerToken img {
+    width: 48px;
+    height: 48px;
+  }
+  .winnerCopy h2 {
+    font-size: 36px;
+  }
+  .tokenWrap {
+    position: static;
+  }
+  .championStamp {
+    top: 12px;
+    right: 64px;
+    width: 72px;
+    height: 72px;
+  }
+  .championStamp strong {
+    font-size: var(--text-md);
+  }
+  .rankPage {
+    padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+    border-radius: 4px 4px 0 0;
+  }
+  .player summary {
+    grid-template-columns: 28px 36px minmax(0, 1fr) 16px;
+    gap: 10px;
+  }
+  .award {
+    grid-column: 3;
+    grid-row: 2;
+    justify-self: start;
+  }
+  .playerToken {
+    width: 34px;
+    height: 34px;
+  }
+  .detail {
+    padding-left: 0;
+  }
+  .detail dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .actions {
+    flex-wrap: wrap;
+  }
+  .actions > :nth-child(2):not(:last-child) {
+    order: -1;
+    flex-basis: 100%;
+  }
+}

@@ -5,7 +5,7 @@ import { TOKEN_META } from './tokenMeta.js'
 interface TokenImageProps {
   token: TokenId
   alt?: string
-  className?: string
+  className?: string | undefined
 }
 
 export function TokenImage({ token, alt, className }: TokenImageProps) {

@@ -1,11 +1,11 @@
 import { getTile, playerNetWorth, stockPortfolioSummary, type GameView, type PlayerStatistics } from '@fortune/game'
-import { Award, ChevronDown, Clock3, Crown, Flag, LogOut, MapPinned, RotateCcw, X } from 'lucide-react'
-import type { CSSProperties } from 'react'
-import '../styles/endgame.css'
+import { ChevronDown, Clock3, Flag, LogOut, RotateCcw, X } from 'lucide-react'
 import { Modal } from './Modal.js'
 import { TokenImage } from './TokenImage.js'
 import { stockProfit } from './stocks/format.js'
 import { formatMoney, formatCount } from '../lib/format.js'
+import { Button, IconButton } from '../ui/index.js'
+import styles from './EndgameReport.module.css'
 
 type AwardMetric = 'rentReceived' | 'rentPaid' | 'steps' | 'doubles' | 'bestAuctionSaving' | 'trapHits'
 const awards: { metric: AwardMetric; title: string; describe: (value: number) => string }[] = [
@@ -127,142 +127,154 @@ export function EndgameReport({
         : `${Math.floor(duration / 3600)} 小时 ${Math.floor((duration % 3600) / 60)} 分钟`
   return (
     <Modal label="本局结果" onDismiss={onClose}>
-      <div className="trip-report-overlay">
-        <section className="trip-report">
-          <header className="trip-report-header">
-            <span>
-              <MapPinned size={18} />
-              本局结果
-            </span>
-            <button className="icon-command" onClick={onClose} aria-label="关闭本局结果">
-              <X size={19} />
-            </button>
-          </header>
-          <div className="trip-winner">
-            <div className="trip-winner-token">
-              {winner && <TokenImage token={winner.token} alt="" />}
-              <Crown size={24} />
+      <div className={styles.overlay}>
+        <section className={styles.passport} aria-label="本局结果">
+          <IconButton className={styles.close} label="关闭本局结果" icon={<X size={19} />} onClick={onClose} />
+
+          <div className={styles.winnerPage}>
+            <span className={styles.eyebrow}>WORLD TOUR · FINAL</span>
+            <div className={styles.tokenWrap}>
+              <span className={styles.winnerToken} style={{ borderColor: winner?.color }}>
+                {winner && <TokenImage token={winner.token} alt="" />}
+              </span>
+              {winner && (
+                <div className={styles.championStamp} aria-hidden="true">
+                  <small>CHAMPION</small>
+                  <strong>环游冠军</strong>
+                </div>
+              )}
             </div>
-            <div className="trip-winner-copy">
+            <div className={styles.winnerCopy}>
               <small>本局赢家</small>
               <h2>{winner?.name ?? '旅途结束'}</h2>
               {finishMessage && <p>{finishMessage}</p>}
             </div>
-            <span className="trip-duration">
-              <Clock3 size={14} />
-              {durationLabel}
+            <p className={styles.duration}>
+              <span>
+                <Clock3 size={14} />
+                {durationLabel}
+              </span>
               <span>第 {game.turnNumber} 回合</span>
-            </span>
+            </p>
           </div>
-          <div className="trip-rankings">
-            {ranked.map((player, index) => {
-              const stats = game.statistics.players[player.id]!
-              const award = titles[player.id]
-              const elimination = game.statistics.eliminations.find((entry) => entry.playerId === player.id)
-              const stocks = stockPortfolioSummary(game.stockMarket, player.id)
-              const measures = [
-                ['期末总资产', formatMoney(playerNetWorth(game, player.id))],
-                ['最高身家', formatMoney(stats.peakNetWorth)],
-                ['游览收入', formatMoney(stats.rentReceived)],
-                ['游览支出', formatMoney(stats.rentPaid)],
-                ['累计购入', `${stats.assetsAcquired} 项`],
-                ['旅途步数', `${formatCount(stats.steps)} 格`],
-                ['使用道具', `${stats.itemUses} 次`],
-                ...(game.stockMarket
-                  ? [
-                      ['股票累计盈亏', stockProfit(stocks.totalProfit)],
-                      ['期末股票市值', formatMoney(stocks.marketValue)],
-                    ]
-                  : []),
-              ]
-              return (
-                <details
-                  className={`trip-player ${player.id === playerId ? 'is-me' : ''}`}
-                  key={player.id}
-                  style={{ '--traveler-color': player.color } as CSSProperties}
-                >
-                  <summary>
-                    <span className="trip-rank">{String(index + 1).padStart(2, '0')}</span>
-                    <TokenImage className="trip-player-token" token={player.token} alt="" />
-                    <div className="trip-player-summary">
-                      <div>
-                        <strong>{player.name}</strong>
-                        {player.id === playerId && <small>你</small>}
+
+          <div className={styles.rankPage}>
+            <h3 className={styles.rankTitle}>旅行者排名</h3>
+            <ol className={styles.rankings}>
+              {ranked.map((player, index) => {
+                const stats = game.statistics.players[player.id]!
+                const award = titles[player.id]
+                const elimination = game.statistics.eliminations.find((entry) => entry.playerId === player.id)
+                const stocks = stockPortfolioSummary(game.stockMarket, player.id)
+                const measures = [
+                  ['期末总资产', formatMoney(playerNetWorth(game, player.id))],
+                  ['最高身家', formatMoney(stats.peakNetWorth)],
+                  ['游览收入', formatMoney(stats.rentReceived)],
+                  ['游览支出', formatMoney(stats.rentPaid)],
+                  ['累计购入', `${stats.assetsAcquired} 项`],
+                  ['旅途步数', `${formatCount(stats.steps)} 格`],
+                  ['使用道具', `${stats.itemUses} 次`],
+                  ...(game.stockMarket
+                    ? [
+                        ['股票累计盈亏', stockProfit(stocks.totalProfit)],
+                        ['期末股票市值', formatMoney(stocks.marketValue)],
+                      ]
+                    : []),
+                ]
+                return (
+                  <li key={player.id}>
+                    <details className={`${styles.player} ${player.id === playerId ? styles.me : ''}`}>
+                      <summary>
+                        <span className={`${styles.rank} ${index === 0 ? styles.first : ''}`}>
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <TokenImage className={styles.playerToken} token={player.token} alt="" />
+                        <span className={styles.playerSummary}>
+                          <strong>
+                            {player.name}
+                            {player.id === playerId ? ' · 你' : ''}
+                          </strong>
+                          <span>{award ? award.describe(award.value) : personalMoment(game, stats)}</span>
+                        </span>
                         {award && (
-                          <span className="trip-award">
-                            <Award size={13} />
+                          <span className={styles.award}>
                             {award.tied > 1 ? '并列·' : ''}
                             {award.title}
                           </span>
                         )}
+                        <ChevronDown className={styles.expand} size={16} />
+                      </summary>
+                      <div className={styles.detail}>
+                        <dl>
+                          {measures.map(([label, value]) => (
+                            <div key={label}>
+                              <dt>{label}</dt>
+                              <dd>{value}</dd>
+                            </div>
+                          ))}
+                        </dl>
+                        {award && <p>{personalMoment(game, stats)}</p>}
+                        {Object.keys(stats.receivedFrom).length > 0 && (
+                          <p>
+                            游览费来源：
+                            {Object.entries(stats.receivedFrom)
+                              .sort((a, b) => b[1] - a[1])
+                              .map(
+                                ([id, amount]) =>
+                                  `${game.players.find((entry) => entry.id === id)?.name ?? '旅伴'} ${formatMoney(amount)}`,
+                              )
+                              .join(' · ')}
+                          </p>
+                        )}
+                        {elimination && (
+                          <small className={styles.elimination}>
+                            <Flag size={12} />第 {elimination.turnNumber} 回合
+                            {elimination.reason === 'surrender' ? '投降' : '破产'}，转为观战
+                          </small>
+                        )}
                       </div>
-                      <p>{award ? award.describe(award.value) : personalMoment(game, stats)}</p>
-                    </div>
-                    <ChevronDown className="trip-expand" size={16} />
-                  </summary>
-                  <div className="trip-player-detail">
-                    <dl>
-                      {measures.map(([label, value]) => (
-                        <div key={label}>
-                          <dt>{label}</dt>
-                          <dd>{value}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                    {award && <p className="trip-personal-moment">{personalMoment(game, stats)}</p>}
-                    {Object.keys(stats.receivedFrom).length > 0 && (
-                      <p className="trip-travelers">
-                        游览费来源：
-                        {Object.entries(stats.receivedFrom)
-                          .sort((a, b) => b[1] - a[1])
-                          .map(
-                            ([id, amount]) =>
-                              `${game.players.find((entry) => entry.id === id)?.name ?? '旅伴'} ${formatMoney(amount)}`,
-                          )
-                          .join(' · ')}
-                      </p>
-                    )}
-                    {elimination && (
-                      <small className="trip-elimination">
-                        <Flag size={12} />第 {elimination.turnNumber} 回合
-                        {elimination.reason === 'surrender' ? '投降' : '破产'}，转为观战
-                      </small>
-                    )}
-                  </div>
-                </details>
-              )
-            })}
-          </div>
-          {highlights.length > 0 && (
-            <details className="trip-highlights">
-              <summary>
-                <span>本局亮点</span>
-                <small>{highlights.length} 项记录</small>
-                <ChevronDown size={16} />
-              </summary>
-              <div>
-                {highlights.map((highlight) => (
-                  <article key={highlight.title}>
-                    <h3>{highlight.title}</h3>
-                    <p>{highlight.text}</p>
-                  </article>
-                ))}
-              </div>
-            </details>
-          )}
-          <footer className="trip-report-actions">
-            <button onClick={onHistory}>回看本局</button>
-            {isHost && (
-              <button className="primary-command" disabled={!available} onClick={onRestart}>
-                <RotateCcw size={17} />
-                再开一局
-              </button>
+                    </details>
+                  </li>
+                )
+              })}
+            </ol>
+            {highlights.length > 0 && (
+              <details className={styles.highlights}>
+                <summary>
+                  <span>本局亮点</span>
+                  <small>{highlights.length} 项记录</small>
+                  <ChevronDown size={16} />
+                </summary>
+                <div>
+                  {highlights.map((highlight) => (
+                    <article key={highlight.title}>
+                      <h4>{highlight.title}</h4>
+                      <p>{highlight.text}</p>
+                    </article>
+                  ))}
+                </div>
+              </details>
             )}
-            <button disabled={!available} onClick={onLeave}>
-              <LogOut size={16} />
-              返回首页
-            </button>
-          </footer>
+            <footer className={styles.actions}>
+              <Button variant="outline" size="lg" onClick={onHistory}>
+                回看本局
+              </Button>
+              {isHost && (
+                <Button
+                  variant="primary"
+                  size="lg"
+                  icon={<RotateCcw size={17} />}
+                  disabled={!available}
+                  onClick={onRestart}
+                >
+                  再开一局
+                </Button>
+              )}
+              <Button variant="outline" size="lg" icon={<LogOut size={16} />} disabled={!available} onClick={onLeave}>
+                返回首页
+              </Button>
+            </footer>
+          </div>
         </section>
       </div>
     </Modal>
