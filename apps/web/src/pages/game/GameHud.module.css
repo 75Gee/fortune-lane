@@ -623,8 +623,10 @@
   .wallet button + button {
     border-left: 1px solid #3a4560;
   }
-  .wallet button:hover {
-    background: #2a3656;
+  @media (hover: hover) {
+    .wallet button:hover {
+      background: #2a3656;
+    }
   }
   .walletItems > span:first-child {
     align-items: center;

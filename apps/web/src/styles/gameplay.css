@@ -116,8 +116,9 @@
   place-items: center;
   border: 1px solid var(--line);
   border-radius: 50%;
-  background: #f7fbf5ee;
-  color: var(--positive);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
   pointer-events: auto;
 }
 .reaction-picker {
@@ -305,8 +306,18 @@
 .portfolio-asset .asset-row {
   width: 100%;
 }
+/* Desktop: above the wallet. Phones: under the scene tools, clear of the action sheet. */
 .reaction-ui:not(.in-dialog) {
   bottom: 270px;
+}
+@media (max-width: 800px) {
+  .reaction-ui:not(.in-dialog) {
+    top: 200px;
+    right: 12px;
+    bottom: auto;
+    left: auto;
+    justify-items: end;
+  }
 }
 @media (max-width: 800px) {
   .activity-entry {
@@ -320,7 +331,7 @@
     padding: 8px 12px;
   }
 }
-@media (max-height: 620px) {
+@media (max-height: 620px) and (min-width: 801px) {
   .reaction-ui:not(.in-dialog) {
     bottom: 210px;
   }
