@@ -88,7 +88,11 @@ export function ActionPanel({
     const current = game.players.find((player) => player.id === game.currentPlayerId)
     return (
       <WaitingSlip
-        title={`${current?.name ?? '当前玩家'} · ${actionDescription(game)}`}
+        title={
+          game.pendingAuction
+            ? `${actionDescription(game)} · 等待揭晓`
+            : `${current?.name ?? '当前玩家'} · ${actionDescription(game)}`
+        }
         detail={me?.isBankrupt ? '你正在观战' : !current?.connected ? '已离线，超时自动行动' : undefined}
         action={watchButton}
       />

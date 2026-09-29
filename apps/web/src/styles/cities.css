@@ -29,37 +29,6 @@
   overflow-wrap: anywhere;
 }
 
-.auction-city-cover:has(.city-image) {
-  position: relative;
-  overflow: hidden;
-  background: #263e36;
-}
-.auction-city-cover > .city-image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-position: center top;
-}
-.auction-city-cover:has(.city-image) > .landing-dialog-head {
-  position: relative;
-  min-height: 216px;
-  align-items: flex-end;
-  border-bottom: 0;
-  color: var(--text-on-accent);
-  background: linear-gradient(0deg, rgb(17 35 33 / 84%), rgb(17 35 33 / 10%) 66%, transparent);
-}
-.auction-city-cover:has(.city-image) .landing-dialog-head small {
-  color: #f0f5f3;
-}
-.auction-city-cover:has(.city-image) .landing-dialog-head > span {
-  color: var(--text-on-accent);
-  background: rgb(255 255 255 / 18%);
-}
-.auction-dialog:has(.city-image) > .decision-close {
-  background: var(--surface);
-}
-
 @media (max-width: 600px) {
   .asset-row.has-city-art {
     grid-template-columns: 4px 60px minmax(0, 1fr) 18px;
@@ -71,9 +40,5 @@
   }
   .asset-row.has-city-art > i {
     height: 40px;
-  }
-  .auction-city-cover:has(.city-image) > .landing-dialog-head {
-    min-height: 144px;
-    padding: 18px 20px;
   }
 }

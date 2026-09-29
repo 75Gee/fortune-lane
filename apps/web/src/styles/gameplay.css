@@ -825,13 +825,6 @@
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
-.auction-summary small {
-  font-size: 11px;
-  line-height: 1.6;
-}
-.auction-content > form {
-  margin-top: 18px;
-}
 .decision-close {
   position: absolute;
   top: 10px;

@@ -38,6 +38,7 @@ const scenes = [
   { name: 'decision-purchase', url: `${game}&decision=purchase` },
   { name: 'decision-upgrade', url: `${game}&decision=upgrade` },
   { name: 'decision-auction', url: `${game}&decision=auction` },
+  { name: 'auction-bid', url: `${game}&decision=auction&viewer=muzi` },
   { name: 'decision-debt', url: `${game}&decision=debt` },
   { name: 'card-chance', url: `${game}&deck=chance` },
   { name: 'card-fate', url: `${game}&deck=fate` },

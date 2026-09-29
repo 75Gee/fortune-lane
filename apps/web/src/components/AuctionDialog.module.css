@@ -1,0 +1,386 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  background: var(--scrim);
+  backdrop-filter: blur(3px);
+}
+
+.slip {
+  display: flex;
+  width: min(960px, 100%);
+  max-height: calc(100dvh - 48px);
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: 0 30px 80px #0f162673;
+}
+
+.cover {
+  position: relative;
+  width: 300px;
+  flex-shrink: 0;
+  background: var(--surface-sunken);
+}
+.coverImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.stamp {
+  position: absolute;
+  left: 32px;
+  bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 16px;
+  border: 3px solid var(--surface);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--accent) 88%, transparent);
+  color: var(--surface);
+  transform: rotate(-8deg);
+}
+.stamp small {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: 0.2em;
+}
+.stamp strong {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+  padding: 26px 30px;
+  overflow-y: auto;
+}
+/* The scroll region can receive the dialog's initial focus; its controls keep their own rings. */
+.content:focus {
+  outline: none;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.header > div {
+  flex: 1;
+  min-width: 0;
+}
+.kicker {
+  margin: 0 0 6px;
+  color: var(--text-muted);
+  font-size: var(--text-md);
+}
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.titleRow h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+.chip i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.clock {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  background: var(--surface-ink);
+  color: var(--text-on-ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.clock.urgent {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+
+.facts {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+.facts > div {
+  padding: 14px 16px;
+}
+.facts > div + div {
+  border-left: 1px dashed var(--line-strong);
+}
+.facts dt {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+.facts dd {
+  margin: 4px 0 2px;
+  font-family: var(--font-mono);
+  font-size: var(--text-3xl);
+  font-weight: 600;
+}
+.facts .factNote {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.form > label {
+  font-size: var(--text-md);
+  font-weight: var(--weight-bold);
+}
+.bidRow {
+  display: flex;
+  gap: 8px;
+}
+.bidField {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  height: 56px;
+  padding: 0 16px;
+  border: 2px solid var(--line-ink);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+}
+.bidField:focus-within {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+.bidField span {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  color: var(--text-muted);
+}
+.bidField input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  outline: none;
+  appearance: textfield;
+}
+.bidField input::-webkit-inner-spin-button,
+.bidField input::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+.quick {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 104px;
+  padding: 4px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  color: var(--text);
+  font-size: var(--text-sm);
+}
+.quick strong {
+  font-family: var(--font-mono);
+  font-size: var(--text-md);
+}
+.quick:not(:disabled):hover {
+  border-color: var(--line-ink);
+}
+.error {
+  margin: 0;
+  color: var(--danger);
+  font-size: var(--text-sm);
+}
+.rule {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+.commands {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+}
+.waiting {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+}
+
+.ledger {
+  width: 100%;
+  border-collapse: collapse;
+  border-top: 2px solid var(--line-ink);
+  font-size: var(--text-base);
+}
+.ledger th {
+  padding: 8px 4px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  text-align: left;
+}
+.ledger th:nth-child(2),
+.ledger td:nth-child(2) {
+  text-align: right;
+}
+.ledger th:last-child,
+.ledger td:last-child {
+  width: 120px;
+  text-align: right;
+}
+.ledger td {
+  height: 48px;
+  padding: 0 4px;
+  border-bottom: 1px solid var(--line);
+}
+.ledger tr.me td {
+  background: var(--surface-raised);
+  font-weight: var(--weight-bold);
+}
+.who {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.who img {
+  width: 26px;
+  height: 26px;
+}
+.money {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+.sealed,
+.short {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1.5px solid;
+  border-radius: var(--radius-xs);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+.sealed {
+  color: var(--accent);
+  transform: rotate(-4deg);
+}
+.short {
+  color: var(--text-muted);
+}
+.thinking {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.rules {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+.rules summary {
+  cursor: pointer;
+  color: var(--text);
+  font-weight: var(--weight-medium);
+}
+.rules p {
+  margin: 6px 0 0;
+}
+
+@media (max-width: 800px) {
+  .overlay {
+    padding: 0;
+    place-items: end stretch;
+  }
+  .slip {
+    flex-direction: column;
+    width: 100%;
+    max-height: 92dvh;
+    border-radius: 18px 18px 0 0;
+  }
+  .cover {
+    width: 100%;
+    height: 120px;
+  }
+  .stamp {
+    left: auto;
+    right: 16px;
+    bottom: 14px;
+    padding: 6px 12px;
+  }
+  .stamp strong {
+    font-size: var(--text-lg);
+  }
+  .content {
+    gap: 14px;
+    padding: 16px;
+  }
+  .titleRow h2 {
+    font-size: var(--text-3xl);
+  }
+  .facts dd {
+    font-size: var(--text-xl);
+  }
+  .bidRow {
+    flex-wrap: wrap;
+  }
+  .bidField {
+    flex-basis: 100%;
+  }
+  .quick {
+    flex: 1;
+    min-height: 44px;
+  }
+  .ledger th:last-child,
+  .ledger td:last-child {
+    width: 96px;
+  }
+}
