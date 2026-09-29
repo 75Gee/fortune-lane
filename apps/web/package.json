@@ -10,6 +10,8 @@
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/noto-serif-sc": "^5.3.0",
     "@fortune/game": "workspace:*",
     "@fortune/protocol": "workspace:*",
     "cannon-es": "^0.20.0",
