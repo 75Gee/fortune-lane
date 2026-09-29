@@ -1,8 +1,4 @@
 /* Player-facing hierarchy: decisions first, details on demand. */
-:root {
-  --ui-muted: #637366;
-  --ui-line: #dce4dc;
-}
 .game-screen .board-region > .board-toolbar {
   grid-template-columns: minmax(220px, 1fr) minmax(0, 2fr) auto;
 }
@@ -228,7 +224,7 @@
   top: 0;
   z-index: 3;
   padding: 16px 20px;
-  background: #fff;
+  background: var(--surface);
 }
 .tile-detail > .deed-header > .deed-title {
   display: grid;
@@ -436,7 +432,7 @@
 }
 .liquidation-property.is-selected > select {
   border-color: #92b28a;
-  background: #f5f9ef;
+  background: var(--surface-muted);
 }
 .liquidation-property > p {
   margin: 6px 0 0;
@@ -559,7 +555,7 @@
 .stock-workspace .stock-order {
   grid-area: order;
   border-radius: 8px;
-  background: #f5f8f2;
+  background: var(--surface-subtle);
 }
 .stock-workspace .stock-detail {
   grid-area: chart;
@@ -664,10 +660,10 @@
   justify-content: center;
   gap: 7px;
   min-height: 42px;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--ui-line);
   border-radius: 6px;
-  color: #345a47;
+  color: var(--text-secondary);
   font-size: 13px;
 }
 .token-picker button {
@@ -698,7 +694,7 @@
   padding: 12px 24px;
   border: 1px solid var(--ui-line);
   border-radius: 6px;
-  background: #fff;
+  background: var(--surface);
   color: #44604e;
   font-size: 14px;
 }
@@ -763,7 +759,7 @@
   color: var(--ui-muted);
 }
 .item-inventory .item-selection > .item-preview.is-warning {
-  background: #fff5e5;
+  background: var(--surface-warm);
   color: #825626;
 }
 .item-confirm {
@@ -771,7 +767,7 @@
   bottom: 0;
   z-index: 2;
   padding: 10px 0;
-  background: #fff;
+  background: var(--surface);
 }
 .item-confirm .item-use {
   margin-top: 0;
@@ -816,7 +812,7 @@
   position: sticky;
   top: 60px;
   z-index: 2;
-  background: #fff;
+  background: var(--surface);
   padding-block: 10px;
 }
 .trip-player-detail dt,
@@ -841,7 +837,7 @@
     bottom: 0;
     z-index: 2;
     padding: 16px 0;
-    background: #fcfdf8;
+    background: var(--surface-subtle);
   }
 }
 @media (max-width: 800px) {

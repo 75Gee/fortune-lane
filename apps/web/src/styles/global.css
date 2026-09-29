@@ -1,27 +1,10 @@
 :root {
-  font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    'PingFang SC',
-    'Microsoft YaHei',
-    sans-serif;
-  color: #252c36;
-  background: #f3f6fa;
+  font-family: var(--font-sans);
+  color: var(--text);
+  background: var(--surface-page);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   letter-spacing: 0;
-  --ink: #252c36;
-  --muted: #727d8c;
-  --surface: #fff;
-  --line: #dfe5ed;
-  --green: #087f70;
-  --green-dark: #086356;
-  --red: #cf5064;
-  --yellow: #f3c85c;
-  --blue: #3d7cc9;
-  --shadow: 0 16px 48px #273b5317;
 }
 * {
   box-sizing: border-box;
@@ -59,7 +42,7 @@ button:disabled {
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
-  outline: 3px solid #3d7cc980;
+  outline: 3px solid var(--focus-ring);
   outline-offset: 3px;
 }
 button {
@@ -101,7 +84,7 @@ p {
   padding: 8px 16px;
   border: 1px solid #d6e1df;
   border-radius: 8px;
-  background: #f6faf9;
+  background: var(--surface-subtle);
   color: #42675f;
 }
 .debug-panel-head {
@@ -123,7 +106,7 @@ p {
   padding: 8px;
   border: 1px solid #d6e1df;
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: #29443d;
 }
 .debug-panel > .primary-command {
@@ -141,7 +124,7 @@ p {
   gap: 16px;
   min-height: 72px;
   padding: 14px 32px;
-  background: #fff;
+  background: var(--surface);
   border-bottom: 1px solid var(--line);
 }
 .brand {
@@ -158,7 +141,7 @@ p {
   height: 36px;
   flex-shrink: 0;
   background: var(--green);
-  color: #fff;
+  color: var(--text-on-accent);
   border-radius: 8px;
   transform: rotate(-6deg);
 }
@@ -202,10 +185,10 @@ p {
   padding: 0;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: #fff;
+  background: var(--surface);
 }
 .icon-command:hover {
-  background: #edf2f7;
+  background: var(--surface-page);
 }
 .header-commands {
   display: flex;
@@ -228,7 +211,7 @@ p {
   border: 1px solid transparent;
   border-radius: 6px;
   background: var(--green);
-  color: #fff;
+  color: var(--text-on-accent);
   font-size: 14px;
   font-weight: 750;
 }
@@ -242,7 +225,7 @@ p {
   gap: 4px;
   padding: 4px;
   border-radius: 7px;
-  background: #edf1f6;
+  background: var(--surface-page);
 }
 .segmented button {
   display: flex;
@@ -259,7 +242,7 @@ p {
   font-weight: 650;
 }
 .segmented button.active {
-  background: #fff;
+  background: var(--surface);
   color: var(--green);
   box-shadow: 0 2px 5px #273b5310;
 }
@@ -337,7 +320,7 @@ p {
   padding: 12px 14px;
   border: 1px solid #d5dde7;
   border-radius: 5px;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   font-size: 16px;
 }
@@ -375,7 +358,7 @@ p {
   padding: 8px 4px;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: #f7f9fc;
+  background: var(--surface-page);
   font-size: 11px;
   color: var(--muted);
 }
@@ -390,7 +373,7 @@ p {
 .token-picker button.selected {
   color: var(--green);
   border-color: var(--green);
-  background: #eaf7f2;
+  background: var(--surface-sunken);
   box-shadow: inset 0 0 0 1px var(--green);
 }
 .token-picker img,
@@ -407,7 +390,7 @@ p {
 
 /* Lobby seats and the shared departure action. */
 .lobby-screen {
-  background: #f3f6fa;
+  background: var(--surface-page);
   padding-bottom: 32px;
 }
 .lobby-table {
@@ -446,7 +429,7 @@ p {
   padding: 8px 16px;
   border: 1px dashed #96b2c9;
   border-radius: 6px;
-  background: #fff;
+  background: var(--surface);
 }
 .room-code span {
   color: var(--muted);
@@ -480,11 +463,11 @@ p {
   padding: 20px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
 }
 .player-seat.is-ready {
   border-color: #75b9a5;
-  background: #f4fcf8;
+  background: var(--surface-muted);
 }
 .seat-token {
   display: grid;
@@ -492,7 +475,7 @@ p {
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  background: #edf3fb;
+  background: var(--surface-page);
 }
 .seat-token img,
 .seat-token .token-fallback {
@@ -553,12 +536,12 @@ p {
 }
 .ready-command {
   color: var(--ink);
-  background: #fff;
+  background: var(--surface);
   border-color: var(--line);
 }
 .ready-command.is-ready {
   color: var(--green);
-  background: #e6f5ee;
+  background: var(--accent-soft);
   border-color: #b0d9c8;
 }
 
@@ -599,7 +582,7 @@ p {
   min-height: 0;
   padding: 20px 28px;
   overflow: auto;
-  background: #edf2f8;
+  background: var(--surface-page);
 }
 .board-toolbar {
   display: flex;
@@ -701,7 +684,7 @@ p {
   height: 45px;
   border: 1px solid #c6d2df;
   border-radius: 7px;
-  background: #fff;
+  background: var(--surface);
   color: #344f65;
   font-size: 38px;
   line-height: 1;
@@ -726,11 +709,11 @@ p {
   padding: 10px 12px;
   border: 0;
   border-bottom: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface);
   text-align: left;
 }
 .route-stop:hover {
-  background: #f6fbff;
+  background: var(--surface-page);
 }
 .route-number {
   display: grid;
@@ -771,7 +754,7 @@ p {
   min-width: 0;
   overflow-y: auto;
   border-left: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface);
 }
 .panel-tabs {
   display: grid;
@@ -833,7 +816,7 @@ p {
   text-align: left;
 }
 .player-row.is-current {
-  background: #eef8f4;
+  background: var(--surface-sunken);
   box-shadow: inset 3px 0 var(--green);
 }
 .player-row.is-bankrupt {
@@ -850,7 +833,7 @@ p {
   height: 38px;
   border: 2px solid;
   border-radius: 50%;
-  background: #fff;
+  background: var(--surface);
 }
 .player-token-small img,
 .player-token-small .token-fallback {
@@ -972,7 +955,7 @@ p {
 .action-grid button,
 .decision-buttons button,
 .asset-actions button {
-  background: #fff;
+  background: var(--surface);
   border-color: var(--line);
   color: var(--ink);
   font-size: 12px;
@@ -982,7 +965,7 @@ p {
   grid-column: 1 / -1;
 }
 .decision-buttons button.accept {
-  color: #fff;
+  color: var(--text-on-accent);
   background: var(--green);
   border-color: var(--green);
 }
@@ -1147,11 +1130,11 @@ p {
   padding: 10px 6px;
   border: 0;
   border-bottom: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface);
   text-align: left;
 }
 .wheel-properties button:hover:not(:disabled) {
-  background: #f0f8f4;
+  background: var(--surface-muted);
 }
 .wheel-properties strong {
   font-size: 13px;
@@ -1189,19 +1172,19 @@ p {
 .landing-overlay,
 .result-overlay {
   position: fixed;
-  z-index: 70;
+  z-index: var(--layer-overlay);
   inset: 0;
   display: grid;
   place-items: center;
   padding: 24px;
-  background: #25374875;
+  background: var(--scrim);
   backdrop-filter: blur(4px);
 }
 .landing-dialog {
   width: min(580px, 100%);
   max-height: calc(100dvh - 48px);
   overflow-y: auto;
-  background: #fff;
+  background: var(--surface);
   border-radius: 8px;
   box-shadow: 0 24px 80px #14283a30;
 }
@@ -1218,7 +1201,7 @@ p {
   width: 44px;
   height: 44px;
   flex-shrink: 0;
-  background: #eaf6f2;
+  background: var(--surface-sunken);
   color: var(--green);
   border-radius: 50%;
 }
@@ -1270,7 +1253,7 @@ p {
   gap: 5px;
   min-width: 0;
   padding: 10px 3px;
-  background: #f2f5f9;
+  background: var(--surface-page);
   border-radius: 4px;
 }
 .landing-rent-track span {
@@ -1285,12 +1268,12 @@ p {
   text-align: center;
 }
 .landing-rent-track > div.current {
-  background: #e4f4ed;
+  background: var(--accent-soft);
   color: var(--green);
 }
 .landing-rent-track > div.next {
   background: #fff1c8;
-  color: #947023;
+  color: var(--gold-ink);
 }
 .rent-tier-label {
   display: flex;
@@ -1307,7 +1290,7 @@ p {
   grid-template-columns: 1.2fr 1fr;
   gap: 10px;
   padding: 18px 24px 24px;
-  background: #fff;
+  background: var(--surface);
   border-top: 1px solid var(--line);
 }
 .landing-actions button {
@@ -1319,14 +1302,14 @@ p {
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: #fff;
+  background: var(--surface);
   font-size: 14px;
   font-weight: 700;
 }
 .landing-actions button.accept {
   background: var(--green);
   border-color: var(--green);
-  color: #fff;
+  color: var(--text-on-accent);
 }
 .deck-chance {
   --deck-color: #936707;
@@ -1421,20 +1404,20 @@ p {
 }
 .detail-backdrop {
   position: fixed;
-  z-index: 39;
+  z-index: var(--layer-popover-backdrop);
   inset: 64px 350px 0 0;
   background: #273b5325;
   border: 0;
 }
 .tile-detail {
   position: fixed;
-  z-index: 40;
+  z-index: var(--layer-popover);
   right: 374px;
   top: 100px;
   width: 350px;
   max-height: calc(100dvh - 125px);
   overflow-y: auto;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
   box-shadow: var(--shadow);
@@ -1491,17 +1474,17 @@ p {
   color: var(--muted);
 }
 .result-overlay {
-  z-index: 100;
+  z-index: var(--layer-modal);
 }
 .result-panel {
   width: min(440px, 100%);
   padding: 36px;
-  background: #fff;
+  background: var(--surface);
   border-radius: 8px;
   text-align: center;
 }
 .result-panel > svg {
-  color: #c39827;
+  color: var(--gold);
 }
 .result-panel > span {
   display: block;
@@ -1526,12 +1509,12 @@ p {
 }
 .result-panel > div > button:not(.primary-command) {
   color: var(--ink);
-  background: #f2f5f9;
+  background: var(--surface-page);
   border-color: var(--line);
 }
 .connection-banner {
   position: fixed;
-  z-index: 110;
+  z-index: var(--layer-banner);
   top: 76px;
   left: 50%;
   transform: translateX(-50%);
@@ -1541,7 +1524,7 @@ p {
   max-width: calc(100% - 24px);
   width: max-content;
   padding: 14px 18px;
-  background: #fff5d9;
+  background: var(--gold-soft);
   border: 1px solid #e5ce90;
   border-radius: 6px;
   font-size: 12px;
@@ -1549,7 +1532,7 @@ p {
 }
 .error-toast {
   position: fixed;
-  z-index: 120;
+  z-index: var(--layer-toast);
   top: 80px;
   left: 50%;
   transform: translateX(-50%);
@@ -1649,7 +1632,7 @@ p {
     gap: 0;
     min-height: calc(100dvh - 64px);
     padding: 0;
-    background: #f3f6fa;
+    background: var(--surface-page);
     overflow: visible;
   }
   .entry-scene {
@@ -1679,7 +1662,7 @@ p {
     margin: -36px auto 32px;
     padding: 24px;
     gap: 20px;
-    background: #fff;
+    background: var(--surface);
   }
   .token-picker > div {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1732,12 +1715,12 @@ p {
   }
   .lobby-actions {
     position: fixed;
-    z-index: 20;
+    z-index: var(--layer-sticky);
     left: 0;
     right: 0;
     bottom: 0;
     padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
-    background: #fff;
+    background: var(--surface);
   }
   .lobby-actions button {
     flex: 1;
@@ -1753,7 +1736,7 @@ p {
   .game-screen .game-header {
     position: sticky;
     top: 0;
-    z-index: 25;
+    z-index: var(--layer-header);
     height: 60px;
     min-height: 60px;
     padding: 10px 16px;
@@ -1835,7 +1818,7 @@ p {
   .game-sidebar {
     display: none;
     position: fixed;
-    z-index: 60;
+    z-index: var(--layer-panel);
     top: auto;
     right: 0;
     bottom: 0;
@@ -1861,23 +1844,23 @@ p {
   .panel-backdrop {
     display: block;
     position: fixed;
-    z-index: 59;
+    z-index: var(--layer-panel-backdrop);
     inset: 0;
     border: 0;
-    background: #25374875;
+    background: var(--scrim);
   }
   .panel-tabs {
     position: sticky;
     top: 0;
     z-index: 2;
-    background: #fff;
+    background: var(--surface);
   }
   .detail-backdrop {
     inset: 0;
-    z-index: 61;
+    z-index: var(--layer-panel-backdrop);
   }
   .tile-detail {
-    z-index: 62;
+    z-index: var(--layer-panel);
     top: auto;
     right: 0;
     left: 0;
@@ -2090,7 +2073,7 @@ p {
   color: #426c5e;
 }
 .scene-tools button:hover {
-  background: #e1f1e8;
+  background: var(--accent-soft);
 }
 .world-location {
   position: absolute;
@@ -2120,7 +2103,7 @@ p {
   font-size: 11px;
 }
 .world-preview {
-  background: #e8f0eb;
+  background: var(--surface-sunken);
   min-height: 100dvh;
 }
 .world-preview > header,
@@ -2131,7 +2114,7 @@ p {
   gap: 12px;
   height: 58px;
   padding: 8px 20px;
-  color: #345d4c;
+  color: var(--text-secondary);
   font-size: 13px;
 }
 .world-preview > header a {
@@ -2152,10 +2135,10 @@ p {
   max-width: 120px;
   min-height: 36px;
   padding: 5px 4px;
-  border: 1px solid #b9ccbf;
+  border: 1px solid var(--line-strong);
   border-radius: 4px;
-  background: #f6faf4;
-  color: #345d4c;
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
   font-size: 12px;
 }
 .world-preview-destination {
@@ -2165,10 +2148,10 @@ p {
   max-width: 160px;
   min-height: 36px;
   padding: 5px 4px;
-  border: 1px solid #b9ccbf;
+  border: 1px solid var(--line-strong);
   border-radius: 4px;
-  background: #f6faf4;
-  color: #345d4c;
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
   font-size: 12px;
 }
 .world-preview .board-scene {
@@ -2196,13 +2179,13 @@ p {
   width: 38px;
   height: 38px;
   border-radius: 4px;
-  border: 1px solid #b9ccbf;
-  background: #f6faf4;
-  color: #345d4c;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
 }
 .game-layout > .board-region {
   padding: 0;
-  background: #e8f0eb;
+  background: var(--surface-sunken);
 }
 .board-region > .board-toolbar {
   padding: 16px 22px 0;
@@ -2221,7 +2204,7 @@ p {
   text-align: center;
 }
 .modal-error {
-  z-index: 150;
+  z-index: var(--layer-top);
 }
 .resume-rooms {
   display: grid;
@@ -2291,7 +2274,7 @@ p {
   color: var(--muted);
 }
 .saved-room-remove:hover {
-  background: #f2f6f1;
+  background: var(--surface-subtle);
   color: var(--ink);
 }
 .saved-room-more {
@@ -2305,7 +2288,7 @@ p {
   border: 0;
   border-radius: 5px;
   color: var(--green);
-  background: #f2f7f1;
+  background: var(--surface-muted);
   font-size: 12px;
 }
 .saved-room-more[aria-expanded='true'] > svg {
@@ -2337,7 +2320,7 @@ p {
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 5px;
-  background: #f7faf4;
+  background: var(--surface-subtle);
   font-size: 12px;
   color: var(--muted);
 }

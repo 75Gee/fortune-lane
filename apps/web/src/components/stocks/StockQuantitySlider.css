@@ -39,7 +39,7 @@
   margin-top: -9px;
   border: 2px solid var(--green);
   border-radius: 50%;
-  background: #fff;
+  background: var(--surface);
 }
 .stock-quantity-range::-moz-range-thumb {
   box-sizing: border-box;
@@ -47,7 +47,7 @@
   height: 22px;
   border: 2px solid var(--green);
   border-radius: 50%;
-  background: #fff;
+  background: var(--surface);
 }
 .stock-quantity-slider .stock-quantity-exact {
   display: flex;
@@ -67,7 +67,7 @@
   margin: 0;
   border: 1px solid var(--ui-line);
   border-radius: 6px;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   font-size: 16px;
   text-align: right;

@@ -55,7 +55,7 @@
   width: 88px;
   height: 88px;
   border-radius: 50%;
-  background: #f7edcd;
+  background: var(--gold-soft);
 }
 .trip-winner-token img {
   width: 76px;
@@ -66,12 +66,12 @@
   position: absolute;
   right: -1px;
   top: -6px;
-  color: #c89832;
+  color: var(--gold);
   fill: #fce8a7;
   transform: rotate(16deg);
 }
 .trip-winner small {
-  color: #926d29;
+  color: var(--gold-ink);
   font-size: 12px;
   font-weight: 650;
 }
@@ -121,13 +121,13 @@
 }
 .trip-player summary:focus-visible,
 .trip-highlights summary:focus-visible {
-  outline: 3px solid #3d7cc980;
+  outline: 3px solid var(--focus-ring);
   outline-offset: -2px;
 }
 .trip-rank {
   width: 23px;
   flex-shrink: 0;
-  color: #939da7;
+  color: var(--neutral-cool);
   font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
@@ -165,8 +165,8 @@
   gap: 3px;
   padding: 3px 7px;
   border-radius: 5px;
-  background: #f7f2e5;
-  color: #8b692d;
+  background: var(--surface-warm);
+  color: var(--gold-ink);
   font-size: 11px;
   font-weight: 650;
 }
@@ -193,7 +193,7 @@
   margin: 0;
   padding: 18px;
   border-radius: 8px;
-  background: #f5f8fa;
+  background: var(--surface-page);
 }
 .trip-player-detail dt {
   color: var(--muted);
@@ -228,7 +228,7 @@
 .trip-highlights {
   margin: 18px 24px;
   padding: 0 14px;
-  background: #f4f8f6;
+  background: var(--surface-subtle);
   border-radius: 8px;
 }
 .trip-highlights summary {
@@ -250,7 +250,7 @@
 }
 .trip-highlights article {
   padding: 13px 0;
-  border-top: 1px solid #dfe8e3;
+  border-top: 1px solid var(--line);
 }
 .trip-highlights h3 {
   margin: 0 0 5px;
@@ -269,7 +269,7 @@
   justify-content: center;
   gap: 10px;
   padding: 18px 24px;
-  background: #fff;
+  background: var(--surface);
   border-top: 1px solid var(--line);
 }
 .trip-report-actions button {
@@ -281,13 +281,13 @@
   padding: 8px 15px;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: #fff;
+  background: var(--surface);
   font-size: 13px;
   font-weight: 650;
 }
 .trip-report-actions .primary-command {
   background: var(--green);
-  color: #fff;
+  color: var(--text-on-accent);
   border-color: var(--green);
 }
 .card-property-dialog > p {

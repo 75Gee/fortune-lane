@@ -1,6 +1,7 @@
 import { StrictMode, lazy, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App.js'
+import './styles/tokens.css'
 import './styles/global.css'
 import './styles/gameplay.css'
 import './styles/interface.css'
