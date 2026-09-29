@@ -290,12 +290,6 @@
   color: #fff;
   border-color: var(--green);
 }
-.card-reward-art {
-  width: 94px;
-  height: 130px;
-  margin: 16px auto;
-  object-fit: contain;
-}
 .card-property-dialog > p {
   line-height: 1.8;
   font-size: 14px;
