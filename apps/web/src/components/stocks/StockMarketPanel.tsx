@@ -325,7 +325,6 @@ export function StockMarketPanel({
                   key={`${selected}:${windowSize}`}
                   points={points}
                   name={stock.name}
-                  color={stock.color}
                   costCents={position ? (position.costBasis * 100) / position.quantity : undefined}
                 />
               </details>

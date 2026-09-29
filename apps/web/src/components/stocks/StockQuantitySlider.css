@@ -23,12 +23,12 @@
 .stock-quantity-range::-webkit-slider-runnable-track {
   height: 4px;
   border-radius: 2px;
-  background: linear-gradient(to right, var(--green) var(--quantity-progress), #d7e2d6 var(--quantity-progress));
+  background: linear-gradient(to right, var(--text) var(--quantity-progress), var(--line) var(--quantity-progress));
 }
 .stock-quantity-range::-moz-range-track {
   height: 4px;
   border-radius: 2px;
-  background: linear-gradient(to right, var(--green) var(--quantity-progress), #d7e2d6 var(--quantity-progress));
+  background: linear-gradient(to right, var(--text) var(--quantity-progress), var(--line) var(--quantity-progress));
 }
 .stock-quantity-range::-webkit-slider-thumb {
   appearance: none;
@@ -37,7 +37,7 @@
   width: 22px;
   height: 22px;
   margin-top: -9px;
-  border: 2px solid var(--green);
+  border: 2px solid var(--text);
   border-radius: 50%;
   background: var(--surface);
 }
@@ -45,7 +45,7 @@
   box-sizing: border-box;
   width: 22px;
   height: 22px;
-  border: 2px solid var(--green);
+  border: 2px solid var(--text);
   border-radius: 50%;
   background: var(--surface);
 }
@@ -74,7 +74,7 @@
   font-variant-numeric: tabular-nums;
 }
 .stock-quantity-slider .stock-quantity-exact input[aria-invalid='true'] {
-  border-color: #b85c42;
+  border-color: var(--danger);
 }
 .stock-quantity-slider:has(input:disabled) {
   opacity: 0.5;

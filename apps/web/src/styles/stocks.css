@@ -1,396 +1,517 @@
+/*
+ * Stock market sheet, holdings summary and liquidation rows — everything prefixed stock-/liquidation-.
+ * Passport theme: paper sheet, navy ledger rules, red-up / green-down figures.
+ */
 .stock-positive {
-  color: #c14742;
+  color: var(--market-up);
 }
 .stock-negative {
-  color: #258167;
+  color: var(--market-down);
 }
 .stock-neutral {
-  color: #788277;
+  color: var(--text-muted);
 }
-.stock-entry {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 50px;
-  padding: 6px 16px;
-  border: 1px solid var(--line-soft);
-  border-radius: 9px;
-  background: var(--surface-subtle);
-  color: var(--text-secondary);
-  text-align: left;
-}
-.stock-entry > span {
-  display: grid;
-  gap: 4px;
-}
-.stock-entry small {
-  color: #75806d;
-  font-size: 10px;
-  letter-spacing: 0.03em;
-}
-.stock-entry > span > span {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-}
-.stock-entry strong {
-  font-size: 18px;
-  font-variant-numeric: tabular-nums;
-}
-.stock-entry b {
-  font-size: 12px;
-  white-space: nowrap;
-}
+
+/* ---------- Sheet ---------- */
+
 .stock-panel {
   position: fixed;
   z-index: var(--layer-panel);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: min(820px, calc(100vw - 40px));
-  max-height: calc(100dvh - 40px);
+  width: min(1140px, calc(100vw - 48px));
+  max-height: calc(100dvh - 48px);
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--line-soft);
-  border-radius: 16px;
-  background: var(--surface-raised);
-  box-shadow: 0 24px 90px #182e3433;
-  color: #293d34;
   overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: 0 30px 80px #0f162673;
+  color: var(--text);
 }
 .stock-panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 22px;
-  border-bottom: 1px solid var(--line-soft);
   flex-shrink: 0;
+  padding: 16px 28px;
+  border-bottom: 2px solid var(--line-ink);
 }
 .stock-panel-header > div {
   display: flex;
-  align-items: center;
-  gap: 9px;
+  align-items: baseline;
+  gap: 14px;
+}
+.stock-panel-header > div > svg {
+  align-self: center;
 }
 .stock-panel-header h2 {
   margin: 0;
-  font-size: 18px;
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 900;
 }
 .stock-panel-header span {
-  margin-left: 7px;
+  font-size: var(--text-sm);
   color: var(--text-subtle);
-  font-size: 11px;
 }
 .stock-panel-body {
-  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px 28px 22px;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 .stock-panel dt {
-  color: var(--text-subtle);
+  color: var(--text-muted);
 }
 .stock-panel dd {
   margin: 0;
   font-variant-numeric: tabular-nums;
 }
+
+/* Account summary */
+.stock-account {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  align-items: start;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--line-strong);
+}
+.stock-account > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stock-account > div > span {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+.stock-account > div > strong {
+  font-family: var(--font-mono);
+  font-size: var(--text-3xl);
+  font-weight: 600;
+}
+.stock-account > div > strong small {
+  font-size: var(--text-base);
+}
+.stock-account-details {
+  font-size: var(--text-sm);
+}
+.stock-account-details summary {
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  cursor: pointer;
+}
+.stock-account-details dl {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+}
+.stock-account-details dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+.stock-account-details dd {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+/* Ticker cards */
 .stock-selector {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
-  margin-bottom: 24px;
 }
 .stock-selector > button {
-  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
   min-width: 0;
-  border: 1px solid var(--line-soft);
-  border-radius: 10px;
-  background: var(--surface);
+  padding: 12px 14px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  color: var(--text);
   text-align: left;
-  color: inherit;
+}
+.stock-selector > button:hover {
+  border-color: var(--line-strong);
 }
 .stock-selector > button.is-selected {
-  border-color: #52876a;
-  background: var(--surface-muted);
-  box-shadow: inset 0 0 0 1px #52876a;
-}
-.stock-selector > button > span {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 5px;
+  border-color: var(--line-ink);
+  background: var(--surface-ink);
+  color: var(--text-on-ink);
 }
 .stock-selector strong {
-  font-size: 12px;
-}
-.stock-selector > button > span small {
-  font-size: 9px;
-  color: #7d8e74;
-  white-space: nowrap;
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
 }
 .stock-selector > button > div {
   display: flex;
+  align-items: baseline;
   flex-wrap: wrap;
   gap: 4px 8px;
-  align-items: baseline;
-  margin: 9px 0;
 }
 .stock-selector b {
-  font-size: 17px;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: 600;
 }
-.stock-selector > button > div small {
-  font-size: 10px;
+.stock-selector small {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
 }
-.stock-selector svg {
-  width: 100%;
-  height: 25px;
-  display: block;
+.stock-selector > button.is-selected .stock-positive {
+  color: #ffb4a3;
 }
+.stock-selector > button.is-selected .stock-negative {
+  color: #9fd8b8;
+}
+.stock-selector > button.is-selected .stock-neutral {
+  color: #c7cbd6;
+}
+
+/* Selected stock */
+.stock-selected {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+}
+.stock-selected h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 900;
+}
+.stock-selected p {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: var(--text-md);
+}
+.stock-selected p span {
+  font-weight: var(--weight-bold);
+}
+.stock-selected > strong {
+  font-family: var(--font-mono);
+  font-size: var(--text-4xl);
+  font-weight: 600;
+}
+.stock-project-brief {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px dashed var(--gold);
+  border-radius: var(--radius-md);
+  background: var(--gold-soft);
+  color: var(--gold-ink);
+  font-size: var(--text-md);
+}
+
+/* Chart left, order ticket right */
 .stock-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1.65fr) minmax(230px, 1fr);
+  grid-template-columns: minmax(0, 1fr) 360px;
+  align-items: start;
   gap: 24px;
 }
+.stock-order {
+  order: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border: 2px solid var(--line-ink);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+}
+.stock-order-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 3px;
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+}
+.stock-order-tabs button {
+  min-height: 40px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  font-size: var(--text-base);
+}
+.stock-order-tabs button.active {
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font-weight: var(--weight-bold);
+}
+.stock-order-tabs button.active:last-child {
+  background: var(--surface-ink);
+  color: var(--text-on-ink);
+}
+.stock-order-available,
+.stock-quantity-heading,
+.stock-order > label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: var(--text-md);
+}
+.stock-order-available span,
+.stock-quantity-heading span + span,
+.stock-order > label span {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.stock-order-available strong {
+  font-family: var(--font-mono);
+}
+.stock-order > label {
+  font-weight: var(--weight-bold);
+}
+.stock-order > input {
+  height: 52px;
+  padding: 0 14px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  background: #fff;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+}
+.stock-order > input::placeholder {
+  color: var(--text-subtle);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+}
+.stock-order-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.stock-order-shortcuts button {
+  min-height: 40px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--text-md);
+}
+.stock-order-total {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line-strong);
+}
+.stock-order-total dt {
+  font-size: var(--text-sm);
+}
+.stock-order-total dd {
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+.stock-submit {
+  min-height: 52px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+}
+.stock-submit:not(:disabled):hover {
+  background: var(--accent-strong);
+}
+.stock-order-note {
+  min-height: 1.4em;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
 .stock-detail {
   min-width: 0;
-  padding-top: 2px;
 }
-.stock-detail > header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 14px;
-}
-.stock-detail h3 {
-  display: flex;
-  align-items: baseline;
-  gap: 7px;
-  margin: 0;
-  font-size: 17px;
-}
-.stock-detail h3 small {
-  font-size: 10px;
-  color: #94a18b;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-}
-.stock-detail header p {
-  color: var(--text-subtle);
-  font-size: 11px;
-  line-height: 1.5;
-  margin: 7px 0 0;
-}
-.stock-detail header > strong {
-  display: grid;
-  text-align: right;
-  gap: 4px;
-  font-size: 14px;
-  white-space: nowrap;
-}
-.stock-detail header > strong small {
-  color: var(--text-subtle);
-  font-weight: 400;
-  font-size: 10px;
+.stock-chart-disclosure > summary {
+  margin-bottom: 10px;
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
 }
 .stock-periods {
-  display: flex;
-  gap: 4px;
-  margin: 20px 0 12px;
+  display: inline-flex;
+  margin-bottom: 10px;
+  padding: 3px;
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
 }
 .stock-periods button {
+  min-height: 32px;
+  padding: 0 12px;
   border: 0;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   background: transparent;
-  padding: 5px 10px;
-  font-size: 11px;
-  color: var(--text-subtle);
+  color: var(--text);
+  font-size: var(--text-sm);
 }
 .stock-periods button.active {
-  background: #e9f0e1;
-  color: #416744;
+  background: var(--surface-raised);
+  font-weight: var(--weight-bold);
+  box-shadow: var(--shadow-sm);
 }
 .stock-chart {
   margin: 0;
+  padding: 14px 16px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
 }
 .stock-chart figcaption {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  min-height: 22px;
-  font-size: 10px;
-  color: #94a08c;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
 }
 .stock-chart figcaption strong {
-  color: #52634d;
-  font-size: 12px;
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  color: var(--text);
 }
 .stock-chart figcaption small {
   margin-left: auto;
-  font-size: 9px;
 }
 .stock-chart svg {
-  width: 100%;
   display: block;
-  outline-offset: 3px;
-  touch-action: pan-y;
+  width: 100%;
+  height: auto;
+  overflow: visible;
 }
+.stock-chart svg:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 4px;
+}
+/* The SVG scales up with the sheet; 9 user units render at roughly 12–14px. */
 .stock-chart svg text {
-  font-size: 11px;
-  fill: #95a08e;
+  fill: var(--text-muted);
+  font-size: 9px;
+}
+.stock-chart-grid {
+  stroke: var(--line);
+}
+.stock-chart-area {
+  fill: var(--surface-muted);
+  opacity: 0.6;
+}
+.stock-chart-cost {
+  stroke: var(--text-subtle);
+}
+.stock-chart-line {
+  stroke: var(--text);
+}
+.stock-chart-cursor {
+  stroke: var(--text);
+  stroke-opacity: 0.25;
+}
+.stock-chart-dot {
+  fill: var(--accent);
+  stroke: var(--surface-raised);
 }
 .stock-chart-empty {
-  padding: 60px 0;
+  padding: 40px 0;
+  color: var(--text-muted);
   text-align: center;
-  font-size: 12px;
-  color: var(--text-subtle);
 }
-.stock-order {
-  background: var(--surface-muted);
-  border: 1px solid var(--line-soft);
-  border-radius: 12px;
-  padding: 14px;
-}
-.stock-order-tabs {
-  display: flex;
-  gap: 4px;
-  padding: 3px;
-  background: #e4eadc;
-  border-radius: 7px;
-}
-.stock-order-tabs button {
-  flex: 1;
-  border: 0;
-  border-radius: 5px;
-  background: transparent;
-  color: #7d8c73;
-  padding: 7px;
-  font-size: 12px;
-}
-.stock-order-tabs button.active {
-  color: #315941;
-  background: var(--surface);
-  box-shadow: 0 1px 4px #354a3c12;
-  font-weight: 600;
-}
-.stock-order-available {
-  display: flex;
-  justify-content: space-between;
-  gap: 6px;
-  font-size: 11px;
-  padding: 15px 0;
-}
-.stock-order-available span {
-  color: #849279;
-}
-.stock-order > label {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  font-size: 11px;
-  gap: 6px;
-}
-.stock-order > label span {
-  color: var(--text-subtle);
-  font-size: 10px;
-}
-.stock-order > input {
-  width: 100%;
-  border: 1px solid #d9e2ce;
-  border-radius: 6px;
-  background: var(--surface);
-  padding: 11px;
-  margin: 7px 0;
-  color: #304735;
-  font: inherit;
-  font-size: 16px;
-}
-.stock-order > input::placeholder {
-  color: #a3ad98;
-  font-size: 12px;
-}
-.stock-order-shortcuts {
-  display: flex;
-  gap: 6px;
-}
-.stock-order-shortcuts button {
-  flex: 1;
-  border: 1px solid var(--line-soft);
-  background: var(--surface-subtle);
-  color: #75886a;
-  border-radius: 5px;
-  padding: 5px;
-  font-size: 10px;
-}
-.stock-order-total {
-  display: grid;
-  gap: 9px;
-  margin: 17px 0;
-  font-size: 11px;
-}
-.stock-order-total > div {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-}
-.stock-order-total dd {
-  font-weight: 600;
-}
-.stock-submit {
-  width: 100%;
-  min-height: 40px;
-  font-size: 13px;
-}
-.stock-order-note {
-  margin: 9px 0 0;
-  font-size: 10px;
-  color: #8a967f;
-  line-height: 1.6;
-  min-height: 32px;
-}
+
 .stock-help {
-  margin-top: 18px;
-  border-top: 1px solid var(--line-soft);
   padding-top: 12px;
-  font-size: 11px;
-  color: #94a087;
+  border-top: 1px dashed var(--line-strong);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
 }
 .stock-help summary {
+  color: var(--text);
+  font-weight: var(--weight-medium);
   cursor: pointer;
-  width: fit-content;
+}
+.stock-help-content {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 10px;
+}
+.stock-help h3 {
+  margin: 0 0 4px;
+  color: var(--text);
+  font-size: var(--text-md);
 }
 .stock-help p {
-  line-height: 1.8;
-  margin: 8px 0 0;
+  margin: 0 0 6px;
+  line-height: 1.7;
 }
+
+.stock-payment-hint {
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px dashed var(--gold);
+  border-radius: var(--radius-md);
+  background: var(--gold-soft);
+  color: var(--gold-ink);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+/* ---------- Holdings summary (assets panel) ---------- */
+
 .stock-holdings {
-  padding: 14px 0;
   margin-bottom: 10px;
-  border-bottom: 1px solid var(--line-soft);
+  padding: 14px 0;
+  border-bottom: 1px dashed var(--line-strong);
 }
 .stock-holdings > header,
 .stock-holdings > div {
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  font-size: 12px;
   padding: 6px 0;
+  font-size: var(--text-md);
+}
+.stock-holdings > header b,
+.stock-holdings > div strong {
+  font-family: var(--font-mono);
 }
 .stock-holdings > div {
-  color: #65765d;
-  font-size: 11px;
+  color: var(--text-secondary);
 }
 .stock-holdings small {
   margin-left: 8px;
-  color: #98a18e;
+  color: var(--text-muted);
 }
 .stock-holdings footer {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 16px;
-  font-size: 10px;
-  color: #94a087;
   margin-top: 8px;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
 }
+
+/* ---------- Liquidation rows (debt planner) ---------- */
+
 .liquidation-stocks {
   margin: 16px 0;
 }
@@ -399,130 +520,97 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
-  font-size: 12px;
+  font-size: var(--text-md);
+  font-weight: var(--weight-bold);
 }
-.liquidation-stocks > header button {
-  background: transparent;
-  border: 0;
-  color: #5e8159;
+.liquidation-stocks > header button,
+.liquidation-stock > button {
   padding: 6px;
-  font-size: 11px;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font-size: var(--text-sm);
 }
 .liquidation-stock {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 82px 32px;
+  grid-template-columns: minmax(0, 1fr) 82px 36px;
   align-items: center;
   gap: 8px;
-  border-bottom: 1px solid var(--line-soft);
   padding: 10px 0;
+  border-bottom: 1px solid var(--line);
 }
 .liquidation-stock > span {
   display: grid;
   gap: 6px;
-  font-size: 12px;
+  font-size: var(--text-md);
 }
 .liquidation-stock small {
-  font-size: 10px;
-  color: #8b9980;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
 }
-.liquidation-stock > button {
-  padding: 4px 0;
-  border: 0;
-  background: transparent;
-  color: #5e8159;
-  font-size: 11px;
+
+/* ---------- Narrow screens ---------- */
+
+@media (max-width: 1000px) {
+  .stock-workspace {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+  .stock-help-content {
+    grid-template-columns: 1fr;
+  }
 }
+
 @media (max-width: 800px) {
-  .stock-entry {
-    flex: 1.25;
-    justify-content: center;
-    padding: 5px 10px;
-    min-height: 44px;
-  }
-  .stock-entry > svg {
-    display: none;
-  }
-  .stock-entry strong {
-    font-size: 15px;
-  }
-  .stock-entry > span > span {
-    gap: 8px;
-  }
-  .stock-entry b {
-    font-size: 11px;
-  }
-  .stock-entry small {
-    font-size: 9px;
-  }
   .stock-panel {
-    width: calc(100vw - 24px);
-    max-height: calc(100dvh - 24px);
-  }
-}
-@media (max-width: 600px) {
-  .stock-panel {
-    width: 100%;
-    max-height: calc(100dvh - 14px);
     top: auto;
     bottom: 0;
     left: 0;
     transform: none;
-    border-radius: 16px 16px 0 0;
+    width: 100%;
+    max-height: 92dvh;
+    border-radius: 18px 18px 0 0;
   }
   .stock-panel-header {
     padding: 12px 16px;
   }
-  .stock-panel-header span {
-    font-size: 10px;
-    margin-left: 0;
+  .stock-panel-header h2 {
+    font-size: var(--text-2xl);
   }
   .stock-panel-body {
-    padding: 18px 16px max(18px, env(safe-area-inset-bottom));
+    gap: 14px;
+    padding: 14px 16px 20px;
+  }
+  .stock-account {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .stock-account-details {
+    grid-column: 1 / -1;
+  }
+  .stock-account > div > strong {
+    font-size: var(--text-xl);
   }
   .stock-selector {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    margin-bottom: 22px;
+    gap: 6px;
   }
   .stock-selector > button {
-    padding: 10px 12px;
+    padding: 8px 10px;
   }
-  .stock-selector > button > div {
-    margin: 6px 0;
+  .stock-selector b {
+    font-size: var(--text-base);
   }
-  .stock-selector svg {
-    height: 18px;
+  .stock-selected h3 {
+    font-size: var(--text-2xl);
+  }
+  .stock-selected > strong {
+    font-size: var(--text-2xl);
   }
   .stock-workspace {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 16px;
+    grid-template-columns: 1fr;
+    gap: 14px;
   }
   .stock-order {
+    order: 0;
     padding: 14px;
   }
-  .stock-order-note {
-    min-height: 0;
-  }
-  .stock-detail h3 {
-    font-size: 16px;
-  }
-}
-
-.stock-project {
-  display: grid;
-  gap: 5px;
-  padding: 10px 12px;
-  margin-top: 14px;
-  border: 1px solid #e0dced;
-  border-radius: 8px;
-  background: #f6f4fa;
-  color: #66577b;
-  line-height: 1.5;
-}
-.stock-project strong {
-  font-size: 12px;
-}
-.stock-project span,
-.stock-project small {
-  font-size: 10px;
 }

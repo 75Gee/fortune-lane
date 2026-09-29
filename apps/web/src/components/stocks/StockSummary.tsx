@@ -1,36 +1,6 @@
 import { STOCKS, stockPortfolioSummary, stockPositionValue, type StockMarketView } from '@fortune/game'
-import { ChartNoAxesCombined, ChevronRight } from 'lucide-react'
 import { stockMoney, stockPercent, stockTone } from './format.js'
 import '../../styles/stocks.css'
-
-export function StockEntry({
-  market,
-  playerId,
-  onOpen,
-}: {
-  market: StockMarketView
-  playerId: string
-  onOpen: () => void
-}) {
-  const summary = stockPortfolioSummary(market, playerId)
-  return (
-    <button
-      className="stock-entry"
-      onClick={onOpen}
-      aria-label={`打开股市，持仓市值 ${stockMoney(summary.marketValue)}，持仓涨跌 ${stockPercent(summary.returnRate)}`}
-    >
-      <ChartNoAxesCombined size={20} />
-      <span>
-        <small>股市 · 持仓市值</small>
-        <span>
-          <strong>{stockMoney(summary.marketValue)}</strong>
-          <b className={stockTone(summary.returnRate)}>{stockPercent(summary.returnRate)}</b>
-        </span>
-      </span>
-      <ChevronRight size={15} />
-    </button>
-  )
-}
 
 export function StockHoldings({ market, playerId }: { market: StockMarketView | undefined; playerId: string }) {
   const summary = stockPortfolioSummary(market, playerId)

@@ -1,19 +1,16 @@
 import type { StockPricePoint } from '@fortune/game'
-import { useId, useState } from 'react'
+import { useState } from 'react'
 import { stockPrice } from './format.js'
 
 export function StockChart({
   points,
-  color,
   name,
   costCents,
 }: {
   points: readonly StockPricePoint[]
-  color: string
   name: string
   costCents?: number | undefined
 }) {
-  const id = useId().replace(/:/g, '')
   const [cursor, setCursor] = useState<number | null>(null)
   if (!points.length) return <p className="stock-chart-empty">等待首个报价</p>
   const width = 440,
@@ -83,36 +80,44 @@ export function StockChart({
           }
         }}
       >
-        <defs>
-          <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={color} stopOpacity=".18" />
-            <stop offset="100%" stopColor={color} stopOpacity="0" />
-          </linearGradient>
-        </defs>
         {ticks.map((price, i) => (
           <g key={i}>
-            <line x1={left} x2={left + plotWidth} y1={y(price)} y2={y(price)} stroke="#e3e8e0" strokeDasharray="3 4" />
+            <line
+              className="stock-chart-grid"
+              x1={left}
+              x2={left + plotWidth}
+              y1={y(price)}
+              y2={y(price)}
+              strokeDasharray="3 4"
+            />
             <text x={left + plotWidth + 9} y={y(price) + 4}>
               {(price / 100).toFixed(2)}
             </text>
           </g>
         ))}
-        <path d={area} fill={`url(#${id})`} />
+        <path className="stock-chart-area" d={area} />
         {costCents !== undefined && (
           <line
             x1={left}
             x2={left + plotWidth}
             y1={y(costCents)}
             y2={y(costCents)}
-            stroke="#a08554"
+            className="stock-chart-cost"
             strokeDasharray="5 4"
           />
         )}
-        <path d={path} fill="none" stroke={color} strokeWidth="2.3" strokeLinejoin="round" strokeLinecap="round" />
+        <path
+          className="stock-chart-line"
+          d={path}
+          fill="none"
+          strokeWidth="2.3"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
         {cursor !== null && (
-          <line x1={x(selected)} x2={x(selected)} y1={top} y2={top + plotHeight} stroke={color} strokeOpacity=".3" />
+          <line className="stock-chart-cursor" x1={x(selected)} x2={x(selected)} y1={top} y2={top + plotHeight} />
         )}
-        <circle cx={x(selected)} cy={y(point.priceCents)} r="3.5" fill={color} stroke="white" strokeWidth="1.5" />
+        <circle className="stock-chart-dot" cx={x(selected)} cy={y(point.priceCents)} r="4.5" strokeWidth="2" />
         <text x={left} y={height - 4}>
           第 {points[0]!.turn} 回合
         </text>
