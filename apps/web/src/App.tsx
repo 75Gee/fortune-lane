@@ -58,19 +58,40 @@ export function App() {
   }
 
   return (
-    <CommandAvailabilityContext.Provider value={connection.status === 'connected' && !connection.requestPending && !connection.retryAvailable}>
-    <ModalErrorContext.Provider value={{ error: connection.error, clear: connection.clearError, ...(connection.retryAvailable ? { retry: connection.retryCommand } : {}) }}>
-      {content}
-      {state?.game && connection.session && state.room.roomCode === connection.session.roomCode && <Reactions room={state.room} reactions={connection.reactions} onSend={connection.sendReaction} connected={connection.status === 'connected'} />}
-      {(connection.error || connection.retryAvailable) && (
-        <div className="error-toast" role="alert">
-          <AlertCircle size={19} />
-          <span>{connection.error ?? '上次操作尚未确认，请重试确认'}</span>
-          {connection.retryAvailable && <button onClick={connection.retryCommand} title="重试确认" aria-label="重试确认"><RotateCcw size={18} /></button>}
-          <button onClick={connection.clearError} aria-label="关闭提示"><X size={17} /></button>
-        </div>
-      )}
-    </ModalErrorContext.Provider>
+    <CommandAvailabilityContext.Provider
+      value={connection.status === 'connected' && !connection.requestPending && !connection.retryAvailable}
+    >
+      <ModalErrorContext.Provider
+        value={{
+          error: connection.error,
+          clear: connection.clearError,
+          ...(connection.retryAvailable ? { retry: connection.retryCommand } : {}),
+        }}
+      >
+        {content}
+        {state?.game && connection.session && state.room.roomCode === connection.session.roomCode && (
+          <Reactions
+            room={state.room}
+            reactions={connection.reactions}
+            onSend={connection.sendReaction}
+            connected={connection.status === 'connected'}
+          />
+        )}
+        {(connection.error || connection.retryAvailable) && (
+          <div className="error-toast" role="alert">
+            <AlertCircle size={19} />
+            <span>{connection.error ?? '上次操作尚未确认，请重试确认'}</span>
+            {connection.retryAvailable && (
+              <button onClick={connection.retryCommand} title="重试确认" aria-label="重试确认">
+                <RotateCcw size={18} />
+              </button>
+            )}
+            <button onClick={connection.clearError} aria-label="关闭提示">
+              <X size={17} />
+            </button>
+          </div>
+        )}
+      </ModalErrorContext.Provider>
     </CommandAvailabilityContext.Provider>
   )
 }

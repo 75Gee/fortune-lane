@@ -16,9 +16,11 @@ export function contactShadows(scene: THREE.Scene, capacity = 256) {
   const geometry = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2)
   const opacity = new THREE.InstancedBufferAttribute(new Float32Array(capacity), 1).setUsage(THREE.DynamicDrawUsage)
   const rounded = new THREE.InstancedBufferAttribute(new Float32Array(capacity), 1)
-  geometry.setAttribute('contactOpacity', opacity); geometry.setAttribute('contactRounded', rounded)
+  geometry.setAttribute('contactOpacity', opacity)
+  geometry.setAttribute('contactRounded', rounded)
   const material = new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false,
+    transparent: true,
+    depthWrite: false,
     uniforms: { ink: { value: new THREE.Color('#355345') } },
     vertexShader: `
       attribute float contactOpacity;
@@ -47,11 +49,15 @@ export function contactShadows(scene: THREE.Scene, capacity = 256) {
       }`,
   })
   const mesh = new THREE.InstancedMesh(geometry, material, capacity)
-  mesh.name = '柔和接地投影'; mesh.count = 0; mesh.frustumCulled = false
+  mesh.name = '柔和接地投影'
+  mesh.count = 0
+  mesh.frustumCulled = false
   mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
   // Draw underneath transparent labels, never darkening their lettering.
-  mesh.renderOrder = -1; scene.add(mesh)
-  const transform = new THREE.Object3D(), free: number[] = []
+  mesh.renderOrder = -1
+  scene.add(mesh)
+  const transform = new THREE.Object3D(),
+    free: number[] = []
   return {
     add(initial: Footprint) {
       const index = free.length ? free.pop()! : mesh.count
@@ -62,18 +68,29 @@ export function contactShadows(scene: THREE.Scene, capacity = 256) {
       const write = () => {
         transform.position.set(current.x, current.y, current.z)
         transform.rotation.set(0, current.rotation, 0)
-        transform.scale.set(current.width, 1, current.depth); transform.updateMatrix()
-        mesh.setMatrixAt(index, transform.matrix); mesh.instanceMatrix.needsUpdate = true
-        opacity.setX(index, current.opacity); opacity.needsUpdate = true
-        rounded.setX(index, current.shape === 'rounded' ? 1 : 0); rounded.needsUpdate = true
+        transform.scale.set(current.width, 1, current.depth)
+        transform.updateMatrix()
+        mesh.setMatrixAt(index, transform.matrix)
+        mesh.instanceMatrix.needsUpdate = true
+        opacity.setX(index, current.opacity)
+        opacity.needsUpdate = true
+        rounded.setX(index, current.shape === 'rounded' ? 1 : 0)
+        rounded.needsUpdate = true
       }
       write()
       return {
         set(next: Partial<Footprint>) {
           if (removed || !Object.entries(next).some(([key, value]) => current[key as keyof Footprint] !== value)) return
-          Object.assign(current, next); write()
+          Object.assign(current, next)
+          write()
         },
-        remove() { if (removed) return; removed = true; opacity.setX(index, 0); opacity.needsUpdate = true; free.push(index) },
+        remove() {
+          if (removed) return
+          removed = true
+          opacity.setX(index, 0)
+          opacity.needsUpdate = true
+          free.push(index)
+        },
       }
     },
   }

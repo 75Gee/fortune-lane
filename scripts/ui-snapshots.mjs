@@ -56,7 +56,14 @@ async function capture(label, base) {
   const failures = []
   try {
     for (const [viewportName, viewport] of Object.entries(viewports)) {
-      const context = await browser.newContext({ viewport: { width: viewport.width, height: viewport.height }, isMobile: !!viewport.isMobile, hasTouch: !!viewport.hasTouch, deviceScaleFactor: viewport.deviceScaleFactor ?? 1, locale: 'zh-CN', timezoneId: 'Asia/Shanghai' })
+      const context = await browser.newContext({
+        viewport: { width: viewport.width, height: viewport.height },
+        isMobile: !!viewport.isMobile,
+        hasTouch: !!viewport.hasTouch,
+        deviceScaleFactor: viewport.deviceScaleFactor ?? 1,
+        locale: 'zh-CN',
+        timezoneId: 'Asia/Shanghai',
+      })
       // Pin the clock so turn timers and "time ago" labels render identically between runs.
       await context.addInitScript(() => {
         const fixed = new Date('2026-01-01T12:00:00+08:00').getTime()
@@ -90,7 +97,9 @@ async function capture(label, base) {
 }
 
 async function compare(before, after) {
-  const beforeDir = outDir(before), afterDir = outDir(after), diffDir = path.join(outDir(after), 'diff')
+  const beforeDir = outDir(before),
+    afterDir = outDir(after),
+    diffDir = path.join(outDir(after), 'diff')
   await mkdir(diffDir, { recursive: true })
   const files = (await readdir(beforeDir)).filter((file) => file.endsWith('.png'))
   const browser = await launch()
@@ -98,27 +107,57 @@ async function compare(before, after) {
   const rows = []
   for (const file of files) {
     let afterPng
-    try { afterPng = await readFile(path.join(afterDir, file)) } catch { rows.push([file, 'missing']); continue }
+    try {
+      afterPng = await readFile(path.join(afterDir, file))
+    } catch {
+      rows.push([file, 'missing'])
+      continue
+    }
     const beforePng = await readFile(path.join(beforeDir, file))
     // Pixel diff in the browser canvas to avoid adding an image dependency.
-    const result = await page.evaluate(async ([a, b]) => {
-      const load = async (base64) => createImageBitmap(await (await fetch(`data:image/png;base64,${base64}`)).blob())
-      const [imageA, imageB] = await Promise.all([load(a), load(b)])
-      const width = Math.max(imageA.width, imageB.width), height = Math.max(imageA.height, imageB.height)
-      const read = (image) => { const canvas = new OffscreenCanvas(width, height); const context = canvas.getContext('2d'); context.drawImage(image, 0, 0); return context.getImageData(0, 0, width, height) }
-      const dataA = read(imageA), dataB = read(imageB)
-      const out = new OffscreenCanvas(width, height), outContext = out.getContext('2d'), diff = outContext.createImageData(width, height)
-      let changed = 0
-      for (let i = 0; i < dataA.data.length; i += 4) {
-        const delta = Math.abs(dataA.data[i] - dataB.data[i]) + Math.abs(dataA.data[i + 1] - dataB.data[i + 1]) + Math.abs(dataA.data[i + 2] - dataB.data[i + 2])
-        const gray = (dataB.data[i] + dataB.data[i + 1] + dataB.data[i + 2]) / 3
-        if (delta > 24) { changed++; diff.data.set([230, 30, 90, 255], i) } else diff.data.set([gray, gray, gray, 70], i)
-      }
-      outContext.putImageData(diff, 0, 0)
-      const reader = new FileReader()
-      const url = await new Promise(async (resolve) => { reader.onload = () => resolve(reader.result); reader.readAsDataURL(await out.convertToBlob()) })
-      return { ratio: changed / (width * height), sizeChanged: imageA.width !== imageB.width || imageA.height !== imageB.height, png: url.split(',')[1] }
-    }, [beforePng.toString('base64'), afterPng.toString('base64')])
+    const result = await page.evaluate(
+      async ([a, b]) => {
+        const load = async (base64) => createImageBitmap(await (await fetch(`data:image/png;base64,${base64}`)).blob())
+        const [imageA, imageB] = await Promise.all([load(a), load(b)])
+        const width = Math.max(imageA.width, imageB.width),
+          height = Math.max(imageA.height, imageB.height)
+        const read = (image) => {
+          const canvas = new OffscreenCanvas(width, height)
+          const context = canvas.getContext('2d')
+          context.drawImage(image, 0, 0)
+          return context.getImageData(0, 0, width, height)
+        }
+        const dataA = read(imageA),
+          dataB = read(imageB)
+        const out = new OffscreenCanvas(width, height),
+          outContext = out.getContext('2d'),
+          diff = outContext.createImageData(width, height)
+        let changed = 0
+        for (let i = 0; i < dataA.data.length; i += 4) {
+          const delta =
+            Math.abs(dataA.data[i] - dataB.data[i]) +
+            Math.abs(dataA.data[i + 1] - dataB.data[i + 1]) +
+            Math.abs(dataA.data[i + 2] - dataB.data[i + 2])
+          const gray = (dataB.data[i] + dataB.data[i + 1] + dataB.data[i + 2]) / 3
+          if (delta > 24) {
+            changed++
+            diff.data.set([230, 30, 90, 255], i)
+          } else diff.data.set([gray, gray, gray, 70], i)
+        }
+        outContext.putImageData(diff, 0, 0)
+        const reader = new FileReader()
+        const url = await new Promise(async (resolve) => {
+          reader.onload = () => resolve(reader.result)
+          reader.readAsDataURL(await out.convertToBlob())
+        })
+        return {
+          ratio: changed / (width * height),
+          sizeChanged: imageA.width !== imageB.width || imageA.height !== imageB.height,
+          png: url.split(',')[1],
+        }
+      },
+      [beforePng.toString('base64'), afterPng.toString('base64')],
+    )
     if (result.ratio > 0) await writeFile(path.join(diffDir, file), Buffer.from(result.png, 'base64'))
     rows.push([file, `${(result.ratio * 100).toFixed(2)}%${result.sizeChanged ? ' (size changed)' : ''}`])
   }

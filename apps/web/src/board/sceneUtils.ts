@@ -30,8 +30,16 @@ export function disposeScene(scene: THREE.Object3D) {
   textures.forEach((texture) => texture.dispose())
 }
 
-export function solid(parent: THREE.Object3D, geometry: THREE.BufferGeometry, color: THREE.ColorRepresentation, x = 0, y = 0, z = 0, metalness = .05) {
-  const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color, roughness: .38, metalness }))
+export function solid(
+  parent: THREE.Object3D,
+  geometry: THREE.BufferGeometry,
+  color: THREE.ColorRepresentation,
+  x = 0,
+  y = 0,
+  z = 0,
+  metalness = 0.05,
+) {
+  const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color, roughness: 0.38, metalness }))
   mesh.position.set(x, y, z)
   mesh.castShadow = true
   mesh.receiveShadow = true

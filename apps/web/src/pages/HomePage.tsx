@@ -25,18 +25,34 @@ interface HomePageProps {
 function inviteRoomCode(): string {
   if (typeof window === 'undefined') return ''
   const value = new URLSearchParams(window.location.search).get('room') ?? ''
-  return value.toUpperCase().replace(/[^A-Z2-9]/g, '').slice(0, 6)
+  return value
+    .toUpperCase()
+    .replace(/[^A-Z2-9]/g, '')
+    .slice(0, 6)
 }
 
-export function HomePage({ connected, onCreate, onJoin, pending = false, savedRooms = [], savedRoomsStatus, removedRoomCount, onResume, onRemoveSavedRooms, onUndoRemoveSavedRooms }: HomePageProps) {
-  useLayoutEffect(() => { window.scrollTo(0, 0) }, [])
+export function HomePage({
+  connected,
+  onCreate,
+  onJoin,
+  pending = false,
+  savedRooms = [],
+  savedRoomsStatus,
+  removedRoomCount,
+  onResume,
+  onRemoveSavedRooms,
+  onUndoRemoveSavedRooms,
+}: HomePageProps) {
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
   const initialRoomCode = inviteRoomCode()
   const [mode, setMode] = useState<'create' | 'join'>(initialRoomCode ? 'join' : 'create')
   const [name, setName] = useState('')
   const [roomCode, setRoomCode] = useState(initialRoomCode)
   const [token, setToken] = useState<TokenId>('suitcase')
   const [submitting, setSubmitting] = useState(false)
-  const hasActiveRoom = savedRooms.some(room => room.phase !== 'finished')
+  const hasActiveRoom = savedRooms.some((room) => room.phase !== 'finished')
   const [showEntry, setShowEntry] = useState(() => !!initialRoomCode || !hasActiveRoom)
   const [debugOpen, setDebugOpen] = useState(false)
 
@@ -60,7 +76,8 @@ export function HomePage({ connected, onCreate, onJoin, pending = false, savedRo
       <header className="entry-header">
         <Brand />
         <div className={`connection-pill ${connected ? 'is-online' : ''}`}>
-          <span />{connected ? '已连接' : '正在连接…'}
+          <span />
+          {connected ? '已连接' : '正在连接…'}
         </div>
       </header>
 
@@ -76,79 +93,158 @@ export function HomePage({ connected, onCreate, onJoin, pending = false, savedRo
         </div>
 
         <form className="entry-form" onSubmit={submit}>
-          <SavedRoomsList rooms={savedRooms} connected={connected} pending={pending || submitting} status={savedRoomsStatus} removedCount={removedRoomCount} onResume={onResume} onRemove={onRemoveSavedRooms} onUndoRemove={onUndoRemoveSavedRooms} />
-          {pending && !submitting && <p className="copy-feedback" role="status">正在连接房间…</p>}
-          {hasActiveRoom && !showEntry && <div className="entry-new-room"><span>开始新的对局</span><div><button type="button" onClick={() => { setMode('create'); setShowEntry(true) }}><Plus size={17} />创建房间</button><button type="button" onClick={() => { setMode('join'); setShowEntry(true) }}><DoorOpen size={17} />加入房间</button></div></div>}
-          <div className="entry-fields" hidden={hasActiveRoom && !showEntry}><div className="entry-title">
-            <span className="eyebrow"><Users size={15} /> 2–6 位玩家</span>
-          </div>
+          <SavedRoomsList
+            rooms={savedRooms}
+            connected={connected}
+            pending={pending || submitting}
+            status={savedRoomsStatus}
+            removedCount={removedRoomCount}
+            onResume={onResume}
+            onRemove={onRemoveSavedRooms}
+            onUndoRemove={onUndoRemoveSavedRooms}
+          />
+          {pending && !submitting && (
+            <p className="copy-feedback" role="status">
+              正在连接房间…
+            </p>
+          )}
+          {hasActiveRoom && !showEntry && (
+            <div className="entry-new-room">
+              <span>开始新的对局</span>
+              <div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode('create')
+                    setShowEntry(true)
+                  }}
+                >
+                  <Plus size={17} />
+                  创建房间
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode('join')
+                    setShowEntry(true)
+                  }}
+                >
+                  <DoorOpen size={17} />
+                  加入房间
+                </button>
+              </div>
+            </div>
+          )}
+          <div className="entry-fields" hidden={hasActiveRoom && !showEntry}>
+            <div className="entry-title">
+              <span className="eyebrow">
+                <Users size={15} /> 2–6 位玩家
+              </span>
+            </div>
 
-          <div className="segmented" role="group" aria-label="房间操作">
-            <button type="button" aria-pressed={mode === 'create'} className={mode === 'create' ? 'active' : ''} onClick={() => setMode('create')}>
-              <Plus size={17} /> 创建房间
-            </button>
-            <button type="button" aria-pressed={mode === 'join'} className={mode === 'join' ? 'active' : ''} onClick={() => setMode('join')}>
-              <DoorOpen size={17} /> 加入房间
-            </button>
-          </div>
+            <div className="segmented" role="group" aria-label="房间操作">
+              <button
+                type="button"
+                aria-pressed={mode === 'create'}
+                className={mode === 'create' ? 'active' : ''}
+                onClick={() => setMode('create')}
+              >
+                <Plus size={17} /> 创建房间
+              </button>
+              <button
+                type="button"
+                aria-pressed={mode === 'join'}
+                className={mode === 'join' ? 'active' : ''}
+                onClick={() => setMode('join')}
+              >
+                <DoorOpen size={17} /> 加入房间
+              </button>
+            </div>
 
-          <label className="field">
-            <span>昵称（最多12个字符）</span>
-            <input
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              maxLength={12}
-              placeholder="怎么称呼你？"
-              autoComplete="nickname"
-            />
-          </label>
-
-          {mode === 'join' && (
             <label className="field">
-              <span>六位房间码</span>
+              <span>昵称（最多12个字符）</span>
               <input
-                className="room-code-input"
-                value={roomCode}
-                onChange={(event) => setRoomCode(event.target.value.toUpperCase().replace(/[^A-Z2-9]/g, '').slice(0, 6))}
-                placeholder="例如 A7K9Q2"
-                autoCapitalize="characters"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                maxLength={12}
+                placeholder="怎么称呼你？"
+                autoComplete="nickname"
               />
             </label>
-          )}
 
-          <fieldset className="token-picker">
-            <legend>选择棋子</legend>
-            <div>
-              {TOKEN_IDS.map((id) => (
-                <button
-                  key={id}
-                  type="button"
-                  className={token === id ? 'selected' : ''}
-                  onClick={() => setToken(id)}
-                  title={`${TOKEN_META[id].city} · ${TOKEN_META[id].name}`}
-                  aria-label={`${TOKEN_META[id].city} · ${TOKEN_META[id].name}`}
-                  aria-pressed={token === id}
-                >
-                  <TokenImage token={id} />
-                  <span>{TOKEN_META[id].name}</span>
-                </button>
-              ))}
-            </div>
-          </fieldset>
+            {mode === 'join' && (
+              <label className="field">
+                <span>六位房间码</span>
+                <input
+                  className="room-code-input"
+                  value={roomCode}
+                  onChange={(event) =>
+                    setRoomCode(
+                      event.target.value
+                        .toUpperCase()
+                        .replace(/[^A-Z2-9]/g, '')
+                        .slice(0, 6),
+                    )
+                  }
+                  placeholder="例如 A7K9Q2"
+                  autoCapitalize="characters"
+                />
+              </label>
+            )}
 
-          <button
-            className="primary-command"
-            type="submit"
-            disabled={!connected || pending || !name.trim() || submitting || (mode === 'join' && roomCode.length !== 6)}
-          >
-            {!connected ? '正在连接…' : submitting ? (mode === 'create' ? '正在创建…' : '正在加入…') : mode === 'create' ? '创建房间' : '加入房间'}
-            <ArrowRight size={18} />
-          </button>
+            <fieldset className="token-picker">
+              <legend>选择棋子</legend>
+              <div>
+                {TOKEN_IDS.map((id) => (
+                  <button
+                    key={id}
+                    type="button"
+                    className={token === id ? 'selected' : ''}
+                    onClick={() => setToken(id)}
+                    title={`${TOKEN_META[id].city} · ${TOKEN_META[id].name}`}
+                    aria-label={`${TOKEN_META[id].city} · ${TOKEN_META[id].name}`}
+                    aria-pressed={token === id}
+                  >
+                    <TokenImage token={id} />
+                    <span>{TOKEN_META[id].name}</span>
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+
+            <button
+              className="primary-command"
+              type="submit"
+              disabled={
+                !connected || pending || !name.trim() || submitting || (mode === 'join' && roomCode.length !== 6)
+              }
+            >
+              {!connected
+                ? '正在连接…'
+                : submitting
+                  ? mode === 'create'
+                    ? '正在创建…'
+                    : '正在加入…'
+                  : mode === 'create'
+                    ? '创建房间'
+                    : '加入房间'}
+              <ArrowRight size={18} />
+            </button>
           </div>
         </form>
       </section>
-      {import.meta.env.DEV && <footer className="entry-debug"><button type="button" onClick={() => setDebugOpen(true)}>调试面板</button></footer>}
-      {import.meta.env.DEV && debugOpen && <Suspense fallback={<p role="status">正在打开调试面板…</p>}><DebugPanel onClose={() => setDebugOpen(false)} /></Suspense>}
+      {import.meta.env.DEV && (
+        <footer className="entry-debug">
+          <button type="button" onClick={() => setDebugOpen(true)}>
+            调试面板
+          </button>
+        </footer>
+      )}
+      {import.meta.env.DEV && debugOpen && (
+        <Suspense fallback={<p role="status">正在打开调试面板…</p>}>
+          <DebugPanel onClose={() => setDebugOpen(false)} />
+        </Suspense>
+      )}
     </main>
   )
 }
