@@ -1,4 +1,4 @@
-import { ITEMS, RENT_GROWTH_START, isDetained, rentMultiplier, type GameCommand, type GameEvent, type GameView } from '@fortune/game'
+import { ITEMS, rentGrowthStart, isDetained, rentMultiplier, type GameCommand, type GameEvent, type GameView } from '@fortune/game'
 import type { RoomSnapshot } from '@fortune/protocol'
 import { Backpack, Building2, ChevronRight, Flag, HandCoins, Library, LogOut, Map, MoreHorizontal, Route, Sparkles, Users, Volume2, VolumeX, Wallet } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -118,7 +118,7 @@ export function GamePage({ room, game, playerId, events, connectionStatus, comma
       <div className="game-layout">
         <section className="board-region">
           <div className="board-toolbar">
-            <div className="turn-summary"><div><strong>{game.phase === 'FINISHED' ? '本局结束' : game.pendingAuction ? '正在竞拍' : `${current?.id === playerId ? '轮到你' : current?.name ?? '当前玩家'} · ${actionDescription(game)}`}</strong><TurnClock deadline={game.pendingAuction?.deadline ?? room.turnDeadline} offset={clockOffset} /></div><span>第 {game.turnNumber} 回合{game.turnNumber > RENT_GROWTH_START ? ` · 游览费 ×${rentMultiplier(game.turnNumber).toFixed(2)}` : ''}</span></div>
+            <div className="turn-summary"><div><strong>{game.phase === 'FINISHED' ? '本局结束' : game.pendingAuction ? '正在竞拍' : `${current?.id === playerId ? '轮到你' : current?.name ?? '当前玩家'} · ${actionDescription(game)}`}</strong><TurnClock deadline={game.pendingAuction?.deadline ?? room.turnDeadline} offset={clockOffset} /></div><span>第 {game.turnNumber} 回合{game.turnNumber >= rentGrowthStart(game.players.length) ? ` · 游览费 ×${rentMultiplier(game.turnNumber, game.players.length).toFixed(2)}` : ''}</span></div>
             <div className="game-player-strip" aria-label="玩家现金与当前回合">
               {game.players.map(player => <button key={player.id} className={`${player.id === game.currentPlayerId ? 'is-current' : ''} ${player.isBankrupt ? 'is-bankrupt' : ''}`} title={`${player.name} · ${player.isBankrupt ? '观战中' : money(player.cash)}`} aria-label={`查看${player.name}的资产`} onClick={() => openInfo('assets', player.id)}>
                 <span className="player-token-small" style={{ borderColor: player.color }}><TokenImage token={player.token} />{player.turtleRollsRemaining > 0 && <span className="turtle-status-badge" title={`乌龟效果：剩余 ${player.turtleRollsRemaining} 次常规掷骰`}><img src={ITEMS.turtle.image} alt="乌龟效果" /><b>{player.turtleRollsRemaining}</b></span>}</span>

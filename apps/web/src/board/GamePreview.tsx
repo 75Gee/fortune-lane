@@ -1,4 +1,4 @@
-import { advanceStockMarket, applyCommand, CHANCE_CARDS, createGame, FATE_CARDS, getTileById, STOCK_IDS, WHEEL_SPIN_MS, type GameCommand, type GameEvent } from '@fortune/game'
+import { advanceStockMarket, applyCommand, BOARD, CHANCE_CARDS, createGame, FATE_CARDS, getTileById, STOCK_IDS, WHEEL_SPIN_MS, type GameCommand, type GameEvent } from '@fortune/game'
 import { publicGameState, type RoomSnapshot } from '@fortune/protocol'
 import { useEffect, useState } from 'react'
 import { CommandAvailabilityContext, ModalErrorContext } from '../components/Modal.js'
@@ -29,6 +29,12 @@ function previewGame() {
   ]
   game.actionLog = [{ id: 'preview-purchase', revision: 38, turnNumber: 14, type: 'PROPERTY_UPGRADED', playerId: 'xiaoman', tileIndex: getTileById('香港').index, amount: 1100, message: '小满完善香港的游览设施，城市升至 2 级。' }]
   const query = new URLSearchParams(location.search)
+  if (query.has('facilities')) {
+    for (const tile of game.tiles) if (tile.ownerId === 'xiaoman') Object.assign(tile, { ownerId: null, level: 0, mortgaged: false })
+    for (const id of ['airport-south', 'electric', 'water']) game.tiles[getTileById(id).index] = { ownerId: 'xiaoman', level: 0, mortgaged: false }
+    game.players[0]!.position = getTileById('airport-south').index
+    game.actionLog = []
+  }
   if (query.has('stocks')) {
     // Isolated artwork fixture: deterministic history, real trade accounting.
     for (const playerId of ['xiaoman', 'alan']) for (const stockId of STOCK_IDS) {
@@ -43,7 +49,10 @@ function previewGame() {
   if (query.has('cash') && Number.isSafeInteger(previewCash) && previewCash >= 0) game.players[0]!.cash = previewCash
   const decision = query.get('decision')
   if (decision === 'purchase' || decision === 'upgrade' || decision === 'auction') {
-    const tileIndex = getTileById(decision === 'upgrade' ? '香港' : '维也纳').index
+    const requestedTile = BOARD.find(tile => tile.id === query.get('tile')
+      && (decision === 'upgrade' ? tile.kind === 'property' : ['property', 'airport', 'utility'].includes(tile.kind)))
+    const tileIndex = (requestedTile ?? getTileById(decision === 'upgrade' ? '香港' : '维也纳')).index
+    game.tiles[tileIndex] = { ownerId: decision === 'upgrade' ? 'xiaoman' : null, level: decision === 'upgrade' ? 2 : 0, mortgaged: false }
     game.players[0]!.position = tileIndex
     game.pendingDecision = { type: decision === 'upgrade' ? 'upgrade' : 'purchase', playerId: 'xiaoman', tileIndex }
     game.phase = decision === 'upgrade' ? 'WAITING_FOR_UPGRADE' : 'WAITING_FOR_PURCHASE'

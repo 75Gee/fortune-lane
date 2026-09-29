@@ -1,4 +1,4 @@
-import { MAX_PROPERTY_LEVEL, RENT_GROWTH_START, assetActionQuote, cardPropertyCandidates, getCard, getTile, rentForTile, rentMultiplier, scaleRent, type GameCommand, type GameView } from '@fortune/game'
+import { MAX_PROPERTY_LEVEL, rentGrowthStart, assetActionQuote, cardPropertyCandidates, getCard, getTile, rentForTile, rentMultiplier, scaleRent, type GameCommand, type GameView } from '@fortune/game'
 import { Building2, Check, Hotel, Landmark, X } from 'lucide-react'
 import { useContext } from 'react'
 import { TurnClock } from '../board/GameBoard.js'
@@ -45,7 +45,7 @@ function LandingContent({ game, playerId, decisionsReady, onCommand, clockOffset
     return <Modal label="选择降级地产" onDismiss={close}><div className="landing-overlay"><section className={`landing-dialog card-property-dialog deck-${card.deck}`}>
       {!required && <button className="decision-close icon-command" aria-label="关闭查看" onClick={onDismiss}><X size={18} /></button>}<header className="landing-dialog-head"><span><CardDeckSymbol deck={card.deck} size={24} /></span><div><small>{actor?.name} · {CARD_DECK_ART[card.deck].name}卡</small><h2>{card.title}</h2></div><TurnClock deadline={deadline} offset={clockOffset} /></header>
       <p>{isMyTurn ? '选择一处城市降一级，不返还建造费。' : `等待 ${actor?.name} 选择一处城市降级。`}</p>
-      <div className="wheel-properties">{cardPropertyCandidates(game, pending.playerId).map((tile) => <button key={tile.index} disabled={!isMyTurn || !available} onClick={() => onCommand({ type: 'CHOOSE_CARD_PROPERTY', choiceId: pending.id, tileIndex: tile.index })}><Landmark size={18} /><strong>{tile.name}</strong><span>{game.tiles[tile.index]!.level} → {game.tiles[tile.index]!.level - 1} 级<small>降级后游览费 {money(scaleRent(tile.rents?.[game.tiles[tile.index]!.level - 1] ?? 0, game.turnNumber))}</small></span></button>)}</div>
+      <div className="wheel-properties">{cardPropertyCandidates(game, pending.playerId).map((tile) => <button key={tile.index} disabled={!isMyTurn || !available} onClick={() => onCommand({ type: 'CHOOSE_CARD_PROPERTY', choiceId: pending.id, tileIndex: tile.index })}><Landmark size={18} /><strong>{tile.name}</strong><span>{game.tiles[tile.index]!.level} → {game.tiles[tile.index]!.level - 1} 级<small>降级后游览费 {money(scaleRent(tile.rents?.[game.tiles[tile.index]!.level - 1] ?? 0, game.turnNumber, game.players.length))}</small></span></button>)}</div>
       {isMyTurn && deadline !== null && <p className="choice-hint">超时选择建造费最低的城市</p>}
     </section></div></Modal>
   }
@@ -93,7 +93,7 @@ function LandingContent({ game, playerId, decisionsReady, onCommand, clockOffset
     const actionCost = isPurchase ? (tile.price ?? 0) : (tile.buildCost ?? 0)
     const quote = assetActionQuote(game, decision.playerId, tile.index, isPurchase ? 'BUY_PROPERTY' : 'UPGRADE_PROPERTY')
     const canAfford = quote.allowed
-    const nextRent = scaleRent(tile.rents?.[isPurchase ? 0 : currentLevel + 1] ?? 0, game.turnNumber)
+    const nextRent = scaleRent(tile.rents?.[isPurchase ? 0 : currentLevel + 1] ?? 0, game.turnNumber, game.players.length)
     const feeLabel = tile.kind === 'property'
       ? isPurchase ? '购入后游览费' : '升级后游览费'
       : '购入后游览费'
@@ -119,7 +119,7 @@ function LandingContent({ game, playerId, decisionsReady, onCommand, clockOffset
             <strong className="landing-price">{money(actionCost)}</strong>
           </header>
 
-          {game.turnNumber > RENT_GROWTH_START && <p className="rent-notice">游览费加速 · 当前 ×{rentMultiplier(game.turnNumber).toFixed(2)}，下回合再涨 1%</p>}
+          {game.turnNumber >= rentGrowthStart(game.players.length) && <p className="rent-notice">游览费加速 · 当前 ×{rentMultiplier(game.turnNumber, game.players.length).toFixed(2)}，下回合再涨 2%</p>}
 
           <div className="decision-timing"><TurnClock deadline={deadline} offset={clockOffset} /><span>{isPurchase ? '超时放弃购买，交由其他玩家竞拍' : '超时暂不升级'}</span></div>
           <div className="landing-deed-summary">
@@ -137,7 +137,7 @@ function LandingContent({ game, playerId, decisionsReady, onCommand, clockOffset
                   <span className="rent-tier-label">
                     {level === 0 ? '空地' : <BuildingIcons level={level} size={18} />}
                   </span>
-                  <strong>{money(scaleRent(rent, game.turnNumber))}</strong>
+                  <strong>{money(scaleRent(rent, game.turnNumber, game.players.length))}</strong>
                 </div>
               ))}
             </div></details>

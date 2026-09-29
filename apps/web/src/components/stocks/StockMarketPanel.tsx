@@ -81,7 +81,7 @@ export function StockMarketPanel({ game, playerId, available, onCommand, onClose
           </details>
         </section>
       </div>
-      <details className="stock-help"><summary>股票与交易说明</summary><div className="stock-help-content"><section><h3>{stock.name}</h3><p>{stock.description}</p>{selected === 'tech' && <p>{market.project ? `当前为${market.project.exposure > .2 ? '重大' : '普通'}项目；公开线索已计入价格，成功概率不等于收益率。` : market.projectNews ? `第 ${market.projectNews.turn} 回合${market.projectNews.kind === 'success' ? '项目成功' : market.projectNews.kind === 'failure' ? '项目未成功' : '项目消息更新'}，等待新项目。` : '暂无进行中的项目。'}</p>}</section><section><h3>成交规则</h3><p>按当前报价成交。每 5 个玩家回合更新行情，价格更新后需重新确认。其他人行动时也能交易，不消耗回合或延长倒计时。</p><p>买入金额向上取整到元，卖出向下取整到元。</p></section><section><h3>盈亏与走势</h3><p>持仓盈亏对应剩余股票；累计盈亏包含已实现盈亏。红色为盈利，绿色为亏损。历史走势不预示后续方向。</p></section></div></details>
+      <details className="stock-help"><summary>股票与交易说明</summary><div className="stock-help-content"><section><h3>{stock.name}</h3><p>{stock.description}</p>{selected === 'tech' && <p>{market.project ? `当前为${market.project.exposure > .2 ? '重大' : '普通'}项目；公开线索已计入价格，成功概率不等于收益率。` : market.projectNews ? `第 ${market.projectNews.turn} 回合${market.projectNews.kind === 'success' ? '项目成功' : market.projectNews.kind === 'failure' ? '项目未成功' : '项目消息更新'}，等待新项目。` : '暂无进行中的项目。'}</p>}</section><section><h3>成交规则</h3><p>按当前报价成交。每 10 个玩家回合更新行情，价格更新后需重新确认。其他人行动时也能交易，不消耗回合或延长倒计时。</p><p>买入金额向上取整到元，卖出向下取整到元。</p></section><section><h3>盈亏与走势</h3><p>持仓盈亏对应剩余股票；累计盈亏包含已实现盈亏。红色为盈利，绿色为亏损。历史走势不预示后续方向。</p></section></div></details>
     </div>
   </section></Modal>
 }

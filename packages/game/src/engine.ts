@@ -1,6 +1,6 @@
 import { createTileStates } from './board.js'
 import { createDeck } from './cards.js'
-import { STARTING_CASH } from './economy.js'
+import { ITEM_GRANT_INTERVAL, STARTING_CASH, rentGrowthStart } from './economy.js'
 import { handleAssets } from './engine/commands/assets.js'
 import { handleBidding } from './engine/commands/bidding.js'
 import { handleCards } from './engine/commands/cards.js'
@@ -11,7 +11,7 @@ import { handleLiquidation } from './engine/commands/liquidation.js'
 import { handleWheel } from './engine/commands/wheel.js'
 import { handleStocks } from './engine/commands/stocks.js'
 import { advanceStockMarket, createStockMarket } from './stockMarket/model.js'
-import { isDetained } from './items.js'
+import { isDetained, ITEMS } from './items.js'
 import { assetActionQuote, canRollAgain, type AssetAction } from './queries.js'
 import { PLAYER_COLORS, type CommandResult, type DiceRoll, type GameCommand, type GameEvent, type GamePlayerSetup, type GameState, type PlayerState, type RandomSource } from './types.js'
 
@@ -50,6 +50,7 @@ export function createGame(
     token: setup.token,
     color: PLAYER_COLORS[index] ?? PLAYER_COLORS[0],
     cash: STARTING_CASH,
+    startRewardReceipts: 0,
     position: 0,
     isInJail: false,
     isInHospital: false,
@@ -247,8 +248,18 @@ export function applyCommand(
     if (!checkWinner(state, events)) advancePlayer(state, events)
   }
   if (state.phase !== 'FINISHED' && state.turnNumber !== current.turnNumber) {
+    if (state.turnNumber % ITEM_GRANT_INTERVAL === 0 && state.turnNumber <= rentGrowthStart(state.players.length)) {
+      for (const recipient of state.players) {
+        if (recipient.isBankrupt) continue
+        const itemKind = 'chosen-die' as const
+        recipient.items.push(itemKind)
+        addEvent(state, events, {
+          type: 'ITEM_RECEIVED', playerId: recipient.id, itemKind,
+          message: `第 ${state.turnNumber} 回合道具补给：${recipient.name} 获得「${ITEMS[itemKind].name}」${state.turnNumber === rentGrowthStart(state.players.length) ? '，本次为最后一轮定时补给' : ''}`,
+        })
+      }
+    }
     advanceStockMarket(state.stockMarket, state.turnNumber, marketRandom)
-    checkWinner(state, events)
   }
   if (state.phase === 'FINISHED' && state.statistics.finishedAt === null) state.statistics.finishedAt = now
   updateNetWorthPeaks(state)

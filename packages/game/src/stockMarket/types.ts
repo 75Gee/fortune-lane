@@ -51,7 +51,7 @@ export interface EventStockState extends StockModelState {
   project: (StockProjectView & { age: number; duration: number }) | null
 }
 export interface CurrentStockMarketState extends StockMarketView {
-  modelVersion: 8
+  modelVersion: 9
   nextUpdateTurn: number
   /** These fields never leave the authoritative engine. */
   internal: { civic: SentimentStockState; transit: CycleStockState; travel: TrendStockState; tech: EventStockState }
@@ -60,7 +60,10 @@ export interface LegacyStockMarketState extends StockMarketView {
   modelVersion?: 1 | 2 | 3 | 4 | 5 | 6 | 7
   internal: Record<StockId, { price: number; trend?: StockTrend; referencePrice?: number }>
 }
-export type StockMarketState = CurrentStockMarketState | LegacyStockMarketState
+export interface PreviousStockMarketState extends Omit<CurrentStockMarketState, 'modelVersion'> {
+  modelVersion: 8
+}
+export type StockMarketState = CurrentStockMarketState | PreviousStockMarketState | LegacyStockMarketState
 export interface StockSaleSelection { stockId: StockId; quantity: number }
 export interface StockFunding { stockSales: StockSaleSelection[]; quoteRevision: number }
 export interface StockTrade {

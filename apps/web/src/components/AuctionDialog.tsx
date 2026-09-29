@@ -3,6 +3,7 @@ import { Check, Gavel, X } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
 import { CommandAvailabilityContext, Modal } from './Modal.js'
 import { StockPaymentHint } from './stocks/StockPaymentHint.js'
+import { CityImage } from './CityImage.js'
 
 const money = (value: number) => `¥${value.toLocaleString('zh-CN')}`
 
@@ -25,7 +26,7 @@ export function AuctionDialog({ game, auction, playerId, clockOffset, onCommand,
   const submit = (value: number) => { if (!available || sending || submitted || !seconds) return; setSending(true); onCommand({ type: 'BID_AUCTION', auctionId: auction.id, amount: value }) }
   return <Modal label="地产竞拍" onDismiss={onClose}><div className="landing-overlay"><section className="landing-dialog auction-dialog">
     {onClose && <button className="decision-close icon-command" aria-label="关闭竞拍查看" onClick={onClose}><X size={18} /></button>}
-    <header className="landing-dialog-head"><span><Gavel size={23} /></span><div><small>{seconds ? `密封竞拍 · 剩余 ${seconds}秒` : '出价截止，正在揭晓'}</small><h2>{getTile(auction.tileIndex).name}</h2></div></header>
+    <div className="auction-city-cover"><CityImage city={getTile(auction.tileIndex).name} /><header className="landing-dialog-head"><span><Gavel size={23} /></span><div><small>{seconds ? `密封竞拍 · 剩余 ${seconds}秒` : '出价截止，正在揭晓'}</small><h2>{getTile(auction.tileIndex).name}</h2></div></header></div>
     <div className="auction-content">
       <div className="auction-summary"><span>起拍价<strong>{money(minimumBid)}</strong><small>标价 {money(getTile(auction.tileIndex).price ?? 0)} · 底价即抵押价值</small></span><span>我的可用资金<strong>{money(funds)}</strong><small>现金 {money(cash)} ＋ 持股 {money(Math.max(0, funds - cash))}</small></span></div>
       {mine && !submitted ? <form onSubmit={(event) => { event.preventDefault(); if (valid) submit(bid) }}>

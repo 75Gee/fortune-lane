@@ -5,7 +5,7 @@ import { Modal } from './Modal.js'
 import { TokenImage } from './TokenImage.js'
 
 export function ItemCatalog() {
-  return <section className="item-catalog"><h3>道具补给</h3><p>停在道具格，随机获得一张道具，四种机会相同。每个自己的回合最多使用一张，对子追加行动不重置；每人场上最多保留一个路障或炸弹。</p>
+  return <section className="item-catalog"><h3>道具补给</h3><p>停在道具格可随机获得一张道具。每 25 个总回合，还会向未出局玩家各随机发一张；租金开始加速时最后发放一次。四种道具机会相同。每个自己的回合最多使用一张，对子追加行动不重置；每人场上最多保留一个路障或炸弹。</p>
     {ITEM_KINDS.map((kind) => <article key={kind}><img src={ITEMS[kind].image} alt="" loading="lazy" /><div><strong>{ITEMS[kind].name}</strong><p>{ITEMS[kind].description}</p></div></article>)}
   </section>
 }
@@ -46,7 +46,7 @@ export function ItemInventory({ game, playerId, available, onCommand, onClose }:
       const amount = me.items.filter((held) => held === kind).length
       return <button key={kind} aria-label={`${ITEMS[kind].name}，持有 ${amount} 张`} aria-pressed={selected === kind} className={selected === kind ? 'selected' : ''} onClick={() => setSelected(kind)}><img src={ITEMS[kind].image} alt="" /><strong>{ITEMS[kind].name}</strong><small>×{amount}</small></button>
     })}</div>
-    {!item && <p className="empty-state">停在道具格可获得道具</p>}
+    {!item && <p className="empty-state">停在道具格可获得随机道具；每25总回合领取自选骰子，租金加速开始时最后发放一次。</p>}
     {item && <div className="item-selection"><p className="item-effect">{selected === 'turtle' ? '使目标接下来两次常规行动只掷一颗骰子。' : selected === 'chosen-die' ? '选择点数，额外前进一次。' : selected === 'roadblock' ? '选择位置，拦停下一位经过的玩家。' : '选择位置，踩中的玩家将住院并结束回合。'}</p>
       {selected === 'turtle' && count > 0 && <div className="item-targets" role="group" aria-label="指定乌龟卡目标">{game.players.filter((player) => !player.isBankrupt).map((player) => <button key={player.id} disabled={!usable || player.turtleRollsRemaining > 0} aria-pressed={targetId === player.id} onClick={() => setTargetId(player.id)}><TokenImage token={player.token} /><span><strong>{player.name}{player.id === playerId ? ' · 你' : ''}</strong>{(player.turtleRollsRemaining > 0 || player.isInHospital || player.isInJail) && <small>{player.turtleRollsRemaining > 0 ? `乌龟剩余 ${player.turtleRollsRemaining} 次` : player.isInHospital ? '出院后生效' : '出狱后生效'}</small>}</span></button>)}</div>}
       {selected === 'chosen-die' && count > 0 && <><div className="chosen-values" role="group" aria-label="指定骰子点数">{[1, 2, 3, 4, 5, 6].map((number) => <button key={number} aria-label={`${number}点`} disabled={!usable} aria-pressed={value === number} onClick={() => setValue(number)}>{number}</button>)}</div>

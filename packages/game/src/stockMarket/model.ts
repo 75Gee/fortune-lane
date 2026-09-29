@@ -1,5 +1,5 @@
 import type { RandomSource } from '../types.js'
-import { MARKET_NOISE, STOCK_MODEL_PARAMETERS as PARAMETERS, STOCK_UPDATE_INTERVAL } from './parameters.js'
+import { MARKET_NOISE, STOCK_MODEL_PARAMETERS as PARAMETERS, STOCK_MODEL_STEP_INTERVAL, STOCK_UPDATE_INTERVAL } from './parameters.js'
 import { STOCK_IDS, type CurrentStockMarketState, type StockId, type StockMarketState, type SentimentStockState } from './types.js'
 
 export const STOCK_HISTORY_LENGTH = 601
@@ -12,12 +12,12 @@ function initialInternal(prices: Record<StockId, number>, turn: number, random: 
     civic: base('civic'),
     transit: { ...base('transit'), cycle: [0, 0], cycleVariance: 0, period: 24 + 12 * random() },
     travel: { ...base('travel'), trend: 0, trendVariance: 0, covariance: 0 },
-    tech: { price: prices.tech, fundamental: prices.tech, projectValue: 1, project: null, nextProjectTurn: turn + integer(random, 6, 10) * STOCK_UPDATE_INTERVAL },
+    tech: { price: prices.tech, fundamental: prices.tech, projectValue: 1, project: null, nextProjectTurn: turn + integer(random, 6, 10) * STOCK_MODEL_STEP_INTERVAL },
   }
 }
 export function createStockMarket(playerIds: readonly string[], turn = 1, random: RandomSource = Math.random): CurrentStockMarketState {
   return {
-    modelVersion: 8, nextUpdateTurn: turn + STOCK_UPDATE_INTERVAL,
+    modelVersion: 9, nextUpdateTurn: turn + STOCK_UPDATE_INTERVAL,
     quoteRevision: 1, updatedTurn: turn, project: null, projectNews: null,
     stocks: Object.fromEntries(STOCK_IDS.map(id => [id, { priceCents: 10_000, previousPriceCents: 10_000, history: [{ turn, priceCents: 10_000 }] }])) as CurrentStockMarketState['stocks'],
     internal: initialInternal({ civic: 100, transit: 100, travel: 100, tech: 100 }, turn, random),
@@ -26,9 +26,13 @@ export function createStockMarket(playerIds: readonly string[], turn = 1, random
 }
 /** Preserve existing quotes, high precision prices and holdings on migration. */
 function upgradeModel(market: StockMarketState, random: RandomSource): asserts market is CurrentStockMarketState {
-  if (market.modelVersion === 8) return
+  if (market.modelVersion === 9) return
+  if (market.modelVersion === 8) {
+    Object.assign(market, { modelVersion: 9, nextUpdateTurn: market.updatedTurn + STOCK_UPDATE_INTERVAL })
+    return
+  }
   const prices = Object.fromEntries(STOCK_IDS.map(id => [id, market.internal[id].price])) as Record<StockId, number>
-  Object.assign(market, { modelVersion: 8, nextUpdateTurn: market.updatedTurn + STOCK_UPDATE_INTERVAL,
+  Object.assign(market, { modelVersion: 9, nextUpdateTurn: market.updatedTurn + STOCK_UPDATE_INTERVAL,
     internal: initialInternal(prices, market.updatedTurn, random), project: null, projectNews: null })
 }
 function sentiment(state: SentimentStockState, memory: number, noise: number, random: RandomSource): void {
@@ -40,7 +44,7 @@ function updateProject(market: CurrentStockMarketState, turn: number, random: Ra
   if (!state.project && turn >= state.nextProjectTurn) {
     const duration = integer(random, 7, 9)
     state.project = { age: 0, duration, probability: .5, exposure: random() < .25 ? .26 : .16,
-      revealTurn: turn + (duration - 1) * STOCK_UPDATE_INTERVAL }
+      revealTurn: turn + (duration - 1) * STOCK_MODEL_STEP_INTERVAL }
     market.projectNews = { turn, kind: 'start', probability: .5 }
   }
   const project = state.project
@@ -59,11 +63,10 @@ function updateProject(market: CurrentStockMarketState, turn: number, random: Ra
       state.projectValue *= (1 + (success ? project.exposure : -project.exposure))
         / (1 + project.exposure * (2 * project.probability - 1))
       market.projectNews = { turn, kind: success ? 'success' : 'failure', probability: project.probability }
-      state.nextProjectTurn = turn + integer(random, 8, 12) * STOCK_UPDATE_INTERVAL
+      state.nextProjectTurn = turn + integer(random, 8, 12) * STOCK_MODEL_STEP_INTERVAL
       state.project = null
     }
   }
-  market.project = state.project ? { probability: state.project.probability, exposure: state.project.exposure, revealTurn: state.project.revealTurn } : null
   // Fold completed events into fundamental value; avoid unbounded accumulated
   // project multipliers in long-lived games. This does not change the price.
   if (!state.project) {
@@ -72,7 +75,7 @@ function updateProject(market: CurrentStockMarketState, turn: number, random: Ra
   }
   state.price = clipPrice(state.fundamental * state.projectValue)
 }
-function tick(market: CurrentStockMarketState, turn: number, random: RandomSource): void {
+function step(market: CurrentStockMarketState, turn: number, random: RandomSource): void {
   const commonShock = MARKET_NOISE * normal(random)
   for (const id of STOCK_IDS) {
     const p = PARAMETERS[id], state = market.internal[id]
@@ -104,7 +107,20 @@ function tick(market: CurrentStockMarketState, turn: number, random: RandomSourc
   travel.trendVariance = trendVariance; travel.covariance = covariance
   travel.price = clipPrice(travel.fundamental * Math.exp(travel.sentiment - travel.sentimentVariance / 2))
   updateProject(market, turn, random)
+}
 
+function tick(market: CurrentStockMarketState, turn: number, random: RandomSource): void {
+  for (let stepTurn = market.updatedTurn + STOCK_MODEL_STEP_INTERVAL; stepTurn <= turn; stepTurn += STOCK_MODEL_STEP_INTERVAL) {
+    step(market, stepTurn, random)
+  }
+  const project = market.internal.tech.project
+  market.project = project ? {
+    probability: project.probability,
+    exposure: project.exposure,
+    revealTurn: turn + Math.ceil((project.revealTurn - turn) / STOCK_UPDATE_INTERVAL) * STOCK_UPDATE_INTERVAL,
+  } : null
+  // News and project outcomes become public with their matching quote.
+  if (market.projectNews && market.projectNews.turn > market.updatedTurn) market.projectNews.turn = turn
   for (const id of STOCK_IDS) {
     const quote = market.stocks[id]
     quote.previousPriceCents = quote.priceCents

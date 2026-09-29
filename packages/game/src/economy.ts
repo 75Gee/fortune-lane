@@ -2,10 +2,11 @@ import { BOARD, getTile, isOwnable } from './board.js'
 import type { GameState } from './types.js'
 
 export const STARTING_CASH = 15_000
-export const WINNING_NET_WORTH = 100_000
-export const PASS_START_REWARD = 2_000
+export const PASS_START_REWARD = 4_000
+export const PASS_START_DECREMENT = 400
+export const PASS_START_MINIMUM = 2_000
 export const JAIL_FINE = 500
-export const RENT_GROWTH_START = 300
+export const ITEM_GRANT_INTERVAL = 25
 export const AIRPORT_RENTS = [0, 300, 600, 1_000, 1_600] as const
 export const UTILITY_MULTIPLIERS = [0, 50, 90] as const
 
@@ -16,18 +17,26 @@ export function auctionMinimumBid(tileIndex: number): number {
   return tile.mortgage
 }
 
-export function rentMultiplier(turnNumber: number): number {
-  return 1.01 ** Math.max(0, turnNumber - RENT_GROWTH_START)
+export function passStartReward(receipts: number): number {
+  return Math.max(PASS_START_MINIMUM, PASS_START_REWARD - PASS_START_DECREMENT * receipts)
 }
 
-export function scaleRent(base: number, turnNumber: number): number {
+export function rentGrowthStart(initialPlayerCount: number): number {
+  return 100 + (initialPlayerCount - 2) * ITEM_GRANT_INTERVAL
+}
+
+export function rentMultiplier(turnNumber: number, initialPlayerCount: number): number {
+  return 1.02 ** Math.max(0, turnNumber - rentGrowthStart(initialPlayerCount) + 1)
+}
+
+export function scaleRent(base: number, turnNumber: number, initialPlayerCount: number): number {
   if (base <= 0) return 0
-  return Math.min(Number.MAX_SAFE_INTEGER, Math.ceil(base * rentMultiplier(turnNumber)))
+  return Math.min(Number.MAX_SAFE_INTEGER, Math.ceil(base * rentMultiplier(turnNumber, initialPlayerCount)))
 }
 
 // The same quote is used for settlement, deeds and prospective purchases.
 export function rentForTile(
-  state: Pick<GameState, 'tiles' | 'turnNumber'>,
+  state: Pick<GameState, 'tiles' | 'turnNumber' | 'players'>,
   tileIndex: number,
   diceTotal: number,
   ownerId = state.tiles[tileIndex]?.ownerId,
@@ -46,7 +55,7 @@ export function rentForTile(
       ? AIRPORT_RENTS[count] ?? 0
       : diceTotal * (UTILITY_MULTIPLIERS[count] ?? 0)
   }
-  return scaleRent(base, state.turnNumber)
+  return scaleRent(base, state.turnNumber, state.players.length)
 }
 
 export function redeemCost(tileIndex: number): number {

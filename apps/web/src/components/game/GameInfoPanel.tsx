@@ -3,6 +3,7 @@ import { Building2, ChevronRight, Library, Sparkles, Users, X } from 'lucide-rea
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { ActivityHistory } from '../ActivityCenter.js'
 import { CardLibrary } from '../CardLibrary.js'
+import { CityImage, cityImageSource } from '../CityImage.js'
 import { ItemCatalog } from '../ItemInventory.js'
 import { Modal } from '../Modal.js'
 import { TokenImage } from '../TokenImage.js'
@@ -72,7 +73,7 @@ export function GameInfoPanel({ game, playerId, roomCode, initialTab, initialOwn
             {game.tiles.map((state, index) => {
               if (state.ownerId !== assetOwner) return null
               const tile = getTile(index)
-              return <div className="portfolio-asset" key={index}><button className="asset-row" aria-label={`查看${tile.name}详情与操作`} onClick={() => openDetail(index)}><i style={{ background: tile.color ?? '#3984b5' }} /><span><strong>{tile.name}</strong><small>{state.mortgaged ? '已抵押 · 暂不收费' : `${tile.kind === 'property' ? `${state.level} 级 · ` : ''}游览费 ${tile.kind === 'utility' ? '按骰点计费' : money(rentForTile(game, index, 0))}`}</small></span><ChevronRight size={17} /></button></div>
+              return <div className="portfolio-asset" key={index}><button className={`asset-row${cityImageSource(tile.name) ? ' has-city-art' : ''}`} aria-label={`查看${tile.name}详情与操作`} onClick={() => openDetail(index)}><i style={{ background: tile.color ?? '#3984b5' }} /><CityImage city={tile.name} thumbnail loading="lazy" /><span><strong>{tile.name}</strong><small>{state.mortgaged ? '已抵押 · 暂不收费' : `${tile.kind === 'property' ? `${state.level} 级 · ` : ''}游览费 ${tile.kind === 'utility' ? '按骰点计费' : money(rentForTile(game, index, 0))}`}</small></span><ChevronRight size={17} /></button></div>
             })}
             </div>
           </section>

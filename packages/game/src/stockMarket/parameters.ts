@@ -1,6 +1,8 @@
-export const STOCK_UPDATE_INTERVAL = 5
+export const STOCK_UPDATE_INTERVAL = 10
+export const STOCK_MODEL_STEP_INTERVAL = 5
 
-// Per quote update. Fundamental growth is intentionally small; temporary
+// Per five-turn model step; each published quote combines two steps.
+// Fundamental growth is intentionally small; temporary
 // signals are weaker than company noise so timing is useful but uncertain.
 export const STOCK_MODEL_PARAMETERS = {
   civic: { growth: .0003, beta: .15, noise: .006, sentimentMemory: .6, sentimentNoise: .0025 },

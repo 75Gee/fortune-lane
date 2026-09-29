@@ -88,6 +88,7 @@ export interface PlayerState {
   token: TokenId
   color: string
   cash: number
+  startRewardReceipts: number
   position: number
   isInJail: boolean
   isInHospital: boolean

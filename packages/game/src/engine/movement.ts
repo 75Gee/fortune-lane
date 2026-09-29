@@ -1,11 +1,10 @@
 import { BOARD, getTile, getTileById } from '../board.js'
-import { PASS_START_REWARD } from '../economy.js'
+import { passStartReward } from '../economy.js'
 import { movementPreview } from '../items.js'
 import { type GameEvent, type GameState, type PlayerState } from '../types.js'
 
 import { addEvent } from './context.js'
 import { transitionTo } from './transitions.js'
-import { checkWinner } from './turns.js'
 
 export function sendToDetention(state: GameState, player: PlayerState, events: GameEvent[], facility: 'jail' | 'hospital', reason: string): void {
   const from = player.position
@@ -58,16 +57,17 @@ export function moveBy(
     message: `${player.name} ${steps < 0 ? '后退' : '前进'}到 ${getTile(to).name}`,
   })
   for (let pass = 0; pass < startPasses; pass += 1) {
-    player.cash += PASS_START_REWARD
+    const receipts = player.startRewardReceipts ?? 0
+    const reward = passStartReward(receipts)
+    player.cash += reward
+    player.startRewardReceipts = receipts + 1
     addEvent(state, events, {
       type: 'PASSED_START',
       playerId: player.id,
       tileIndex: 0,
-      amount: PASS_START_REWARD,
-      message: `${player.name} 经过起点，领取 ${PASS_START_REWARD} 元`,
+      amount: reward,
+      message: `${player.name} 经过起点，领取 ${reward} 元`,
     })
-    // Reaching the target at the start takes precedence over landing costs.
-    if (checkWinner(state, events)) return
   }
   if (hazard) {
     state.hazards = state.hazards.filter((entry) => entry.id !== hazard.id)
