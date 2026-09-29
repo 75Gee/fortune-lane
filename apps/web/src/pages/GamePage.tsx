@@ -1,43 +1,25 @@
-import {
-  ITEMS,
-  rentGrowthStart,
-  isDetained,
-  rentMultiplier,
-  type GameCommand,
-  type GameEvent,
-  type GameView,
-} from '@fortune/game'
+import { isDetained, type GameCommand, type GameEvent, type GameView } from '@fortune/game'
 import type { RoomSnapshot } from '@fortune/protocol'
-import {
-  Backpack,
-  Building2,
-  ChevronRight,
-  Flag,
-  HandCoins,
-  Library,
-  LogOut,
-  Map,
-  MoreHorizontal,
-  Route,
-  Sparkles,
-  Users,
-  Volume2,
-  VolumeX,
-  Wallet,
-} from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { DicePresentation } from '../board/DicePresentation.js'
-import { GameBoard, TurnClock } from '../board/GameBoard.js'
+import { GameBoard } from '../board/GameBoard.js'
 import { useGamePresentation } from '../board/useGamePresentation.js'
 import { ActivityBroadcast } from '../components/ActivityCenter.js'
-import { Brand } from '../components/Brand.js'
 import { EndgameReport } from '../components/EndgameReport.js'
 import { ItemInventory } from '../components/ItemInventory.js'
 import { LandingDialog } from '../components/LandingDialog.js'
 import { CommandAvailabilityContext, Modal } from '../components/Modal.js'
-import { TokenImage } from '../components/TokenImage.js'
-import { StockEntry } from '../components/stocks/StockSummary.js'
+import { decisionId, needsDecision } from '../components/decisionState.js'
+import { ActionPanel } from '../components/game/ActionPanel.js'
+import { GameInfoPanel, type InfoTab } from '../components/game/GameInfoPanel.js'
+import { RouteView } from '../components/game/RouteView.js'
+import { TileDetail } from '../components/game/TileDetail.js'
 import { StockMarketPanel } from '../components/stocks/StockMarketPanel.js'
+import { usePersistentToggle } from '../lib/usePersistentToggle.js'
+import { BoardToolbar, type BoardView } from './game/BoardToolbar.js'
+import { CommandDock } from './game/CommandDock.js'
+import { GameConfirmations, type GameConfirmation } from './game/GameConfirmations.js'
+import { GameHeader } from './game/GameHeader.js'
 
 interface GamePageProps {
   room: RoomSnapshot
@@ -51,26 +33,14 @@ interface GamePageProps {
   onLeave: () => void
 }
 
-import { actionDescription, decisionId, needsDecision } from '../components/decisionState.js'
-import { ActionPanel } from '../components/game/ActionPanel.js'
-import { GameInfoPanel, type InfoTab } from '../components/game/GameInfoPanel.js'
-import { RouteView } from '../components/game/RouteView.js'
-import { TileDetail } from '../components/game/TileDetail.js'
-import { formatMoney } from '../lib/format.js'
-import { ConfirmDialog } from '../ui/index.js'
+/** At most one panel is open at a time; confirmations stack above it. */
 type Panel =
   | { type: 'info'; tab: InfoTab; owner: string }
   | { type: 'tile'; index: number }
   | { type: 'items' }
   | { type: 'stocks' }
   | null
-function readPreference(key: string): boolean {
-  try {
-    return localStorage.getItem(key) !== 'false'
-  } catch {
-    return true
-  }
-}
+
 export function GamePage({
   room,
   game,
@@ -83,28 +53,21 @@ export function GamePage({
   onLeave,
 }: GamePageProps) {
   const [panel, setPanel] = useState<Panel>(null)
+  const [confirm, setConfirm] = useState<GameConfirmation | null>(null)
   const [watchedDecision, setWatchedDecision] = useState<string | null>(null)
-  const [soundEnabled, setSoundEnabled] = useState(() => readPreference('fortune-sound'))
-  useEffect(() => {
-    try {
-      localStorage.setItem('fortune-sound', String(soundEnabled))
-    } catch {}
-  }, [soundEnabled])
-  const [settingsOpen, setSettingsOpen] = useState(false)
-  const [boardView, setBoardView] = useState<'board' | 'route'>('board')
-  const [leaveOpen, setLeaveOpen] = useState(false)
-  const [surrenderOpen, setSurrenderOpen] = useState(false)
-  const [surrenderRequested, setSurrenderRequested] = useState(false)
+  const [boardView, setBoardView] = useState<BoardView>('board')
   const [resultReviewed, setResultReviewed] = useState(false)
-  const [bankruptcyOpen, setBankruptcyOpen] = useState(false)
+  const [soundEnabled, setSoundEnabled] = usePersistentToggle('fortune-sound')
+
+  const connected = connectionStatus === 'connected'
+  const canSend = connected && !commandPending
   const onCommand = (command: GameCommand) => {
-    if (commandPending || connectionStatus !== 'connected') return
-    if (command.type === 'DECLARE_BANKRUPTCY') setBankruptcyOpen(true)
+    if (!canSend) return
+    // Bankruptcy is irreversible, so every entry point goes through a confirmation first.
+    if (command.type === 'DECLARE_BANKRUPTCY') setConfirm('bankruptcy')
     else sendCommand(command)
   }
-  useEffect(() => {
-    if (game.phase !== 'WAITING_FOR_DEBT') setBankruptcyOpen(false)
-  }, [game.phase])
+
   const {
     displayPositions,
     displayHazards,
@@ -119,21 +82,15 @@ export function GamePage({
   const clockOffset = useMemo(() => room.serverTime - Date.now(), [room.serverTime])
   const me = game.players.find((player) => player.id === playerId)
   const lobbyMe = room.players.find((player) => player.id === playerId)
-  const current = game.players.find((player) => player.id === game.currentPlayerId)
-  useEffect(() => {
-    if (surrenderRequested && me?.surrendered) {
-      setSurrenderOpen(false)
-      setSurrenderRequested(false)
-    }
-  }, [surrenderRequested, me?.surrendered])
-  useEffect(() => {
-    if (!surrenderRequested) return
-    const timer = window.setTimeout(() => setSurrenderRequested(false), 3000)
-    return () => clearTimeout(timer)
-  }, [surrenderRequested])
+  const available = !isPlaying && canSend
   const decisionKey = decisionId(game)
-  useEffect(() => setWatchedDecision(null), [decisionKey])
   const required = needsDecision(game, playerId)
+  const debt = game.pendingDebt?.debtorId === playerId ? game.pendingDebt : null
+
+  useEffect(() => {
+    if (game.phase !== 'WAITING_FOR_DEBT') setConfirm((current) => (current === 'bankruptcy' ? null : current))
+  }, [game.phase])
+  useEffect(() => setWatchedDecision(null), [decisionKey])
   useEffect(() => {
     if (required && (!isPlaying || game.pendingAuction)) setPanel(null)
   }, [decisionKey, required, isPlaying])
@@ -143,15 +100,9 @@ export function GamePage({
     if (game.currentPlayerId === playerId || game.pendingDebt?.debtorId === playerId)
       setPanel((current) => (current?.type === 'stocks' ? null : current))
   }, [game.currentPlayerId, game.turnNumber, game.pendingDebt?.debtorId, playerId])
-  const openInfo = (tab: InfoTab, owner = playerId) => setPanel({ type: 'info', tab, owner })
-  const openAssets = () => openInfo('assets')
-  const openHistory = () => openInfo('activity')
-  const available = !isPlaying && !commandPending && connectionStatus === 'connected'
-  const lastPresentedRoll = presentedEvents.findLast((event) => event.type === 'DICE_ROLLED')
-  const showRollResult = activeEvent?.type === 'TOKEN_MOVED' && lastPresentedRoll?.revision === activeEvent.revision
-  const debt = game.pendingDebt?.debtorId === playerId ? game.pendingDebt : null
   const previousDebt = useRef(debt)
   useEffect(() => {
+    // Close the liquidation view once the debt is settled.
     if (previousDebt.current && !debt)
       setPanel((current) =>
         current?.type === 'info' && current.tab === 'assets' && current.owner === playerId ? null : current,
@@ -159,156 +110,42 @@ export function GamePage({
     previousDebt.current = debt
   }, [debt, playerId])
 
+  const closePanel = () => setPanel(null)
+  const openInfo = (tab: InfoTab, owner = playerId) => setPanel({ type: 'info', tab, owner })
+  const openAssets = () => openInfo('assets')
+  const openHistory = () => openInfo('activity')
+  const selectTile = (index: number) => setPanel({ type: 'tile', index })
+
+  const lastPresentedRoll = presentedEvents.findLast((event) => event.type === 'DICE_ROLLED')
+  const showRollResult = activeEvent?.type === 'TOKEN_MOVED' && lastPresentedRoll?.revision === activeEvent.revision
+  const expandedAction = game.phase === 'WAITING_FOR_DEBT' || !!game.pendingDecision || (!!me && isDetained(me))
+  const stillPlaying = !me?.isBankrupt && game.phase !== 'FINISHED'
+
   return (
     <CommandAvailabilityContext.Provider value={available}>
-      <main
-        className={`game-screen ${game.phase === 'WAITING_FOR_DEBT' || game.pendingDecision || (me && isDetained(me)) ? 'has-expanded-action' : ''}`}
-      >
-        <header className="game-header">
-          <Brand />
-          <div className="game-room-meta">
-            <span>房间</span>
-            <strong>{room.roomCode}</strong>
-            <i className={connectionStatus === 'connected' ? 'online' : ''} />
-          </div>
-          <div className="header-commands">
-            <nav className="game-info-nav" aria-label="对局信息">
-              <button title="玩家" aria-label="玩家" onClick={() => openInfo('players')}>
-                <Users size={18} />
-                <span>玩家</span>
-              </button>
-              <button title="资产" aria-label="资产" onClick={openAssets}>
-                <Building2 size={18} />
-                <span>资产</span>
-              </button>
-              <button title="动态" aria-label="动态" onClick={openHistory}>
-                <Sparkles size={18} />
-                <span>动态</span>
-              </button>
-              <button title="牌库" aria-label="牌库" onClick={() => openInfo('cards')}>
-                <Library size={18} />
-                <span>牌库</span>
-              </button>
-            </nav>
-            <button
-              className="icon-command"
-              onClick={() => setSettingsOpen((value) => !value)}
-              title="对局设置"
-              aria-label="对局设置"
-              aria-expanded={settingsOpen}
-            >
-              <MoreHorizontal size={20} />
-            </button>
-            {settingsOpen && (
-              <>
-                <button className="settings-backdrop" aria-label="关闭设置" onClick={() => setSettingsOpen(false)} />
-                <div className="game-settings" role="group" aria-label="对局设置">
-                  <small>房间 {room.roomCode}</small>
-                  <button onClick={() => setSoundEnabled((value) => !value)}>
-                    {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-                    {soundEnabled ? '关闭音效' : '开启音效'}
-                  </button>
-                  {!me?.isBankrupt && game.phase !== 'FINISHED' && (
-                    <button
-                      onClick={() => {
-                        setSettingsOpen(false)
-                        setSurrenderOpen(true)
-                      }}
-                    >
-                      <Flag size={18} />
-                      投降并观战
-                    </button>
-                  )}
-                  <button
-                    onClick={() => {
-                      setSettingsOpen(false)
-                      setLeaveOpen(true)
-                    }}
-                  >
-                    <LogOut size={18} />
-                    暂离房间
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </header>
+      <main className={`game-screen ${expandedAction ? 'has-expanded-action' : ''}`}>
+        <GameHeader
+          roomCode={room.roomCode}
+          connected={connected}
+          soundEnabled={soundEnabled}
+          canSurrender={stillPlaying}
+          onToggleSound={() => setSoundEnabled((value) => !value)}
+          onOpenInfo={(tab) => openInfo(tab)}
+          onSurrender={() => setConfirm('surrender')}
+          onLeave={() => setConfirm('leave')}
+        />
 
         <div className="game-layout">
           <section className="board-region">
-            <div className="board-toolbar">
-              <div className="turn-summary">
-                <div>
-                  <strong>
-                    {game.phase === 'FINISHED'
-                      ? '本局结束'
-                      : game.pendingAuction
-                        ? '正在竞拍'
-                        : `${current?.id === playerId ? '轮到你' : (current?.name ?? '当前玩家')} · ${actionDescription(game)}`}
-                  </strong>
-                  <TurnClock deadline={game.pendingAuction?.deadline ?? room.turnDeadline} offset={clockOffset} />
-                </div>
-                <span>
-                  第 {game.turnNumber} 回合
-                  {game.turnNumber >= rentGrowthStart(game.players.length)
-                    ? ` · 游览费 ×${rentMultiplier(game.turnNumber, game.players.length).toFixed(2)}`
-                    : ''}
-                </span>
-              </div>
-              <div className="game-player-strip" aria-label="玩家现金与当前回合">
-                {game.players.map((player) => (
-                  <button
-                    key={player.id}
-                    className={`${player.id === game.currentPlayerId ? 'is-current' : ''} ${player.isBankrupt ? 'is-bankrupt' : ''}`}
-                    title={`${player.name} · ${player.isBankrupt ? '观战中' : formatMoney(player.cash)}`}
-                    aria-label={`查看${player.name}的资产`}
-                    onClick={() => openInfo('assets', player.id)}
-                  >
-                    <span className="player-token-small" style={{ borderColor: player.color }}>
-                      <TokenImage token={player.token} />
-                      {player.turtleRollsRemaining > 0 && (
-                        <span
-                          className="turtle-status-badge"
-                          title={`乌龟效果：剩余 ${player.turtleRollsRemaining} 次常规掷骰`}
-                        >
-                          <img src={ITEMS.turtle.image} alt="乌龟效果" />
-                          <b>{player.turtleRollsRemaining}</b>
-                        </span>
-                      )}
-                    </span>
-                    <span>
-                      <strong>
-                        {player.name}
-                        {player.id === playerId ? ' · 你' : ''}
-                      </strong>
-                      <small>
-                        {player.isBankrupt
-                          ? '观战'
-                          : `${formatMoney(player.cash)}${!player.connected ? ' · 离线' : player.isInHospital ? ' · 住院' : player.isInJail ? ' · 服刑' : ''}`}
-                      </small>
-                    </span>
-                  </button>
-                ))}
-              </div>
-              <div className="segmented board-view-switch" role="group" aria-label="棋盘视图">
-                <button
-                  className={boardView === 'board' ? 'active' : ''}
-                  aria-pressed={boardView === 'board'}
-                  onClick={() => setBoardView('board')}
-                >
-                  <Map size={16} />
-                  实景
-                </button>
-                <button
-                  className={boardView === 'route' ? 'active' : ''}
-                  aria-pressed={boardView === 'route'}
-                  onClick={() => setBoardView('route')}
-                >
-                  <Route size={16} />
-                  路线
-                </button>
-              </div>
-            </div>
+            <BoardToolbar
+              game={game}
+              playerId={playerId}
+              turnDeadline={room.turnDeadline}
+              clockOffset={clockOffset}
+              boardView={boardView}
+              onBoardViewChange={setBoardView}
+              onOpenPlayer={(owner) => openInfo('assets', owner)}
+            />
             <div className={`board-viewport ${boardView === 'route' ? 'show-route' : ''}`}>
               <GameBoard
                 active={boardView === 'board'}
@@ -316,7 +153,7 @@ export function GamePage({
                 playerId={playerId}
                 displayPositions={displayPositions}
                 selectedTile={panel?.type === 'tile' ? panel.index : null}
-                onSelectTile={(index) => setPanel({ type: 'tile', index })}
+                onSelectTile={selectTile}
                 activeEvent={activeEvent}
                 activeEventStartedAt={activeEventStartedAt}
               />
@@ -327,7 +164,7 @@ export function GamePage({
                 displayPositions={displayPositions}
                 displayHazards={displayHazards}
                 activeEvent={activeEvent}
-                onSelectTile={(index) => setPanel({ type: 'tile', index })}
+                onSelectTile={selectTile}
               />
             )}
             {showRollResult && (
@@ -359,7 +196,7 @@ export function GamePage({
               initialTab={panel.tab}
               initialOwner={panel.owner}
               onCommand={onCommand}
-              onClose={() => setPanel(null)}
+              onClose={closePanel}
             />
           )}
         </div>
@@ -370,31 +207,13 @@ export function GamePage({
           dice={displayDice}
           startedAt={activeEventStartedAt}
         />
-        <footer className="game-command-dock">
-          <div className="dock-resources">
-            <button className="balance-command" aria-label="我的资产" title="我的资产" onClick={openAssets}>
-              <Wallet size={19} />
-              <span>
-                <small>{me?.isBankrupt ? '观战中' : '我的现金'}</small>
-                <strong>{formatMoney(me?.cash ?? 0)}</strong>
-              </span>
-              <ChevronRight size={16} />
-            </button>
-            {game.stockMarket && (
-              <StockEntry market={game.stockMarket} playerId={playerId} onOpen={() => setPanel({ type: 'stocks' })} />
-            )}
-            <button
-              className="inventory-command"
-              title={
-                game.currentPlayerId === playerId && game.itemUsedThisTurn ? '本回合道具额度已用完' : '查看和使用道具'
-              }
-              onClick={() => setPanel({ type: 'items' })}
-              aria-label={`我的道具，共 ${me?.items.length ?? 0} 张`}
-            >
-              <Backpack size={21} />
-              <span>道具 {me?.items.length ?? 0}</span>
-            </button>
-          </div>
+        <CommandDock
+          game={game}
+          playerId={playerId}
+          onOpenAssets={openAssets}
+          onOpenStocks={() => setPanel({ type: 'stocks' })}
+          onOpenItems={() => setPanel({ type: 'items' })}
+        >
           {game.phase === 'FINISHED' ? (
             <button className="primary-command" onClick={() => setResultReviewed(false)}>
               查看本局结果
@@ -404,16 +223,14 @@ export function GamePage({
               game={game}
               playerId={playerId}
               onCommand={onCommand}
-              busy={isPlaying || commandPending || connectionStatus !== 'connected'}
+              busy={isPlaying || !canSend}
               onManageAssets={openAssets}
               onWatch={decisionKey && !required ? () => setWatchedDecision(decisionKey) : undefined}
-              onSkipToLive={isPlaying && connectionStatus === 'connected' ? skipToLive : undefined}
-              waitingLabel={
-                connectionStatus !== 'connected' ? '等待重连…' : commandPending ? '正在提交…' : '行动进行中…'
-              }
+              onSkipToLive={isPlaying && connected ? skipToLive : undefined}
+              waitingLabel={!connected ? '等待重连…' : commandPending ? '正在提交…' : '行动进行中…'}
             />
           )}
-        </footer>
+        </CommandDock>
 
         {panel?.type === 'items' && me && (
           <ItemInventory
@@ -421,82 +238,45 @@ export function GamePage({
             playerId={playerId}
             available={available}
             onCommand={onCommand}
-            onClose={() => setPanel(null)}
+            onClose={closePanel}
           />
         )}
         {panel?.type === 'stocks' && (
           <StockMarketPanel
             game={game}
             playerId={playerId}
-            available={!commandPending && connectionStatus === 'connected'}
+            available={canSend}
             onCommand={onCommand}
-            onClose={() => setPanel(null)}
+            onClose={closePanel}
           />
         )}
         {panel?.type === 'tile' && (
-          <Modal label="地点详情" onDismiss={() => setPanel(null)}>
-            <button className="detail-backdrop" aria-label="关闭地点详情" onClick={() => setPanel(null)} />
+          <Modal label="地点详情" onDismiss={closePanel}>
+            <button className="detail-backdrop" aria-label="关闭地点详情" onClick={closePanel} />
             <TileDetail
               game={game}
               tileIndex={panel.index}
               playerId={playerId}
               onCommand={onCommand}
-              onClose={() => setPanel(null)}
+              onClose={closePanel}
             />
           </Modal>
         )}
-        {connectionStatus !== 'connected' && (
+        {!connected && (
           <div className="connection-banner">
             <span className="waiting-pulse" /> 连接断开，正在重连…
           </div>
         )}
-        {leaveOpen && (
-          <ConfirmDialog
-            icon={<LogOut size={28} />}
-            title="暂离房间？"
-            description={
-              me?.isBankrupt || game.phase === 'FINISHED'
-                ? '返回首页后，仍可重返这个房间。'
-                : '对局会继续，超时由系统代操作。返回首页后可重返房间；投降才会结束参赛。'
-            }
-            cancelLabel="留在房间"
-            confirmLabel="暂离房间"
-            confirmDisabled={commandPending || connectionStatus !== 'connected'}
-            onCancel={() => setLeaveOpen(false)}
-            onConfirm={onLeave}
-          />
-        )}
-        {bankruptcyOpen && (
-          <ConfirmDialog
-            tone="danger"
-            icon={<HandCoins size={28} />}
-            title="放弃筹款，宣告破产？"
-            description="股票变现后的现金用于清算，地产归还银行。本局无法继续参赛，但可以留下观战。"
-            cancelLabel="继续筹款"
-            confirmLabel="确认破产"
-            confirmDisabled={commandPending || connectionStatus !== 'connected'}
-            onCancel={() => setBankruptcyOpen(false)}
-            onConfirm={() => {
-              setBankruptcyOpen(false)
-              sendCommand({ type: 'DECLARE_BANKRUPTCY' })
-            }}
-          />
-        )}
-        {surrenderOpen && (
-          <ConfirmDialog
-            tone="danger"
-            icon={<Flag size={28} />}
-            title="确认投降？"
-            description="地产归还银行，本局无法重新参战。你将留在房间继续观战。"
-            cancelLabel="继续游玩"
-            confirmLabel={surrenderRequested ? '正在投降…' : '投降并观战'}
-            confirmDisabled={commandPending || connectionStatus !== 'connected'}
-            locked={surrenderRequested}
-            onCancel={() => setSurrenderOpen(false)}
-            onConfirm={() => {
-              setSurrenderRequested(true)
-              onCommand({ type: 'SURRENDER' })
-            }}
+        {confirm && (
+          <GameConfirmations
+            kind={confirm}
+            stillPlaying={stillPlaying}
+            surrendered={!!me?.surrendered}
+            disabled={!canSend}
+            onClose={() => setConfirm(null)}
+            onLeave={onLeave}
+            onSurrender={() => onCommand({ type: 'SURRENDER' })}
+            onDeclareBankruptcy={() => sendCommand({ type: 'DECLARE_BANKRUPTCY' })}
           />
         )}
 
@@ -505,7 +285,7 @@ export function GamePage({
             game={game}
             playerId={playerId}
             isHost={!!lobbyMe?.isHost}
-            available={!commandPending && connectionStatus === 'connected'}
+            available={canSend}
             onClose={() => setResultReviewed(true)}
             onHistory={() => {
               setResultReviewed(true)
