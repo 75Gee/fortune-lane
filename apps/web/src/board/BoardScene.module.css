@@ -1,0 +1,117 @@
+/* The scene fills whatever box its parent gives it; the game HUD and previews size that box. */
+.tabletop,
+.wrap,
+.scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.wrap {
+  isolation: isolate;
+  overflow: hidden;
+}
+.scene {
+  background: #b8d9e1;
+}
+.scene canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.scene:has(.fallback) canvas {
+  display: none;
+}
+.fallback {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  margin: 0;
+  padding: 20px;
+  color: var(--text-muted);
+  font-size: var(--text-md);
+  text-align: center;
+}
+
+/* Current focus: sits under the turn ticket and view switch. */
+.location {
+  position: absolute;
+  z-index: 3;
+  top: 176px;
+  left: var(--space-6);
+  display: grid;
+  gap: 4px;
+  max-width: 280px;
+  pointer-events: none;
+  color: var(--text);
+  text-shadow:
+    0 0 12px #f7f2e8,
+    0 0 4px #f7f2e8;
+}
+.location strong {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 900;
+  line-height: 1.2;
+}
+.location small {
+  justify-self: start;
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font-size: var(--text-xs);
+  text-shadow: none;
+}
+
+.tools {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  right: var(--space-6);
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.tools button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text);
+}
+.tools button:hover {
+  background: var(--surface-muted);
+}
+.tools button[aria-pressed='true'] {
+  background: var(--surface-ink);
+  color: var(--text-on-ink);
+}
+
+@media (max-width: 800px) {
+  .location {
+    top: 150px;
+    left: var(--space-3);
+  }
+  .location strong {
+    font-size: var(--text-xl);
+  }
+  .tools {
+    top: 146px;
+    right: var(--space-3);
+    transform: none;
+    flex-direction: row;
+  }
+  .tools button {
+    width: 36px;
+    height: 36px;
+  }
+}

@@ -5,25 +5,6 @@
   background: var(--surface-sunken);
 }
 
-.game-command-dock .property-action > .property-decision-head.has-city-art {
-  display: grid;
-  grid-template-columns: 108px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 14px;
-}
-.property-decision-head.has-city-art > .city-image {
-  width: 108px;
-  height: 72px;
-  border-radius: 7px;
-}
-.property-decision-head.has-city-art > div {
-  display: grid;
-  gap: 6px;
-}
-.property-decision-head.has-city-art > strong {
-  white-space: nowrap;
-}
-
 .tile-detail > .deed-city-image {
   width: 100%;
   height: auto;
@@ -80,17 +61,6 @@
 }
 
 @media (max-width: 600px) {
-  .game-command-dock .property-action > .property-decision-head.has-city-art {
-    grid-template-columns: 84px minmax(0, 1fr) auto;
-    gap: 10px;
-  }
-  .property-decision-head.has-city-art > .city-image {
-    width: 84px;
-    height: 56px;
-  }
-  .property-decision-head.has-city-art > div {
-    gap: 4px;
-  }
   .asset-row.has-city-art {
     grid-template-columns: 4px 60px minmax(0, 1fr) 18px;
     gap: 10px;

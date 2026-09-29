@@ -31,6 +31,14 @@ const cityFiles: Readonly<Record<string, string>> = {
   水利公司: 'water-company',
 }
 
+const facilityFiles = new Set(['airport', 'electric-company', 'water-company'])
+
+/** Latin caption for a city, e.g. 纽约 → NEW YORK; undefined for airports and utilities. */
+export function cityLatinName(city: string): string | undefined {
+  const file = cityFiles[city]
+  return file && !facilityFiles.has(file) ? file.replace(/-/g, ' ').toUpperCase() : undefined
+}
+
 export function cityImageSource(city: string, thumbnail = false): string | undefined {
   const file = cityFiles[city]
   return file ? `/assets/cities/${thumbnail ? 'thumbnails/' : ''}${file}.webp` : undefined
@@ -44,7 +52,7 @@ export function CityImage({
   loading = 'eager',
 }: {
   city: string
-  className?: string
+  className?: string | undefined
   thumbnail?: boolean
   loading?: 'eager' | 'lazy'
 }) {

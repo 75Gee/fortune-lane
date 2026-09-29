@@ -1,6 +1,7 @@
 import { type GameEvent, type GameView } from '@fortune/game'
 import { Clock3 } from 'lucide-react'
 import { lazy, Suspense, useEffect, useState } from 'react'
+import styles from './BoardScene.module.css'
 
 const BoardScene = lazy(() => import('./BoardScene.js'))
 
@@ -15,7 +16,15 @@ interface GameBoardProps {
   active: boolean
 }
 
-export function TurnClock({ deadline, offset }: { deadline: number | null; offset: number }) {
+export function TurnClock({
+  deadline,
+  offset,
+  className = '',
+}: {
+  deadline: number | null
+  offset: number
+  className?: string | undefined
+}) {
   const [now, setNow] = useState(Date.now())
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 500)
@@ -24,7 +33,7 @@ export function TurnClock({ deadline, offset }: { deadline: number | null; offse
   const seconds = deadline ? Math.max(0, Math.ceil((deadline - now - offset) / 1000)) : null
   return seconds === null ? null : (
     <span
-      className={`turn-clock ${seconds <= 15 ? 'is-urgent' : ''}`}
+      className={`turn-clock ${seconds <= 15 ? 'is-urgent' : ''} ${className}`}
       aria-label={seconds ? `剩余 ${seconds} 秒` : '时间已到，等待系统处理'}
     >
       <Clock3 size={14} />
@@ -59,8 +68,8 @@ export function GameBoard({
     activeEvent?.type === 'PLAYER_SENT_TO_HOSPITAL' ||
     (activeEvent?.type === 'TOKEN_MOVED' && (activeEvent.path?.length ?? 0) > 12)
   return (
-    <div className="tabletop-board">
-      <Suspense fallback={<div className="board-scene scene-fallback">旅途准备中…</div>}>
+    <div className={styles.tabletop}>
+      <Suspense fallback={<div className={styles.fallback}>旅途准备中…</div>}>
         <BoardScene
           game={game}
           active={active}

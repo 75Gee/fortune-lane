@@ -1,6 +1,6 @@
 // UI regression snapshots for the web client.
 //
-//   node scripts/ui-snapshots.mjs capture <label> [--base http://localhost:5173]
+//   node scripts/ui-snapshots.mjs capture <label> [--base http://localhost:5173] [--with-board] [--only name,name]
 //   node scripts/ui-snapshots.mjs compare <before-label> <after-label>
 //
 // Requires `pnpm --filter @fortune/web dev` to be running. Screens come from the
@@ -21,19 +21,20 @@ const viewports = {
 }
 
 const game = '/?scene=game'
+const menu = '[aria-label="对局菜单"]'
 const scenes = [
   { name: 'home', url: '/' },
   { name: 'game', url: game },
-  { name: 'game-settings', url: game, click: ['[aria-label="对局设置"]'] },
+  { name: 'game-settings', url: game, click: [menu] },
   { name: 'game-assets', url: game, click: ['[aria-label="我的资产"]'] },
-  { name: 'game-players', url: game, click: ['.game-info-nav [aria-label="玩家"]'] },
-  { name: 'game-activity', url: game, click: ['.game-info-nav [aria-label="动态"]'] },
-  { name: 'game-cards', url: game, click: ['.game-info-nav [aria-label="牌库"]'] },
-  { name: 'game-items', url: game, click: ['.inventory-command'] },
-  { name: 'game-stocks', url: `${game}&stocks`, click: ['.stock-entry'] },
-  { name: 'game-leave', url: game, click: ['[aria-label="对局设置"]', 'text=暂离房间'] },
-  { name: 'game-surrender', url: game, click: ['[aria-label="对局设置"]', 'text=投降并观战'] },
-  { name: 'debt-bankruptcy', url: `${game}&decision=debt`, click: ['.debt-give-up'] },
+  { name: 'game-players', url: game, click: [menu, 'role=group[name="对局菜单"] >> text=旅行者'] },
+  { name: 'game-activity', url: game, click: [menu, 'role=group[name="对局菜单"] >> text=动态'] },
+  { name: 'game-cards', url: game, click: [menu, 'role=group[name="对局菜单"] >> text=牌库'] },
+  { name: 'game-items', url: game, click: ['[aria-label^="我的道具"]'] },
+  { name: 'game-stocks', url: `${game}&stocks`, click: ['[aria-label^="打开股市"]'] },
+  { name: 'game-leave', url: game, click: [menu, 'text=暂离房间'] },
+  { name: 'game-surrender', url: game, click: [menu, 'text=投降并观战'] },
+  { name: 'debt-bankruptcy', url: `${game}&decision=debt`, click: ['text=放弃筹款，宣告破产'] },
   { name: 'decision-purchase', url: `${game}&decision=purchase` },
   { name: 'decision-upgrade', url: `${game}&decision=upgrade` },
   { name: 'decision-auction', url: `${game}&decision=auction` },
@@ -44,14 +45,22 @@ const scenes = [
 ]
 
 // Prefer Playwright's bundled browser; fall back to an installed Chrome.
-const launch = () => chromium.launch().catch(() => chromium.launch({ channel: 'chrome' }))
+const gpuArgs = [
+  '--enable-gpu',
+  '--ignore-gpu-blocklist',
+  ...(process.platform === 'darwin' ? ['--use-angle=metal'] : []),
+]
+const launch = () =>
+  chromium.launch({ args: gpuArgs }).catch(() => chromium.launch({ channel: 'chrome', args: gpuArgs }))
 
-const freeze = `
+const hideBoard = `
   canvas { visibility: hidden !important; }
+`
+const freeze = `
   *, *::before, *::after { animation: none !important; transition: none !important; caret-color: transparent !important; }
 `
 
-async function capture(label, base) {
+async function capture(label, base, { withBoard = false, only = null } = {}) {
   const dir = outDir(label)
   await mkdir(dir, { recursive: true })
   const browser = await launch()
@@ -72,12 +81,13 @@ async function capture(label, base) {
         const start = performance.now()
         Date.now = () => fixed + Math.floor(performance.now() - start)
       })
-      for (const scene of scenes) {
+      for (const scene of scenes.filter((entry) => !only || only.includes(entry.name))) {
         const page = await context.newPage()
         try {
           await page.goto(base + scene.url, { waitUntil: 'load' })
-          await page.addStyleTag({ content: freeze })
-          await page.waitForTimeout(1200)
+          await page.addStyleTag({ content: withBoard ? freeze : hideBoard + freeze })
+          // The WebGL board needs a few seconds to load models when it is kept visible.
+          await page.waitForTimeout(withBoard ? 4500 : 1200)
           for (const selector of scene.click ?? []) {
             await page.locator(selector).first().click({ timeout: 4000 })
             await page.waitForTimeout(400)
@@ -172,6 +182,8 @@ async function compare(before, after) {
 const [command, a, b] = process.argv.slice(2)
 const baseIndex = process.argv.indexOf('--base')
 const base = baseIndex > 0 ? process.argv[baseIndex + 1] : 'http://localhost:5173'
-if (command === 'capture' && a) await capture(a, base)
+const onlyIndex = process.argv.indexOf('--only')
+const only = onlyIndex > 0 ? process.argv[onlyIndex + 1].split(',') : null
+if (command === 'capture' && a) await capture(a, base, { withBoard: process.argv.includes('--with-board'), only })
 else if (command === 'compare' && a && b) await compare(a, b)
 else console.log('Usage: node scripts/ui-snapshots.mjs capture <label> | compare <before> <after>')

@@ -93,13 +93,15 @@ export default function ScenePreview() {
           ))}
         </select>
       </header>
-      <BoardScene
-        game={publicGameState(game)}
-        displayPositions={{ preview: position, companion: 7 }}
-        selectedTile={selectedTile}
-        focusPlayerId="preview"
-        onSelectTile={setSelectedTile}
-      />
+      <div className="world-preview-scene">
+        <BoardScene
+          game={publicGameState(game)}
+          displayPositions={{ preview: position, companion: 7 }}
+          selectedTile={selectedTile}
+          focusPlayerId="preview"
+          onSelectTile={setSelectedTile}
+        />
+      </div>
       <footer>
         <select
           className="world-preview-destination"

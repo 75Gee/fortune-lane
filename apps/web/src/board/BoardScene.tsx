@@ -1,6 +1,7 @@
 import { BOARD } from '@fortune/game'
 import { Focus, LocateFixed, Minus, Plus } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import styles from './BoardScene.module.css'
 import { createBoardScene } from './BoardSceneController.js'
 import type { BoardSceneProps, CameraMode, ViewAction } from './boardSceneTypes.js'
 
@@ -47,13 +48,13 @@ export default function BoardScene(props: BoardSceneProps) {
     controller.current?.setEnabled(props.active ?? true)
   }, [props.active])
   return (
-    <div className="board-scene-wrap">
-      <div className="board-scene" ref={host} aria-label="世界之旅三维场景">
-        {failed && <p className="scene-fallback">3D 画面暂不可用，请切换路线查看地点。</p>}
+    <div className={styles.wrap}>
+      <div className={styles.scene} ref={host} aria-label="世界之旅三维场景">
+        {failed && <p className={styles.fallback}>3D 画面暂不可用，请切换路线查看地点。</p>}
       </div>
       {!failed && (
         <>
-          <div className="world-location">
+          <div className={styles.location}>
             <strong>{mode === 'overview' ? '世界棋盘' : BOARD[focusIndex]?.name}</strong>
             {props.game.hazards.some((hazard) => hazard.tileIndex === focusIndex) && (
               <small>
@@ -65,7 +66,7 @@ export default function BoardScene(props: BoardSceneProps) {
               </small>
             )}
           </div>
-          <div className="scene-tools" role="group" aria-label="场景视角">
+          <div className={styles.tools} role="group" aria-label="场景视角">
             <button
               title="跟随棋子"
               aria-label="跟随棋子"

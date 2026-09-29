@@ -433,13 +433,6 @@
   font-size: 11px;
 }
 @media (max-width: 800px) {
-  .game-command-dock:has(.stock-entry) .dock-resources {
-    grid-column: 1 / -1;
-  }
-  .game-command-dock:has(.stock-entry) > .turn-action,
-  .game-command-dock:has(.stock-entry) > .primary-command {
-    grid-column: 1 / -1;
-  }
   .stock-entry {
     flex: 1.25;
     justify-content: center;

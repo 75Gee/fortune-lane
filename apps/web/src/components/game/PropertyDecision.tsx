@@ -7,10 +7,14 @@ import {
   type GameCommand,
   type GameView,
 } from '@fortune/game'
-import { StockPaymentHint } from '../stocks/StockPaymentHint.js'
-import { CityImage, cityImageSource } from '../CityImage.js'
 import { formatMoney } from '../../lib/format.js'
+import { tileSetLabel } from '../../lib/tiles.js'
+import { Button } from '../../ui/index.js'
+import { CityImage, cityLatinName } from '../CityImage.js'
+import { StockPaymentHint } from '../stocks/StockPaymentHint.js'
+import styles from './ActionTicket.module.css'
 
+/** Purchase or upgrade offer, laid out as a boarding pass. */
 export function PropertyDecision({
   game,
   playerId,
@@ -26,27 +30,32 @@ export function PropertyDecision({
   const level = game.tiles[tile.index]!.level
   const action = purchase ? 'BUY_PROPERTY' : 'UPGRADE_PROPERTY'
   const quote = assetActionQuote(game, playerId, tile.index, action)
+  const scaled = (rent: number) => scaleRent(rent, game.turnNumber, game.players.length)
   const fee =
     tile.kind === 'utility'
       ? `${formatMoney(rentForTile(game, tile.index, 1, playerId))}–${formatMoney(rentForTile(game, tile.index, 12, playerId))}`
       : formatMoney(
           tile.kind === 'airport'
             ? rentForTile(game, tile.index, 0, playerId)
-            : scaleRent(tile.rents?.[purchase ? 0 : level + 1] ?? 0, game.turnNumber, game.players.length),
+            : scaled(tile.rents?.[purchase ? 0 : level + 1] ?? 0),
         )
+  const activeTier = purchase ? 0 : level + 1
+  const latin = cityLatinName(tile.name)
 
   return (
-    <section className="turn-action property-action" aria-label={`${tile.name}${purchase ? '购买' : '升级'}决策`}>
-      <div className={`property-decision-head${cityImageSource(tile.name) ? ' has-city-art' : ''}`}>
-        <CityImage city={tile.name} thumbnail />
-        <div>
-          <strong>{tile.name}</strong>
-          <span>{purchase ? '购入地产' : `${level} → ${level + 1} 级`}</span>
+    <section className={styles.ticket} aria-label={`${tile.name}${purchase ? '购买' : '升级'}决策`}>
+      <CityImage city={tile.name} className={styles.image} />
+      <div className={styles.body}>
+        <div className={styles.titleRow}>
+          <CityImage city={tile.name} className={styles.thumb} thumbnail />
+          <h2 className={styles.title}>{tile.name}</h2>
+          {latin && <span className={styles.latin}>{latin}</span>}
+          <span className={styles.chip}>
+            {tile.color && <i style={{ background: tile.color }} />}
+            {purchase ? tileSetLabel(tile) : `${level} → ${level + 1} 级`}
+          </span>
         </div>
-        <strong>{formatMoney(quote.amount)}</strong>
-      </div>
-      <div className="property-decision-body">
-        <dl className="decision-figures">
+        <dl className={styles.figures}>
           <div>
             <dt>{purchase ? '购入后游览费' : '升级后游览费'}</dt>
             <dd>{fee}</dd>
@@ -56,42 +65,54 @@ export function PropertyDecision({
             <dd>{formatMoney(quote.allowed ? quote.balanceAfter : quote.payment.remaining)}</dd>
           </div>
         </dl>
-        <div className="property-commands">
-          <button onClick={() => onCommand({ type: purchase ? 'SKIP_PURCHASE' : 'SKIP_UPGRADE' })}>
-            {purchase ? '交给其他人竞拍' : '暂不升级'}
-          </button>
-          <button
-            className="primary-command"
+        {tile.kind === 'property' && tile.rents && (
+          <div>
+            <span className={styles.label}>
+              各等级游览费{tile.buildCost ? ` · 每级建造 ${formatMoney(tile.buildCost)}` : ''}
+            </span>
+            <div className={styles.ladder}>
+              {tile.rents.map((rent, tier) => (
+                <div key={tier} className={tier === activeTier ? styles.tierActive : undefined}>
+                  <span>{tier === 0 ? '空地' : tier === MAX_PROPERTY_LEVEL ? '旅馆' : `${tier} 级`}</span>
+                  <strong>{scaled(rent).toLocaleString('zh-CN')}</strong>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        <StockPaymentHint payment={quote.payment} />
+        {!quote.allowed && (
+          <p className={styles.warn} role="status">
+            {quote.reason}
+          </p>
+        )}
+      </div>
+      <div className={styles.stub}>
+        <div className={styles.priceBlock}>
+          <span className={styles.label}>{purchase ? '地价' : '升级费用'}</span>
+          <div className={styles.price}>{formatMoney(quote.amount)}</div>
+        </div>
+        <div className={styles.commands}>
+          <Button
+            variant="primary"
+            size="lg"
             disabled={!quote.allowed}
             title={quote.reason ?? undefined}
             onClick={() => onCommand({ type: action, stockFunding: quote.payment.stockFunding })}
           >
             {quote.allowed && quote.payment.stockFunding ? '卖股并' : ''}
             {purchase ? '购买' : '升级'}
-          </button>
+            <span className={styles.mobileOnly}> {formatMoney(quote.amount)}</span>
+          </Button>
+          <Button
+            variant="outline"
+            className={styles.secondaryCommand}
+            onClick={() => onCommand({ type: purchase ? 'SKIP_PURCHASE' : 'SKIP_UPGRADE' })}
+          >
+            {purchase ? '交给竞拍' : '暂不升级'}
+          </Button>
+          <span className={styles.hint}>{purchase ? '超时将交由其他玩家竞拍' : '超时暂不升级'}</span>
         </div>
-      </div>
-      <StockPaymentHint payment={quote.payment} />
-      {!quote.allowed && (
-        <p className="decision-unavailable" role="status">
-          {quote.reason}
-        </p>
-      )}
-      <div className="property-decision-more">
-        {tile.kind === 'property' && (
-          <details className="decision-rates">
-            <summary>各等级游览费</summary>
-            <div className="landing-rent-track">
-              {tile.rents?.map((rent, tier) => (
-                <div key={tier}>
-                  <span>{tier === 0 ? '空地' : tier === MAX_PROPERTY_LEVEL ? '旅馆' : `${tier} 级`}</span>
-                  <strong>{formatMoney(scaleRent(rent, game.turnNumber, game.players.length))}</strong>
-                </div>
-              ))}
-            </div>
-          </details>
-        )}
-        <small>{purchase ? '超时交由其他玩家竞拍' : '超时暂不升级'}</small>
       </div>
     </section>
   )

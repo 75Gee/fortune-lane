@@ -1,19 +1,55 @@
-import { canRollAgain, isDetained, JAIL_FINE, stockPaymentQuote, type GameCommand, type GameView } from '@fortune/game'
 import {
-  Banknote,
-  Building2,
-  ChevronRight,
-  CircleDollarSign,
-  Dice5,
-  DoorOpen,
-  HandCoins,
-  Info,
-  ShieldCheck,
-} from 'lucide-react'
+  canRollAgain,
+  getTile,
+  isDetained,
+  ITEMS,
+  JAIL_FINE,
+  stockPaymentQuote,
+  type GameCommand,
+  type GameView,
+} from '@fortune/game'
+import { Banknote, Building2, ChevronRight, CircleDollarSign, Dice5, ShieldCheck } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { formatMoney } from '../../lib/format.js'
+import { Button } from '../../ui/index.js'
 import { actionDescription } from '../decisionState.js'
 import { StockPaymentHint } from '../stocks/StockPaymentHint.js'
+import styles from './ActionTicket.module.css'
 import { PropertyDecision } from './PropertyDecision.js'
-import { formatMoney } from '../../lib/format.js'
+
+interface ActionPanelProps {
+  game: GameView
+  playerId: string
+  onCommand: (command: GameCommand) => void
+  busy?: boolean
+  waitingLabel?: string
+  onSkipToLive?: (() => void) | undefined
+  onManageAssets: () => void
+  onOpenItems: () => void
+  onWatch?: (() => void) | undefined
+}
+
+function WaitingSlip({ title, detail, action }: { title: string; detail?: string | undefined; action?: ReactNode }) {
+  return (
+    <div className={styles.waiting} role="status">
+      <span className={styles.pulse} />
+      <div>
+        <strong>{title}</strong>
+        {detail && <p>{detail}</p>}
+      </div>
+      {action}
+    </div>
+  )
+}
+
+function Ticket({ children, stub, compact }: { children: ReactNode; stub: ReactNode; compact?: boolean }) {
+  return (
+    <section className={`${styles.ticket} ${compact ? styles.compact : ''}`}>
+      <div className={styles.body}>{children}</div>
+      <div className={styles.stub}>{stub}</div>
+    </section>
+  )
+}
 
 export function ActionPanel({
   game,
@@ -23,48 +59,42 @@ export function ActionPanel({
   waitingLabel = '行动进行中…',
   onSkipToLive,
   onManageAssets,
+  onOpenItems,
   onWatch,
-}: { game: GameView; playerId: string; onCommand: (command: GameCommand) => void } & {
-  busy?: boolean
-  waitingLabel?: string
-  onSkipToLive?: (() => void) | undefined
-  onManageAssets: () => void
-  onWatch?: (() => void) | undefined
-}) {
+}: ActionPanelProps) {
   const me = game.players.find((player) => player.id === playerId)
   const isMyTurn = game.currentPlayerId === playerId
+  const watchButton = onWatch && (
+    <Button size="sm" variant="outline" onClick={onWatch}>
+      查看
+    </Button>
+  )
+
   if (busy)
     return (
-      <div className="turn-action waiting-action">
-        <span className="waiting-pulse" />
-        <strong>{waitingLabel}</strong>
-        {onSkipToLive && (
-          <button className="return-live" onClick={onSkipToLive}>
-            返回当前操作
-          </button>
-        )}
-      </div>
+      <WaitingSlip
+        title={waitingLabel}
+        action={
+          onSkipToLive && (
+            <Button size="sm" variant="outline" onClick={onSkipToLive}>
+              返回当前操作
+            </Button>
+          )
+        }
+      />
     )
 
   if (!me || me.isBankrupt || !isMyTurn) {
     const current = game.players.find((player) => player.id === game.currentPlayerId)
     return (
-      <div className="turn-action waiting-action">
-        <span className="waiting-pulse" />
-        <div>
-          <strong>
-            {current?.name} · {actionDescription(game)}
-          </strong>
-          {(me?.isBankrupt || !current?.connected) && <p>{me?.isBankrupt ? '你正在观战' : '已离线，超时自动行动'}</p>}
-        </div>
-        {onWatch && (
-          <button className="return-live" onClick={onWatch}>
-            查看
-          </button>
-        )}
-      </div>
+      <WaitingSlip
+        title={`${current?.name ?? '当前玩家'} · ${actionDescription(game)}`}
+        detail={me?.isBankrupt ? '你正在观战' : !current?.connected ? '已离线，超时自动行动' : undefined}
+        action={watchButton}
+      />
     )
   }
+
   if (game.pendingDecision?.playerId === playerId)
     return (
       <PropertyDecision
@@ -74,131 +104,171 @@ export function ActionPanel({
         onCommand={onCommand}
       />
     )
-  if (!['WAITING_FOR_ROLL', 'WAITING_FOR_END_TURN', 'WAITING_FOR_DEBT'].includes(game.phase)) {
+
+  if (!['WAITING_FOR_ROLL', 'WAITING_FOR_END_TURN', 'WAITING_FOR_DEBT'].includes(game.phase))
+    return <WaitingSlip title={actionDescription(game)} action={watchButton} />
+
+  if (game.phase === 'WAITING_FOR_ROLL' && isDetained(me)) {
+    const payment = stockPaymentQuote(game, playerId, JAIL_FINE)
+    const place = me.isInHospital ? '出院' : '出狱'
     return (
-      <div className="turn-action waiting-action">
-        <Info size={20} />
-        <strong>{actionDescription(game)}</strong>
-        {onWatch && (
-          <button className="return-live" onClick={onWatch}>
-            查看
-          </button>
-        )}
-      </div>
+      <Ticket
+        stub={
+          <div className={styles.commands}>
+            <Button
+              variant="primary"
+              size="lg"
+              icon={<Dice5 size={18} />}
+              onClick={() => onCommand({ type: 'TRY_JAIL_ROLL' })}
+            >
+              掷对子
+            </Button>
+            <span className={styles.hint}>掷出对子即可{place}</span>
+          </div>
+        }
+      >
+        <span className={styles.eyebrow}>
+          {me.isInHospital ? '住院中' : '服刑中'} · 第 {Math.min(me.jailTurns + 1, 3)}/3 次掷骰
+        </span>
+        <h2 className={styles.title}>准备{place}</h2>
+        <p className={styles.note}>
+          {me.jailTurns >= 2
+            ? `第 3 次仍未掷出对子，将支付 ${formatMoney(JAIL_FINE)}`
+            : '也可以直接付款或使用通行许可。'}
+        </p>
+        <div className={styles.actionsGrid}>
+          <Button
+            variant="outline"
+            icon={<Banknote size={17} />}
+            disabled={!payment.allowed}
+            title={payment.reason ?? undefined}
+            onClick={() => onCommand({ type: 'PAY_JAIL_FINE', stockFunding: payment.stockFunding })}
+          >
+            {payment.stockFunding && payment.allowed ? '卖股并支付' : '支付'} {formatMoney(JAIL_FINE)}
+          </Button>
+          <Button
+            variant="outline"
+            icon={<ShieldCheck size={17} />}
+            disabled={!me.heldCards.length}
+            onClick={() => onCommand({ type: 'USE_JAIL_CARD' })}
+          >
+            {me.heldCards.length ? `通行许可 · ${me.heldCards.length}张` : '暂无通行许可'}
+          </Button>
+        </div>
+        <StockPaymentHint payment={payment} />
+      </Ticket>
     )
   }
 
   if (game.phase === 'WAITING_FOR_ROLL') {
-    if (isDetained(me)) {
-      const payment = stockPaymentQuote(game, playerId, JAIL_FINE)
-      return (
-        <div className="turn-action">
-          <div className="action-heading">
-            <DoorOpen size={20} />
-            <div>
-              <strong>准备{me.isInHospital ? '出院' : '出狱'}</strong>
-              <span>
-                {me.jailTurns >= 2
-                  ? `第3次未掷出对子，将支付 ${formatMoney(JAIL_FINE)}`
-                  : `掷骰机会：第 ${me.jailTurns + 1}/3 次`}
-              </span>
+    const turtle = me.turtleRollsRemaining > 0
+    const canUseItem = me.items.length > 0 && !game.itemUsedThisTurn
+    return (
+      <Ticket
+        compact
+        stub={
+          <Button
+            variant="primary"
+            className={styles.rollButton}
+            icon={<Dice5 size={40} strokeWidth={1.8} />}
+            onClick={() => onCommand({ type: 'ROLL_DICE' })}
+          >
+            {turtle ? '掷单骰' : '掷骰子'}
+          </Button>
+        }
+      >
+        <span className={styles.eyebrow}>YOUR TURN · 当前位置 {getTile(me.position).name}</span>
+        <h2 className={styles.title}>轮到你了</h2>
+        {turtle && <p className={styles.note}>乌龟效果：本次只掷一颗骰子，剩余 {me.turtleRollsRemaining} 次</p>}
+        {canUseItem && (
+          <div>
+            <span className={styles.label}>出发前可使用 1 张道具</span>
+            <div className={styles.items}>
+              {me.items.slice(0, 3).map((item, index) => (
+                <button key={`${item}-${index}`} onClick={onOpenItems}>
+                  <img src={ITEMS[item].image} alt="" />
+                  {ITEMS[item].name}
+                </button>
+              ))}
             </div>
           </div>
-          <div className="action-grid">
-            <button onClick={() => onCommand({ type: 'TRY_JAIL_ROLL' })}>
-              <Dice5 size={18} /> 掷对子
-            </button>
-            <button
-              disabled={!payment.allowed}
-              title={payment.reason ?? undefined}
-              onClick={() => onCommand({ type: 'PAY_JAIL_FINE', stockFunding: payment.stockFunding })}
-            >
-              <Banknote size={18} /> {payment.stockFunding && payment.allowed ? '卖股并支付' : '支付'}{' '}
-              {formatMoney(JAIL_FINE)}
-            </button>
-            <button disabled={!me.heldCards.length} onClick={() => onCommand({ type: 'USE_JAIL_CARD' })}>
-              <ShieldCheck size={18} />
-              {me.heldCards.length ? `通行许可 · ${me.heldCards.length}张` : '暂无通行许可'}
-            </button>
-          </div>
-          <StockPaymentHint payment={payment} />
-        </div>
-      )
-    }
-    return (
-      <div className="turn-action roll-action">
-        <div>
-          <strong>轮到你了</strong>
-          {me.turtleRollsRemaining > 0 && <span>乌龟效果 · 剩余 {me.turtleRollsRemaining} 次</span>}
-        </div>
-        <button className="roll-command" onClick={() => onCommand({ type: 'ROLL_DICE' })}>
-          <Dice5 size={25} /> {me.turtleRollsRemaining > 0 ? '掷单骰' : '掷骰子'}
-        </button>
-      </div>
+        )}
+      </Ticket>
     )
   }
 
   if (game.phase === 'WAITING_FOR_DEBT' && game.pendingDebt) {
-    const difference = Math.max(0, game.pendingDebt.amount - me.cash)
-    const payment = stockPaymentQuote(game, playerId, game.pendingDebt.amount)
+    const debt = game.pendingDebt
+    const difference = Math.max(0, debt.amount - me.cash)
+    const payment = stockPaymentQuote(game, playerId, debt.amount)
+    const creditor = game.players.find((player) => player.id === debt.creditorId)?.name ?? '银行'
     return (
-      <div className="turn-action debt-action">
-        <div className="action-heading">
-          <HandCoins size={20} />
-          <div>
-            <strong>需要支付 {formatMoney(game.pendingDebt.amount)}</strong>
-            <span>
-              {game.pendingDebt.reason} · 收款：
-              {game.players.find((player) => player.id === game.pendingDebt?.creditorId)?.name ?? '银行'}
-            </span>
+      <Ticket
+        stub={
+          <div className={styles.commands}>
+            <Button
+              variant="primary"
+              size="lg"
+              icon={<CircleDollarSign size={18} />}
+              disabled={!payment.allowed}
+              onClick={() =>
+                onCommand(
+                  payment.stockFunding
+                    ? { type: 'LIQUIDATE_ASSETS', selections: [], ...payment.stockFunding }
+                    : { type: 'SETTLE_DEBT' },
+                )
+              }
+            >
+              {payment.stockFunding && payment.allowed ? '卖股并付款' : '支付欠款'}
+            </Button>
+            <Button variant="outline" icon={<Building2 size={17} />} onClick={onManageAssets}>
+              筹款 / 管理资产
+            </Button>
+            <button className={styles.giveUp} onClick={() => onCommand({ type: 'DECLARE_BANKRUPTCY' })}>
+              放弃筹款，宣告破产
+            </button>
           </div>
-        </div>
+        }
+      >
+        <span className={styles.eyebrow}>PAYMENT DUE · 收款 {creditor}</span>
+        <h2 className={styles.title}>需要支付 {formatMoney(debt.amount)}</h2>
+        <p className={styles.note}>{debt.reason}</p>
         {payment.allowed && payment.stockFunding ? (
           <StockPaymentHint payment={payment} />
         ) : (
-          <p>{difference > 0 ? `还差 ${formatMoney(difference)}，可卖股、卖房或抵押筹款` : '钱已凑齐，可以付款了'}</p>
+          <p className={difference > 0 ? styles.warn : styles.note}>
+            {difference > 0 ? `还差 ${formatMoney(difference)}，可卖股、卖房或抵押筹款` : '钱已凑齐，可以付款了'}
+          </p>
         )}
-        <div className="decision-buttons">
-          <button
-            className="accept"
-            disabled={!payment.allowed}
-            onClick={() =>
-              onCommand(
-                payment.stockFunding
-                  ? { type: 'LIQUIDATE_ASSETS', selections: [], ...payment.stockFunding }
-                  : { type: 'SETTLE_DEBT' },
-              )
-            }
-          >
-            <CircleDollarSign size={18} /> {payment.stockFunding && payment.allowed ? '卖股并支付欠款' : '支付欠款'}
-          </button>
-          <button onClick={onManageAssets}>
-            <Building2 size={18} />
-            筹款 / 管理资产
-          </button>
-        </div>
-        <button className="debt-give-up" onClick={() => onCommand({ type: 'DECLARE_BANKRUPTCY' })}>
-          放弃筹款，宣告破产
-        </button>
-      </div>
+      </Ticket>
     )
   }
 
   if (game.phase === 'WAITING_FOR_END_TURN') {
     const extra = canRollAgain(game, playerId)
     return (
-      <div className="turn-action end-action">
-        <div>
-          <span>{extra ? `已连续 ${game.consecutiveDoubles} 次对子` : '本回合已完成'}</span>
-          <strong>
-            {extra ? (game.consecutiveDoubles >= 2 ? '再掷出对子将入狱' : '你还可以再行动一次') : '确认后轮到下一位'}
-          </strong>
-        </div>
-        <button className="primary-command" onClick={() => onCommand({ type: extra ? 'ROLL_AGAIN' : 'END_TURN' })}>
-          {extra ? <Dice5 size={19} /> : <ChevronRight size={19} />}
-          {extra ? '再掷一次' : '结束回合'}
-        </button>
-      </div>
+      <Ticket
+        compact
+        stub={
+          <Button
+            variant="primary"
+            size="lg"
+            block
+            icon={extra ? <Dice5 size={19} /> : <ChevronRight size={19} />}
+            onClick={() => onCommand({ type: extra ? 'ROLL_AGAIN' : 'END_TURN' })}
+          >
+            {extra ? '再掷一次' : '结束回合'}
+          </Button>
+        }
+      >
+        <span className={styles.eyebrow}>
+          {extra ? `DOUBLES · 已连续 ${game.consecutiveDoubles} 次对子` : 'ALL DONE'}
+        </span>
+        <h2 className={styles.title}>
+          {extra ? (game.consecutiveDoubles >= 2 ? '再掷出对子将入狱' : '你还可以再行动一次') : '本回合已完成'}
+        </h2>
+        {!extra && <p className={styles.note}>确认后轮到下一位旅行者。</p>}
+      </Ticket>
     )
   }
 

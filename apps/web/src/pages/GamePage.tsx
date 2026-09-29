@@ -1,4 +1,4 @@
-import { isDetained, type GameCommand, type GameEvent, type GameView } from '@fortune/game'
+import type { GameCommand, GameEvent, GameView } from '@fortune/game'
 import type { RoomSnapshot } from '@fortune/protocol'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { DicePresentation } from '../board/DicePresentation.js'
@@ -16,10 +16,13 @@ import { RouteView } from '../components/game/RouteView.js'
 import { TileDetail } from '../components/game/TileDetail.js'
 import { StockMarketPanel } from '../components/stocks/StockMarketPanel.js'
 import { usePersistentToggle } from '../lib/usePersistentToggle.js'
-import { BoardToolbar, type BoardView } from './game/BoardToolbar.js'
-import { CommandDock } from './game/CommandDock.js'
+import { Button } from '../ui/index.js'
 import { GameConfirmations, type GameConfirmation } from './game/GameConfirmations.js'
-import { GameHeader } from './game/GameHeader.js'
+import styles from './game/GameHud.module.css'
+import { GameMenu } from './game/GameMenu.js'
+import { PlayerRail } from './game/PlayerRail.js'
+import { BoardViewSwitch, TurnTicket, type BoardView } from './game/TurnTicket.js'
+import { Wallet } from './game/Wallet.js'
 
 interface GamePageProps {
   room: RoomSnapshot
@@ -118,119 +121,126 @@ export function GamePage({
 
   const lastPresentedRoll = presentedEvents.findLast((event) => event.type === 'DICE_ROLLED')
   const showRollResult = activeEvent?.type === 'TOKEN_MOVED' && lastPresentedRoll?.revision === activeEvent.revision
-  const expandedAction = game.phase === 'WAITING_FOR_DEBT' || !!game.pendingDecision || (!!me && isDetained(me))
   const stillPlaying = !me?.isBankrupt && game.phase !== 'FINISHED'
 
   return (
     <CommandAvailabilityContext.Provider value={available}>
-      <main className={`game-screen ${expandedAction ? 'has-expanded-action' : ''}`}>
-        <GameHeader
-          roomCode={room.roomCode}
-          connected={connected}
-          soundEnabled={soundEnabled}
-          canSurrender={stillPlaying}
-          onToggleSound={() => setSoundEnabled((value) => !value)}
-          onOpenInfo={(tab) => openInfo(tab)}
-          onSurrender={() => setConfirm('surrender')}
-          onLeave={() => setConfirm('leave')}
-        />
-
-        <div className="game-layout">
-          <section className="board-region">
-            <BoardToolbar
-              game={game}
-              playerId={playerId}
-              turnDeadline={room.turnDeadline}
-              clockOffset={clockOffset}
-              boardView={boardView}
-              onBoardViewChange={setBoardView}
-              onOpenPlayer={(owner) => openInfo('assets', owner)}
-            />
-            <div className={`board-viewport ${boardView === 'route' ? 'show-route' : ''}`}>
-              <GameBoard
-                active={boardView === 'board'}
-                game={visualGame}
-                playerId={playerId}
-                displayPositions={displayPositions}
-                selectedTile={panel?.type === 'tile' ? panel.index : null}
-                onSelectTile={selectTile}
-                activeEvent={activeEvent}
-                activeEventStartedAt={activeEventStartedAt}
-              />
-            </div>
-            {boardView === 'route' && (
-              <RouteView
-                game={game}
-                displayPositions={displayPositions}
-                displayHazards={displayHazards}
-                activeEvent={activeEvent}
-                onSelectTile={selectTile}
-              />
-            )}
-            {showRollResult && (
-              <div className="movement-dice-result" role="status">
-                骰点 {lastPresentedRoll?.dice?.join(' + ')}
-                <span>正在移动</span>
-              </div>
-            )}
-            <ActivityBroadcast events={presentedEvents} playerId={playerId} onHistory={openHistory} />
-            <LandingDialog
-              game={game}
-              playerId={playerId}
-              decisionsReady={!isPlaying}
-              clockOffset={clockOffset}
-              soundEnabled={soundEnabled}
-              onCommand={onCommand}
-              deadline={room.turnDeadline}
-              watching={!!decisionKey && watchedDecision === decisionKey && !panel}
-              onDismiss={() => setWatchedDecision(null)}
-            />
-          </section>
-
-          {panel?.type === 'info' && (
-            <GameInfoPanel
-              key={`${panel.tab}:${panel.owner}`}
-              game={game}
-              playerId={playerId}
-              roomCode={room.roomCode}
-              initialTab={panel.tab}
-              initialOwner={panel.owner}
-              onCommand={onCommand}
-              onClose={closePanel}
-            />
-          )}
+      <main className={styles.shell}>
+        <div className={styles.board} hidden={boardView === 'route'}>
+          <GameBoard
+            active={boardView === 'board'}
+            game={visualGame}
+            playerId={playerId}
+            displayPositions={displayPositions}
+            selectedTile={panel?.type === 'tile' ? panel.index : null}
+            onSelectTile={selectTile}
+            activeEvent={activeEvent}
+            activeEventStartedAt={activeEventStartedAt}
+          />
         </div>
+        {boardView === 'route' && (
+          <div className={styles.routeLayer}>
+            <RouteView
+              game={game}
+              displayPositions={displayPositions}
+              displayHazards={displayHazards}
+              activeEvent={activeEvent}
+              onSelectTile={selectTile}
+            />
+          </div>
+        )}
 
+        <header className={styles.top}>
+          <div className={styles.lead}>
+            <TurnTicket game={game} playerId={playerId} turnDeadline={room.turnDeadline} clockOffset={clockOffset} />
+            <BoardViewSwitch view={boardView} onChange={setBoardView} />
+          </div>
+          <div className={styles.trail}>
+            <PlayerRail game={game} playerId={playerId} onOpenPlayer={(owner) => openInfo('assets', owner)} />
+            <GameMenu
+              roomCode={room.roomCode}
+              connected={connected}
+              soundEnabled={soundEnabled}
+              canSurrender={stillPlaying}
+              onToggleSound={() => setSoundEnabled((value) => !value)}
+              onOpenInfo={(tab) => openInfo(tab)}
+              onSurrender={() => setConfirm('surrender')}
+              onLeave={() => setConfirm('leave')}
+            />
+          </div>
+        </header>
+
+        {showRollResult && (
+          <div className={styles.moveResult} role="status">
+            骰点 {lastPresentedRoll?.dice?.join(' + ')}
+            <span>正在移动</span>
+          </div>
+        )}
+
+        <footer className={styles.bottom}>
+          <ActivityBroadcast
+            className={styles.activity}
+            events={presentedEvents}
+            playerId={playerId}
+            onHistory={openHistory}
+          />
+          <div className={styles.action}>
+            {game.phase === 'FINISHED' ? (
+              <Button variant="primary" size="lg" onClick={() => setResultReviewed(false)}>
+                查看本局结果
+              </Button>
+            ) : (
+              <ActionPanel
+                game={game}
+                playerId={playerId}
+                onCommand={onCommand}
+                busy={isPlaying || !canSend}
+                onManageAssets={openAssets}
+                onOpenItems={() => setPanel({ type: 'items' })}
+                onWatch={decisionKey && !required ? () => setWatchedDecision(decisionKey) : undefined}
+                onSkipToLive={isPlaying && connected ? skipToLive : undefined}
+                waitingLabel={!connected ? '等待重连…' : commandPending ? '正在提交…' : '行动进行中…'}
+              />
+            )}
+          </div>
+          <Wallet
+            game={game}
+            playerId={playerId}
+            onOpenAssets={openAssets}
+            onOpenStocks={() => setPanel({ type: 'stocks' })}
+            onOpenItems={() => setPanel({ type: 'items' })}
+          />
+        </footer>
+
+        <LandingDialog
+          game={game}
+          playerId={playerId}
+          decisionsReady={!isPlaying}
+          clockOffset={clockOffset}
+          soundEnabled={soundEnabled}
+          onCommand={onCommand}
+          deadline={room.turnDeadline}
+          watching={!!decisionKey && watchedDecision === decisionKey && !panel}
+          onDismiss={() => setWatchedDecision(null)}
+        />
+        {panel?.type === 'info' && (
+          <GameInfoPanel
+            key={`${panel.tab}:${panel.owner}`}
+            game={game}
+            playerId={playerId}
+            roomCode={room.roomCode}
+            initialTab={panel.tab}
+            initialOwner={panel.owner}
+            onCommand={onCommand}
+            onClose={closePanel}
+          />
+        )}
         <DicePresentation
           event={activeEvent}
           playerName={game.players.find((player) => player.id === activeEvent?.playerId)?.name ?? '当前玩家'}
           dice={displayDice}
           startedAt={activeEventStartedAt}
         />
-        <CommandDock
-          game={game}
-          playerId={playerId}
-          onOpenAssets={openAssets}
-          onOpenStocks={() => setPanel({ type: 'stocks' })}
-          onOpenItems={() => setPanel({ type: 'items' })}
-        >
-          {game.phase === 'FINISHED' ? (
-            <button className="primary-command" onClick={() => setResultReviewed(false)}>
-              查看本局结果
-            </button>
-          ) : (
-            <ActionPanel
-              game={game}
-              playerId={playerId}
-              onCommand={onCommand}
-              busy={isPlaying || !canSend}
-              onManageAssets={openAssets}
-              onWatch={decisionKey && !required ? () => setWatchedDecision(decisionKey) : undefined}
-              onSkipToLive={isPlaying && connected ? skipToLive : undefined}
-              waitingLabel={!connected ? '等待重连…' : commandPending ? '正在提交…' : '行动进行中…'}
-            />
-          )}
-        </CommandDock>
 
         {panel?.type === 'items' && me && (
           <ItemInventory

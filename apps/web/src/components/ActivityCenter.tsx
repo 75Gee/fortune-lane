@@ -2,6 +2,7 @@ import { ITEMS, getCard, type GameEvent } from '@fortune/game'
 import { History } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { CARD_DECK_ART, CardDeckSymbol } from './CardDeckArt.js'
+import broadcastStyles from './ActivityBroadcast.module.css'
 
 const quietEvents = new Set([
   'DICE_ROLLED',
@@ -103,10 +104,12 @@ export function ActivityBroadcast({
   events,
   playerId,
   onHistory,
+  className = '',
 }: {
   events: GameEvent[]
   playerId: string
   onHistory: () => void
+  className?: string | undefined
 }) {
   const groups = useMemo(() => {
     const grouped = new Map<number, GameEvent[]>()
@@ -140,13 +143,14 @@ export function ActivityBroadcast({
           .join(' ')}`
       : current[1].map((event) => event.message).join(' ')
   return (
-    <section className="activity-broadcast" aria-label="最近动态">
-      <p className="activity-latest" role="status" title={summary}>
+    <section className={`${broadcastStyles.broadcast} ${className}`} aria-label="最近动态">
+      <span className={broadcastStyles.stamp}>最新</span>
+      <p role="status" title={summary}>
         {summary}
       </p>
-      <button className="activity-history-link" onClick={onHistory}>
-        <History size={16} />
-        动态
+      <button onClick={onHistory}>
+        <History size={15} />
+        全部
       </button>
     </section>
   )
