@@ -69,6 +69,12 @@ h3,
 p {
   overflow-wrap: anywhere;
 }
+/* Passport theme: page and dialog titles are set in the serif display face. */
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-weight: 900;
+}
 .entry-screen,
 .lobby-screen {
   min-height: 100dvh;
@@ -82,10 +88,10 @@ p {
 .debug-back {
   min-height: 44px;
   padding: 8px 16px;
-  border: 1px solid #d6e1df;
+  border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface-subtle);
-  color: #42675f;
+  color: var(--text-secondary);
 }
 .debug-panel-head {
   display: flex;
@@ -97,17 +103,17 @@ p {
   margin: 0;
 }
 .debug-panel > p {
-  color: #62776f;
+  color: var(--text-muted);
   font-size: 13px;
 }
 .debug-panel .field select {
   min-height: 44px;
   width: 100%;
   padding: 8px;
-  border: 1px solid #d6e1df;
+  border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
-  color: #29443d;
+  color: var(--text);
 }
 .debug-panel > .primary-command {
   margin-top: 16px;
@@ -159,12 +165,12 @@ p {
   height: 7px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: #a3adbb;
+  background: var(--line-strong);
 }
 .connection-pill.is-online > span,
 .presence.online {
-  background: #0eaa83;
-  box-shadow: 0 0 0 3px #0eaa8314;
+  background: var(--positive);
+  box-shadow: 0 0 0 3px #1f2a4414;
 }
 .eyebrow {
   display: inline-flex;
@@ -233,7 +239,7 @@ p {
 .segmented button.active {
   background: var(--surface);
   color: var(--green);
-  box-shadow: 0 2px 5px #273b5310;
+  box-shadow: 0 2px 5px #1f2a4410;
 }
 
 /* The entry is a playable room setup over the existing illustrated world. */
@@ -247,7 +253,7 @@ p {
   gap: 48px;
   padding: 48px max(40px, calc((100% - 1200px) / 2));
   overflow: hidden;
-  background: #c7e6ec;
+  background: var(--surface-muted);
 }
 .entry-scene {
   align-self: start;
@@ -266,7 +272,7 @@ p {
 }
 .scene-caption {
   max-width: 560px;
-  color: #233b43;
+  color: var(--text);
 }
 .scene-caption > span {
   display: inline-block;
@@ -307,14 +313,14 @@ p {
   min-width: 0;
   min-height: 48px;
   padding: 12px 14px;
-  border: 1px solid #d5dde7;
+  border: 1px solid var(--line);
   border-radius: 5px;
   background: var(--surface);
   color: var(--ink);
   font-size: 16px;
 }
 .field input::placeholder {
-  color: #a0a8b4;
+  color: var(--text-muted);
   font-size: 13px;
 }
 .room-code-input {
@@ -416,7 +422,7 @@ p {
   gap: 16px;
   min-height: 52px;
   padding: 8px 16px;
-  border: 1px dashed #96b2c9;
+  border: 1px dashed var(--line-strong);
   border-radius: 6px;
   background: var(--surface);
 }
@@ -433,8 +439,8 @@ p {
 }
 .invite-command {
   color: var(--blue);
-  background: #e6effb;
-  border-color: #cdddf4;
+  background: var(--surface-subtle);
+  border-color: var(--line);
 }
 .seat-grid {
   display: grid;
@@ -455,7 +461,7 @@ p {
   background: var(--surface);
 }
 .player-seat.is-ready {
-  border-color: #75b9a5;
+  border-color: var(--line-strong);
   background: var(--surface-muted);
 }
 .seat-token {
@@ -492,7 +498,7 @@ p {
   position: absolute;
   right: 12px;
   top: 12px;
-  color: #bf921d;
+  color: var(--gold-ink);
 }
 .presence {
   position: absolute;
@@ -506,7 +512,7 @@ p {
   gap: 6px;
   border-style: dashed;
   background: transparent;
-  color: #9aa5b3;
+  color: var(--text-muted);
 }
 .is-empty > span {
   font-size: 25px;
@@ -531,7 +537,7 @@ p {
 .ready-command.is-ready {
   color: var(--green);
   background: var(--accent-soft);
-  border-color: #b0d9c8;
+  border-color: var(--line-strong);
 }
 
 /* Desktop keeps the board and the decision rail visible together. */
@@ -592,10 +598,10 @@ p {
   place-items: center;
   width: 45px;
   height: 45px;
-  border: 1px solid #c6d2df;
+  border: 1px solid var(--line-strong);
   border-radius: 7px;
   background: var(--surface);
-  color: #344f65;
+  color: var(--text-secondary);
   font-size: 38px;
   line-height: 1;
   box-shadow: 0 4px 0 #b7cad8;
@@ -721,7 +727,7 @@ p {
   padding: 12px 8px;
   position: relative;
   border: 0;
-  border-bottom: 1px solid #edf1f5;
+  border-bottom: 1px solid var(--line);
   background: transparent;
   text-align: left;
 }
@@ -733,7 +739,7 @@ p {
   opacity: 0.5;
 }
 .rank {
-  color: #9ca8b5;
+  color: var(--text-muted);
   font-size: 11px;
 }
 .player-token-small {
@@ -836,7 +842,7 @@ p {
   justify-items: center;
   gap: 14px;
   padding: 38px 0;
-  color: #8a99a9;
+  color: var(--text-muted);
   font-size: 13px;
 }
 .card-library {
@@ -870,11 +876,11 @@ p {
   display: none;
 }
 .library-card summary > svg:first-child {
-  color: #698295;
+  color: var(--text-muted);
 }
 .library-card summary > svg:last-child {
   margin-left: auto;
-  color: #8795a2;
+  color: var(--text-muted);
 }
 .library-card[open] summary > svg:last-child {
   transform: rotate(180deg);
@@ -889,8 +895,8 @@ p {
 .rent-notice {
   margin: 0;
   padding: 12px 20px;
-  background: #fff5db;
-  color: #886822;
+  background: var(--gold-soft);
+  color: var(--gold-ink);
   font-size: 12px;
   line-height: 1.6;
 }
@@ -1000,7 +1006,7 @@ p {
   overflow-y: auto;
   background: var(--surface);
   border-radius: 8px;
-  box-shadow: 0 24px 80px #14283a30;
+  box-shadow: 0 24px 80px #1f2a4430;
 }
 .landing-dialog-head {
   display: flex;
@@ -1086,7 +1092,7 @@ p {
   color: var(--green);
 }
 .landing-rent-track > div.next {
-  background: #fff1c8;
+  background: var(--gold-soft);
   color: var(--gold-ink);
 }
 .rent-tier-label {
@@ -1220,7 +1226,7 @@ p {
   position: fixed;
   z-index: var(--layer-popover-backdrop);
   inset: 64px 350px 0 0;
-  background: #273b5325;
+  background: var(--scrim);
   border: 0;
 }
 .tile-detail {
@@ -1300,7 +1306,7 @@ p {
   width: max-content;
   padding: 14px 18px;
   background: var(--gold-soft);
-  border: 1px solid #e5ce90;
+  border: 1px solid var(--gold);
   border-radius: 6px;
   font-size: 12px;
   box-shadow: var(--shadow);
@@ -1317,10 +1323,10 @@ p {
   gap: 10px;
   width: min(440px, calc(100% - 24px));
   padding: 10px 12px;
-  border: 1px solid #e5adb7;
+  border: 1px solid var(--line-strong);
   border-radius: 7px;
-  background: #fff1f4;
-  color: #ae3850;
+  background: var(--surface-subtle);
+  color: var(--danger);
   font-size: 13px;
   box-shadow: var(--shadow);
 }
@@ -1535,7 +1541,7 @@ p {
     padding-bottom: env(safe-area-inset-bottom);
     border: 0;
     border-radius: 8px 8px 0 0;
-    box-shadow: 0 -12px 40px #25374820;
+    box-shadow: 0 -12px 40px #1f2a4420;
   }
   .game-sidebar.is-open {
     display: flex;
