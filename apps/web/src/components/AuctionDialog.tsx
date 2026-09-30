@@ -79,7 +79,7 @@ export function AuctionDialog({
         ? `你的报价 ${formatMoney(myBid!)} 已密封，等待揭晓`
         : '你的选择已提交，等大家一起揭晓'
     : playerId === auction.initiatorId
-      ? '你已放弃购买，本次由其他旅行者竞拍'
+      ? '你已放弃购买，本次由其他玩家竞拍'
       : '观战中，等待竞拍结果'
 
   return (
@@ -97,9 +97,7 @@ export function AuctionDialog({
           <div className={styles.content}>
             <header className={styles.header}>
               <div>
-                <p className={styles.kicker}>
-                  {initiator ? `${initiator.name}放弃购买，由其他旅行者竞拍` : '地产竞拍'}
-                </p>
+                <p className={styles.kicker}>{initiator ? `${initiator.name}放弃购买，由其他玩家竞拍` : '地产竞拍'}</p>
                 <div className={styles.titleRow}>
                   <h2>{tile.name}</h2>
                   <span className={styles.chip}>
@@ -202,10 +200,10 @@ export function AuctionDialog({
               </>
             )}
 
-            <table className={styles.ledger} aria-label="竞拍旅行者可用资金与出价状态">
+            <table className={styles.ledger} aria-label="竞拍玩家可用资金与出价状态">
               <thead>
                 <tr>
-                  <th scope="col">竞拍旅行者</th>
+                  <th scope="col">竞拍玩家</th>
                   <th scope="col">现金＋持股</th>
                   <th scope="col">状态</th>
                 </tr>

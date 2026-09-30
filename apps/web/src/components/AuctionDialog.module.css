@@ -300,21 +300,19 @@
   font-family: var(--font-mono);
   font-weight: 600;
 }
-.sealed,
-.short {
+.sealed {
   display: inline-block;
   padding: 2px 8px;
   border: 1.5px solid;
   border-radius: var(--radius-xs);
+  color: var(--accent);
   font-size: var(--text-sm);
   font-weight: var(--weight-bold);
-}
-.sealed {
-  color: var(--accent);
   transform: rotate(-4deg);
 }
 .short {
   color: var(--text-muted);
+  font-size: var(--text-sm);
 }
 .thinking {
   color: var(--text-muted);

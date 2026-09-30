@@ -27,7 +27,7 @@ const scenes = [
   { name: 'game', url: game },
   { name: 'game-settings', url: game, click: [menu] },
   { name: 'game-assets', url: game, click: ['[aria-label="我的资产"]'] },
-  { name: 'game-players', url: game, click: [menu, 'role=group[name="对局菜单"] >> text=旅行者'] },
+  { name: 'game-players', url: game, click: [menu, 'role=group[name="对局菜单"] >> text=玩家'] },
   { name: 'game-activity', url: game, click: [menu, 'role=group[name="对局菜单"] >> text=动态'] },
   { name: 'game-cards', url: game, click: [menu, 'role=group[name="对局菜单"] >> text=牌库'] },
   { name: 'game-items', url: game, click: ['[aria-label^="我的道具"]'] },

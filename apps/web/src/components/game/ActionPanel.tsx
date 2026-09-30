@@ -202,7 +202,7 @@ export function ActionPanel({
           </Button>
         }
       >
-        <span className={styles.eyebrow}>YOUR TURN · 当前位置 {getTile(me.position).name}</span>
+        <span className={styles.eyebrow}>当前位置 · {getTile(me.position).name}</span>
         <h2 className={styles.title}>轮到你了</h2>
         {turtle && <p className={styles.note}>乌龟效果：本次只掷一颗骰子，剩余 {me.turtleRollsRemaining} 次</p>}
         {canUseItem && (
@@ -255,7 +255,7 @@ export function ActionPanel({
           </div>
         }
       >
-        <span className={styles.eyebrow}>PAYMENT DUE · 收款 {creditor}</span>
+        <span className={styles.eyebrow}>待付款 · 收款方 {creditor}</span>
         <h2 className={styles.title}>需要支付 {formatMoney(debt.amount)}</h2>
         <p className={styles.note}>{debt.reason}</p>
         {payment.allowed && payment.stockFunding ? (
@@ -286,13 +286,11 @@ export function ActionPanel({
           </Button>
         }
       >
-        <span className={styles.eyebrow}>
-          {extra ? `DOUBLES · 已连续 ${game.consecutiveDoubles} 次对子` : 'ALL DONE'}
-        </span>
+        <span className={styles.eyebrow}>{extra ? `掷出对子 · 已连续 ${game.consecutiveDoubles} 次` : '回合完成'}</span>
         <h2 className={styles.title}>
           {extra ? (game.consecutiveDoubles >= 2 ? '再掷出对子将入狱' : '你还可以再行动一次') : '本回合已完成'}
         </h2>
-        {!extra && <p className={styles.note}>确认后轮到下一位旅行者。</p>}
+        {!extra && <p className={styles.note}>确认后轮到下一位玩家。</p>}
       </Ticket>
     )
   }

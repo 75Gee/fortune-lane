@@ -183,13 +183,9 @@
   background: var(--neutral-cool);
 }
 .stamp {
-  padding: 1px 6px;
-  border: 1.5px solid var(--accent);
-  border-radius: var(--radius-xs);
   color: var(--accent);
   font-size: var(--text-xs);
   font-weight: var(--weight-bold);
-  transform: rotate(-4deg);
 }
 .worth {
   font-family: var(--font-mono);

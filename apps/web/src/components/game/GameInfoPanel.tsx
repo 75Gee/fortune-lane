@@ -69,7 +69,7 @@ export function GameInfoPanel({
       ),
     [game],
   )
-  const titles = { players: '旅行者', assets: '资产', activity: '对局动态', cards: '牌库与道具' }
+  const titles = { players: '玩家', assets: '资产', activity: '对局动态', cards: '牌库与道具' }
   const tabs: { tab: InfoTab; label: string; Icon: typeof Users }[] = [
     { tab: 'players', label: '玩家', Icon: Users },
     { tab: 'assets', label: '资产', Icon: Building2 },
@@ -102,8 +102,8 @@ export function GameInfoPanel({
 
           <section className={styles.section} hidden={panelTab !== 'players'}>
             <div className={styles.ledgerHead}>
-              <span>旅行者</span>
-              <span>总身家 ↓</span>
+              <span>玩家</span>
+              <span>总资产 ↓</span>
             </div>
             <ol className={styles.ledger}>
               {sortedPlayers.map((player, rank) => {
@@ -117,7 +117,7 @@ export function GameInfoPanel({
                 return (
                   <li key={player.id}>
                     <button
-                      aria-label={`查看${player.name}的资产，总身家${formatMoney(playerNetWorth(game, player.id))}${player.surrendered ? '，已投降' : player.isBankrupt ? '，已破产' : `，现金${formatMoney(player.cash)}，${owned}处地产`}`}
+                      aria-label={`查看${player.name}的资产，总资产${formatMoney(playerNetWorth(game, player.id))}${player.surrendered ? '，已投降' : player.isBankrupt ? '，已破产' : `，现金${formatMoney(player.cash)}，${owned}处地产`}`}
                       className={classes.filter(Boolean).join(' ')}
                       onClick={() => {
                         setAssetOwner(player.id)
@@ -203,7 +203,7 @@ export function GameInfoPanel({
                   <dd>{formatMoney(stockValue)}</dd>
                 </div>
                 <div>
-                  <dt>总身家</dt>
+                  <dt>总资产</dt>
                   <dd>{formatMoney(playerNetWorth(game, assetOwner))}</dd>
                 </div>
               </dl>

@@ -36,7 +36,7 @@ export function PlayerRail({
   onOpenPlayer: (playerId: string) => void
 }) {
   return (
-    <section className={`${styles.panel} ${styles.rail}`} aria-label="旅行者">
+    <section className={`${styles.panel} ${styles.rail}`} aria-label="玩家">
       {game.players.map((player) => {
         const name = `${player.name}${player.id === playerId ? ' · 你' : ''}`
         const status = player.isBankrupt ? '观战' : note(player)

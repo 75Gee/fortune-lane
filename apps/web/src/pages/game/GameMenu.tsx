@@ -4,7 +4,7 @@ import type { InfoTab } from '../../components/game/GameInfoPanel.js'
 import styles from './GameHud.module.css'
 
 const INFO_TABS: { tab: InfoTab; label: string; Icon: typeof Users }[] = [
-  { tab: 'players', label: '旅行者', Icon: Users },
+  { tab: 'players', label: '玩家', Icon: Users },
   { tab: 'assets', label: '资产', Icon: Building2 },
   { tab: 'activity', label: '动态', Icon: Sparkles },
   { tab: 'cards', label: '牌库', Icon: Library },

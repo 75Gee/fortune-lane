@@ -1,3 +1,4 @@
+import { TriangleAlert } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Modal } from '../components/Modal.js'
 import { Button } from './Button.js'
@@ -41,7 +42,13 @@ export function ConfirmDialog({
             <Button size="lg" autoFocus disabled={locked} onClick={onCancel}>
               {cancelLabel}
             </Button>
-            <Button size="lg" variant={tone} disabled={confirmDisabled || locked} onClick={onConfirm}>
+            <Button
+              size="lg"
+              variant={tone}
+              icon={tone === 'danger' ? <TriangleAlert size={18} /> : undefined}
+              disabled={confirmDisabled || locked}
+              onClick={onConfirm}
+            >
               {confirmLabel}
             </Button>
           </div>

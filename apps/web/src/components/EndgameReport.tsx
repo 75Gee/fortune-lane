@@ -159,7 +159,7 @@ export function EndgameReport({
           </div>
 
           <div className={styles.rankPage}>
-            <h3 className={styles.rankTitle}>旅行者排名</h3>
+            <h3 className={styles.rankTitle}>玩家排名</h3>
             <ol className={styles.rankings}>
               {ranked.map((player, index) => {
                 const stats = game.statistics.players[player.id]!

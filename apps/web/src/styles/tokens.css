@@ -46,8 +46,9 @@
   --gold-soft: #f4e3c3;
   --info: #2f5d8a;
   --neutral-cool: #8a8f9c;
-  /* Chinese market convention: red rises, green falls. */
-  --market-up: #b8452c;
+  /* Chinese market convention: red rises, green falls. A rose red, so gains never read as the
+     vermilion action colour; figures also carry ▲/▼. */
+  --market-up: #c0344f;
   --market-down: #2f7a55;
 
   /* Typography */

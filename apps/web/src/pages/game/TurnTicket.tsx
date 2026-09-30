@@ -32,7 +32,7 @@ export function TurnTicket({ game, playerId, turnDeadline, clockOffset }: TurnTi
   return (
     <section className={`${styles.panel} ${styles.ticket} ${urgent ? styles.urgentTicket : ''}`} aria-label="当前回合">
       <div className={styles.round}>
-        <small>ROUND</small>
+        <small>回合</small>
         <strong>{game.turnNumber}</strong>
       </div>
       <div className={styles.ticketBody}>

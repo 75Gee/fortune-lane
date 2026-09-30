@@ -8,6 +8,16 @@
 .stock-negative {
   color: var(--market-down);
 }
+.stock-positive::before {
+  content: '▲';
+  margin-right: 2px;
+  font-size: 0.75em;
+}
+.stock-negative::before {
+  content: '▼';
+  margin-right: 2px;
+  font-size: 0.75em;
+}
 .stock-neutral {
   color: var(--text-muted);
 }
