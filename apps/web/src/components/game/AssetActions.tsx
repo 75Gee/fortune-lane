@@ -3,6 +3,7 @@ import { useContext } from 'react'
 import { CommandAvailabilityContext } from '../Modal.js'
 import { StockPaymentHint } from '../stocks/StockPaymentHint.js'
 import { formatMoney } from '../../lib/format.js'
+import styles from './TileDetail.module.css'
 export function AssetActions({
   game,
   tileIndex,
@@ -27,7 +28,7 @@ export function AssetActions({
         ? `赎回后现金 ${formatMoney(quote.balanceAfter)}`
         : null)
   return (
-    <div className="asset-actions">
+    <div className={styles.actions}>
       <button
         disabled={!available || !quote.allowed}
         title={quote.reason ?? undefined}

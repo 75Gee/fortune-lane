@@ -1,5 +1,6 @@
 import {
   ITEMS,
+  MAX_PROPERTY_LEVEL,
   getTile,
   playerNetWorth,
   rentForTile,
@@ -19,6 +20,8 @@ import { StockHoldings } from '../stocks/StockSummary.js'
 import { TileDetail } from './TileDetail.js'
 import { LiquidationPlanner } from './LiquidationPlanner.js'
 import { formatMoney } from '../../lib/format.js'
+import { IconButton } from '../../ui/index.js'
+import styles from './GameInfoPanel.module.css'
 
 export type InfoTab = 'players' | 'assets' | 'activity' | 'cards'
 export function GameInfoPanel({
@@ -66,124 +69,115 @@ export function GameInfoPanel({
       ),
     [game],
   )
+  const titles = { players: '旅行者', assets: '资产', activity: '对局动态', cards: '牌库与道具' }
+  const tabs: { tab: InfoTab; label: string; Icon: typeof Users }[] = [
+    { tab: 'players', label: '玩家', Icon: Users },
+    { tab: 'assets', label: '资产', Icon: Building2 },
+    { tab: 'activity', label: '动态', Icon: Sparkles },
+    { tab: 'cards', label: '牌库', Icon: Library },
+  ]
+  const ownedTiles = game.tiles.flatMap((state, index) => (state.ownerId === assetOwner ? [{ state, index }] : []))
   return (
     <Modal label={`本局信息 · 房间 ${roomCode}`} onDismiss={onClose}>
-      <button className="panel-backdrop" aria-label="关闭本局信息" onClick={onClose} />
-      <aside className="game-sidebar is-open">
+      <button className={styles.backdrop} aria-label="关闭本局信息" onClick={onClose} />
+      <aside className={styles.drawer}>
         {selectedTile === null && (
-          <div className="sidebar-mobile-head">
-            <strong>
-              {planningDebt && panelTab === 'assets'
-                ? '筹款并支付'
-                : { players: '玩家概况', assets: '资产管理', activity: '对局动态', cards: '牌库与道具' }[panelTab]}
-            </strong>
-            <button className="icon-command" aria-label="关闭本局信息" onClick={onClose}>
-              <X size={18} />
-            </button>
-          </div>
+          <header className={styles.header}>
+            <div>
+              <h2>{planningDebt && panelTab === 'assets' ? '筹款并支付' : titles[panelTab]}</h2>
+              <span>房间 {roomCode}</span>
+            </div>
+            <IconButton label="关闭本局信息" icon={<X size={18} />} onClick={onClose} />
+          </header>
         )}
-        <div ref={scroll} hidden={selectedTile !== null} className="info-panel-content">
-          <div className="panel-tabs" role="group" aria-label="对局信息">
-            <button
-              className={panelTab === 'players' ? 'active' : ''}
-              aria-pressed={panelTab === 'players'}
-              onClick={() => setPanelTab('players')}
-            >
-              <Users size={17} />
-              玩家
-            </button>
-            <button
-              className={panelTab === 'assets' ? 'active' : ''}
-              aria-pressed={panelTab === 'assets'}
-              onClick={() => setPanelTab('assets')}
-            >
-              <Building2 size={17} />
-              资产
-            </button>
-            <button
-              className={panelTab === 'activity' ? 'active' : ''}
-              aria-pressed={panelTab === 'activity'}
-              onClick={() => setPanelTab('activity')}
-            >
-              <Sparkles size={17} />
-              动态
-            </button>
-            <button
-              className={panelTab === 'cards' ? 'active' : ''}
-              aria-pressed={panelTab === 'cards'}
-              onClick={() => setPanelTab('cards')}
-            >
-              <Library size={17} />
-              牌库
-            </button>
+        <div ref={scroll} hidden={selectedTile !== null} className={styles.scroll}>
+          <div className={styles.tabs} role="group" aria-label="对局信息">
+            {tabs.map(({ tab, label, Icon }) => (
+              <button key={tab} aria-pressed={panelTab === tab} onClick={() => setPanelTab(tab)}>
+                <Icon size={17} />
+                {label}
+              </button>
+            ))}
           </div>
-          <section className="player-rail" hidden={panelTab !== 'players'}>
-            <div className="player-list-head">
-              <span>玩家</span>
+
+          <section className={styles.section} hidden={panelTab !== 'players'}>
+            <div className={styles.ledgerHead}>
+              <span>旅行者</span>
               <span>总身家 ↓</span>
             </div>
-            <div className="player-list">
+            <ol className={styles.ledger}>
               {sortedPlayers.map((player, rank) => {
                 const owned = game.tiles.filter((tile) => tile.ownerId === player.id).length
+                const classes = [
+                  styles.traveller,
+                  player.id === game.currentPlayerId && styles.current,
+                  player.id === playerId && styles.me,
+                  player.isBankrupt && styles.out,
+                ]
                 return (
-                  <button
-                    aria-label={`查看${player.name}的资产，总身家${formatMoney(playerNetWorth(game, player.id))}${player.surrendered ? '，已投降' : player.isBankrupt ? '，已破产' : `，现金${formatMoney(player.cash)}，${owned}处地产`}`}
-                    className={`player-row ${player.id === game.currentPlayerId ? 'is-current' : ''} ${player.id === playerId ? 'is-me' : ''} ${player.isBankrupt ? 'is-bankrupt' : ''}`}
-                    key={player.id}
-                    onClick={() => {
-                      setAssetOwner(player.id)
-                      setPanelTab('assets')
-                    }}
-                  >
-                    <span className="rank">{rank + 1}</span>
-                    <span className="player-token-small" style={{ borderColor: player.color }}>
-                      <TokenImage token={player.token} />
-                      {player.turtleRollsRemaining > 0 && (
-                        <span
-                          className="turtle-status-badge"
-                          title={`乌龟效果：剩余 ${player.turtleRollsRemaining} 次常规掷骰`}
-                        >
-                          <img src={ITEMS.turtle.image} alt="乌龟效果" />
-                          <b>{player.turtleRollsRemaining}</b>
-                        </span>
+                  <li key={player.id}>
+                    <button
+                      aria-label={`查看${player.name}的资产，总身家${formatMoney(playerNetWorth(game, player.id))}${player.surrendered ? '，已投降' : player.isBankrupt ? '，已破产' : `，现金${formatMoney(player.cash)}，${owned}处地产`}`}
+                      className={classes.filter(Boolean).join(' ')}
+                      onClick={() => {
+                        setAssetOwner(player.id)
+                        setPanelTab('assets')
+                      }}
+                    >
+                      <span className={styles.rank}>{String(rank + 1).padStart(2, '0')}</span>
+                      <span className={styles.token} style={{ borderColor: player.color }}>
+                        <TokenImage token={player.token} alt="" />
+                        {player.turtleRollsRemaining > 0 && (
+                          <img
+                            className={styles.badge}
+                            src={ITEMS.turtle.image}
+                            alt={`乌龟效果剩余 ${player.turtleRollsRemaining} 次`}
+                          />
+                        )}
+                      </span>
+                      <span className={styles.copy}>
+                        <strong>
+                          {player.name}
+                          {player.id === playerId ? ' · 你' : ''}
+                          {!player.connected && <i className={styles.offline} title="已掉线" />}
+                        </strong>
+                        <small>
+                          {player.surrendered
+                            ? '已投降'
+                            : player.isBankrupt
+                              ? '已破产'
+                              : `${owned} 处地产 · 现金 ${formatMoney(player.cash)}`}
+                        </small>
+                      </span>
+                      {player.id === game.currentPlayerId && !player.isBankrupt && (
+                        <span className={styles.stamp}>行动中</span>
                       )}
-                    </span>
-                    <span className="player-copy">
-                      <strong>
-                        {player.name}
-                        {player.id === playerId ? ' · 你' : ''}
-                      </strong>
-                      <small>
-                        {player.surrendered
-                          ? '已投降'
-                          : player.isBankrupt
-                            ? '已破产'
-                            : `${owned} 处地产 · 现金 ${formatMoney(player.cash)}`}
-                      </small>
-                    </span>
-                    <span className="player-worth">
-                      <strong>{formatMoney(playerNetWorth(game, player.id))}</strong>
-                    </span>
-                    {!player.connected && <i className="offline-dot" title="已掉线" />}
-                  </button>
+                      <strong className={styles.worth}>{formatMoney(playerNetWorth(game, player.id))}</strong>
+                    </button>
+                  </li>
                 )
               })}
-            </div>
+            </ol>
           </section>
 
-          <section className="asset-portfolio" hidden={panelTab !== 'assets'}>
+          <section className={styles.section} hidden={panelTab !== 'assets'}>
             {!planningDebt && (
-              <label>
-                资产持有人
-                <select value={assetOwner} onChange={(event) => setAssetOwner(event.target.value)}>
-                  {game.players.map((player) => (
-                    <option key={player.id} value={player.id}>
-                      {player.name}
-                      {player.id === playerId ? ' · 你' : ''}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <div className={styles.owners} role="group" aria-label="资产持有人">
+                {game.players.map((player) => (
+                  <button
+                    key={player.id}
+                    aria-pressed={player.id === assetOwner}
+                    title={player.name}
+                    onClick={() => setAssetOwner(player.id)}
+                  >
+                    <span className={styles.token} style={{ borderColor: player.color }}>
+                      <TokenImage token={player.token} alt="" />
+                    </span>
+                    {player.name}
+                    {player.id === playerId ? ' · 你' : ''}
+                  </button>
+                ))}
+              </div>
             )}
             {planningDebt && (
               <LiquidationPlanner
@@ -194,15 +188,12 @@ export function GameInfoPanel({
               />
             )}
             {!planningDebt && game.pendingDebt?.debtorId === assetOwner && (
-              <div className="portfolio-debt">
-                <strong>
-                  待付 {formatMoney(game.pendingDebt.amount)} · {game.pendingDebt.reason}
-                </strong>
-                <p>正在筹款</p>
-              </div>
+              <p className={styles.debt}>
+                <strong>待付 {formatMoney(game.pendingDebt.amount)}</strong> · {game.pendingDebt.reason} · 正在筹款
+              </p>
             )}
             <div hidden={planningDebt}>
-              <dl className="portfolio-overview">
+              <dl className={styles.figures}>
                 <div>
                   <dt>现金</dt>
                   <dd>{formatMoney(owner?.cash ?? 0)}</dd>
@@ -217,62 +208,81 @@ export function GameInfoPanel({
                 </div>
               </dl>
               {game.stockMarket && (
-                <details className="portfolio-stock-detail">
+                <details className={styles.stocks}>
                   <summary>查看股票持仓</summary>
                   <StockHoldings market={game.stockMarket} playerId={assetOwner} />
                 </details>
               )}
-              <h3 className="portfolio-list-heading">
-                地产 <span>{game.tiles.filter((tile) => tile.ownerId === assetOwner).length} 处</span>
+              <h3 className={styles.listHeading}>
+                地产 <span>{ownedTiles.length} 处</span>
               </h3>
-              {game.tiles.filter((tile) => tile.ownerId === assetOwner).length === 0 && (
-                <p className="empty-state">
-                  <Building2 size={32} />
+              {ownedTiles.length === 0 && (
+                <p className={styles.empty}>
+                  <Building2 size={28} />
                   还没有持有的地产
                 </p>
               )}
-              {game.tiles.map((state, index) => {
-                if (state.ownerId !== assetOwner) return null
-                const tile = getTile(index)
-                return (
-                  <div className="portfolio-asset" key={index}>
-                    <button
-                      className={`asset-row${cityImageSource(tile.name) ? ' has-city-art' : ''}`}
-                      aria-label={`查看${tile.name}详情与操作`}
-                      onClick={() => openDetail(index)}
-                    >
-                      <i style={{ background: tile.color ?? '#3984b5' }} />
-                      <CityImage city={tile.name} thumbnail loading="lazy" />
-                      <span>
-                        <strong>{tile.name}</strong>
-                        <small>
-                          {state.mortgaged
-                            ? '已抵押 · 暂不收费'
-                            : `${tile.kind === 'property' ? `${state.level} 级 · ` : ''}游览费 ${tile.kind === 'utility' ? '按骰点计费' : formatMoney(rentForTile(game, index, 0))}`}
-                        </small>
-                      </span>
-                      <ChevronRight size={17} />
-                    </button>
-                  </div>
-                )
-              })}
+              <ul className={styles.assets}>
+                {ownedTiles.map(({ state, index }) => {
+                  const tile = getTile(index)
+                  return (
+                    <li key={index}>
+                      <button
+                        className={`${styles.asset} ${state.mortgaged ? styles.mortgaged : ''}`}
+                        aria-label={`查看${tile.name}详情与操作`}
+                        onClick={() => openDetail(index)}
+                      >
+                        {cityImageSource(tile.name) ? (
+                          <CityImage city={tile.name} thumbnail loading="lazy" className={styles.assetImage} />
+                        ) : (
+                          <span className={styles.assetImage} />
+                        )}
+                        <span className={styles.assetCopy}>
+                          <strong>
+                            <i style={{ background: tile.color ?? 'var(--info)' }} />
+                            {tile.name}
+                          </strong>
+                          <small>
+                            {state.mortgaged
+                              ? '已抵押 · 暂不收费'
+                              : `游览费 ${tile.kind === 'utility' ? '按骰点计费' : formatMoney(rentForTile(game, index, 0))}`}
+                          </small>
+                        </span>
+                        {tile.kind === 'property' && (
+                          <span className={styles.pips} aria-label={`${state.level} 级`}>
+                            {Array.from({ length: MAX_PROPERTY_LEVEL }, (_, pip) => (
+                              <i key={pip} className={pip < state.level ? styles.pipOn : undefined} />
+                            ))}
+                          </span>
+                        )}
+                        {state.mortgaged && <span className={styles.mortgageStamp}>已抵押</span>}
+                        <ChevronRight size={17} />
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
             </div>
           </section>
 
           {panelTab === 'cards' && (
-            <>
+            <div className={styles.section}>
               <CardLibrary game={game} />
               <details className="catalog-disclosure">
                 <summary>道具规则</summary>
                 <ItemCatalog />
               </details>
-            </>
+            </div>
           )}
 
-          {panelTab === 'activity' && <ActivityHistory events={game.actionLog} playerId={playerId} />}
+          {panelTab === 'activity' && (
+            <div className={styles.section}>
+              <ActivityHistory events={game.actionLog} playerId={playerId} />
+            </div>
+          )}
         </div>
         {selectedTile !== null && (
-          <div className="portfolio-detail">
+          <div className={styles.detail}>
             <TileDetail
               game={game}
               tileIndex={selectedTile}

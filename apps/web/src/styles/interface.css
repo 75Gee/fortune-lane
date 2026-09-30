@@ -1,87 +1,11 @@
 /* Player-facing hierarchy: decisions first, details on demand. */
 
 /* Compact portfolios; management stays in the selected property's detail. */
-.game-sidebar.is-open > .sidebar-mobile-head {
-  min-height: 64px;
-  padding-block: 12px;
-}
-.player-list-head {
-  display: flex;
-  justify-content: space-between;
-  margin: 16px 20px 4px;
-  color: var(--ui-muted);
-  font-size: 12px;
-}
-.player-worth {
-  display: grid;
-  gap: 4px;
-  text-align: right;
-}
-.player-worth strong {
-  font-size: 15px;
-  font-variant-numeric: tabular-nums;
-}
-.player-copy small {
-  line-height: 1.6;
-  color: var(--ui-muted);
-}
-.portfolio-overview {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin: 22px 0 14px;
-}
-.portfolio-overview dt {
-  font-size: 12px;
-  color: var(--ui-muted);
-  margin-bottom: 6px;
-}
-.portfolio-overview dd {
-  margin: 0;
-  font-size: 17px;
-  font-weight: 650;
-  font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
-}
-.portfolio-stock-detail {
-  border-bottom: 1px solid var(--ui-line);
-  padding-bottom: 16px;
-}
-.portfolio-stock-detail > summary,
 .catalog-disclosure > summary {
   color: var(--ui-muted);
   font-size: 12px;
   cursor: pointer;
   padding: 5px 0;
-}
-.portfolio-stock-detail .stock-holdings {
-  border: 0;
-  margin-bottom: 0;
-}
-.portfolio-list-heading {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  margin: 20px 0 6px;
-}
-.portfolio-list-heading span {
-  color: var(--ui-muted);
-  font-size: 12px;
-  font-weight: 400;
-}
-.asset-portfolio .portfolio-asset {
-  margin: 0;
-  border: 0;
-  border-bottom: 1px solid var(--ui-line);
-  border-radius: 0;
-  padding: 0;
-  background: transparent;
-}
-.asset-portfolio .asset-row {
-  padding: 15px 0;
-}
-.asset-row small {
-  color: var(--ui-muted);
 }
 .catalog-disclosure {
   margin: 0 20px 20px;
@@ -91,141 +15,8 @@
 .catalog-disclosure .item-catalog {
   padding-inline: 0;
 }
-.tile-detail > .deed-header {
-  position: sticky;
-  top: 0;
-  z-index: 3;
-  padding: 16px 20px;
-  background: var(--surface);
-}
-.tile-detail > .deed-header > .deed-title {
-  display: grid;
-  flex: 1;
-  gap: 4px;
-}
-.deed-title h3 {
-  margin: 0;
-  font-size: 20px;
-}
-.deed-title small {
-  color: var(--ui-muted);
-  font-size: 12px;
-}
-.deed-header .icon-command {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  border: 0;
-  background: transparent;
-}
-.deed-content {
-  padding: 20px;
-}
-.deed-facts {
-  display: grid;
-  gap: 16px;
-  margin: 0;
-  font-size: 14px;
-}
-.deed-facts > div {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-}
-.deed-facts dt {
-  color: var(--ui-muted);
-}
-.deed-facts dd {
-  margin: 0;
-  text-align: right;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-.deed-facts .deed-rent {
-  margin-bottom: 4px;
-}
-.deed-rent dd {
-  font-size: 23px;
-}
-.deed-note {
-  margin: 12px 0 0;
-  color: var(--ui-muted);
-  font-size: 12px;
-}
-.deed-content .asset-actions {
-  margin-top: 22px;
-  padding: 0;
-  border: 0;
-}
-.deed-content .asset-actions button {
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  font-size: 14px;
-}
-.deed-content .asset-actions button strong {
-  font-size: inherit;
-  font-variant-numeric: tabular-nums;
-}
-.deed-upgrade {
-  margin-top: 18px;
-}
-.deed-upgrade small {
-  display: block;
-  color: var(--ui-muted);
-  font-size: 12px;
-  margin-top: 5px;
-}
-.deed-all-rates {
-  border-top: 1px solid var(--ui-line);
-  margin-top: 20px;
-  padding-top: 14px;
-}
-.deed-all-rates summary {
-  color: var(--ui-muted);
-  font-size: 13px;
-  cursor: pointer;
-}
-.deed-rates-table {
-  width: 100%;
-  margin-top: 18px;
-  border-collapse: collapse;
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
-}
-.deed-rates-table th {
-  color: var(--ui-muted);
-  font-weight: 400;
-}
-.deed-rates-table th,
-.deed-rates-table td {
-  padding: 8px 0;
-  text-align: left;
-}
-.deed-rates-table th:last-child,
-.deed-rates-table td:last-child {
-  text-align: right;
-}
-.deed-rates-table thead {
-  border-bottom: 1px solid var(--ui-line);
-}
-.deed-rates-table .current {
-  color: var(--green);
-  font-weight: 650;
-}
-.deed-all-rates .rent-notice {
-  padding: 0;
-  margin-top: 16px;
-}
-.deed-all-rates .utility-rents {
-  padding: 0;
-}
 
 /* Edit each asset beside its proceeds, with one payment summary. */
-.asset-portfolio:has(.liquidation-planner) {
-  padding-top: 4px;
-}
 .liquidation-planner .portfolio-debt p {
   margin: 6px 0 0;
 }
@@ -805,9 +596,6 @@
   }
   .stock-order-note {
     margin-bottom: 0;
-  }
-  .portfolio-overview dd {
-    font-size: 16px;
   }
   .library-card summary {
     gap: 8px;

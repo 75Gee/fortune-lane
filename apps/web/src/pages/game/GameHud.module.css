@@ -651,3 +651,11 @@
     padding: 150px 12px 320px;
   }
 }
+
+/* Board-selected tile: the board stays visible, lightly dimmed. */
+.tileBackdrop {
+  position: fixed;
+  inset: 0;
+  border: 0;
+  background: color-mix(in srgb, var(--surface-ink) 18%, transparent);
+}

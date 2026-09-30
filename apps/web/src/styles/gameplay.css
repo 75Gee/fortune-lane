@@ -10,54 +10,6 @@
 .turn-clock.is-urgent {
   color: var(--danger-strong);
 }
-.game-sidebar.is-open {
-  position: fixed;
-  z-index: var(--layer-panel);
-  display: flex;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: auto;
-  width: min(420px, 100%);
-  max-height: 100dvh;
-  padding-bottom: env(safe-area-inset-bottom);
-  overflow-y: auto;
-  border: 0;
-  border-left: 1px solid var(--line);
-  border-radius: 0;
-  background: var(--surface);
-  box-shadow: -8px 0 36px #1f2a4420;
-}
-.sidebar-mobile-head {
-  position: sticky;
-  top: 0;
-  z-index: 4;
-  display: flex;
-  flex-shrink: 0;
-  justify-content: space-between;
-  align-items: center;
-  min-height: 72px;
-  padding: 14px 20px;
-  background: var(--surface);
-}
-.sidebar-mobile-head > div {
-  display: grid;
-  gap: 4px;
-}
-.sidebar-mobile-head strong {
-  font-size: 17px;
-}
-.sidebar-mobile-head small {
-  color: var(--text-muted);
-  font-size: 11px;
-}
-.game-sidebar .panel-tabs {
-  position: sticky;
-  top: 72px;
-  z-index: 3;
-  padding-top: 0;
-  background: var(--surface);
-}
 .panel-backdrop {
   display: block;
   position: fixed;
@@ -66,34 +18,6 @@
   border: 0;
   background: var(--scrim);
   backdrop-filter: blur(2px);
-}
-.detail-backdrop {
-  inset: 0;
-  background: var(--scrim);
-}
-.tile-detail {
-  top: 76px;
-  right: 20px;
-  width: min(390px, calc(100% - 40px));
-  max-height: calc(100dvh - 96px);
-}
-@media (max-width: 800px) {
-  .game-sidebar.is-open {
-    top: auto;
-    bottom: 0;
-    width: 100%;
-    max-height: 85dvh;
-    border: 0;
-    border-radius: 8px 8px 0 0;
-  }
-  .tile-detail {
-    top: auto;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    width: 100%;
-    max-height: 82dvh;
-  }
 }
 .reaction-ui {
   position: fixed;
@@ -302,9 +226,6 @@
   font-size: 12px;
   line-height: 1.7;
   color: var(--gold-ink);
-}
-.portfolio-asset .asset-row {
-  width: 100%;
 }
 /* Desktop: above the wallet. Phones: under the scene tools, clear of the action sheet. */
 .reaction-ui:not(.in-dialog) {
@@ -606,30 +527,6 @@
   line-height: 1.6;
   color: var(--text-muted);
 }
-.player-token-small {
-  position: relative;
-}
-.turtle-status-badge {
-  position: absolute;
-  right: -10px;
-  bottom: -5px;
-  display: flex;
-  align-items: center;
-  border: 1px solid var(--positive);
-  border-radius: 8px;
-  background: var(--surface);
-  padding-right: 3px;
-}
-.player-token-small .turtle-status-badge img {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-}
-.turtle-status-badge b {
-  color: var(--positive);
-  font-size: 10px;
-  line-height: 14px;
-}
 .route-stop .route-hazard {
   color: var(--accent);
   font-weight: 650;
@@ -774,60 +671,8 @@
   width: 100%;
   margin-bottom: 12px;
 }
-.game-sidebar.is-open {
-  overflow: hidden;
-}
-.info-panel-content,
-.portfolio-detail {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-gutter: stable;
-}
 [hidden] {
   display: none !important;
-}
-.game-sidebar .panel-tabs {
-  top: 0;
-}
-.portfolio-detail {
-  padding: 0;
-}
-.portfolio-detail .tile-detail {
-  position: static;
-  width: 100%;
-  max-height: none;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  overflow: visible;
-}
-.portfolio-asset {
-  border-bottom: 1px solid var(--line-soft);
-  padding-bottom: 10px;
-}
-.portfolio-asset .asset-actions {
-  margin: 0 18px;
-  padding: 0;
-  border: 0;
-}
-.asset-actions {
-  display: grid;
-  gap: 7px;
-}
-.asset-actions small {
-  color: var(--text-muted);
-  font-size: 11px;
-  line-height: 1.5;
-}
-.asset-actions button {
-  min-height: 40px;
-  border: 1px solid var(--line);
-  background: var(--surface-muted);
-  color: var(--text-secondary);
 }
 .stock-payment-hint {
   margin: 8px 0 0;

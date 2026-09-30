@@ -159,8 +159,7 @@ h2 {
   font-size: 12px;
 }
 .connection-pill > span,
-.presence,
-.offline-dot {
+.presence {
   width: 7px;
   height: 7px;
   flex-shrink: 0;
@@ -196,8 +195,7 @@ h2 {
 }
 .primary-command,
 .ready-command,
-.invite-command,
-.asset-actions button {
+.invite-command {
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -307,8 +305,7 @@ h2 {
   font-size: 13px;
   font-weight: 650;
 }
-.field input,
-.asset-portfolio select {
+.field input {
   width: 100%;
   min-width: 0;
   min-height: 48px;
@@ -664,123 +661,14 @@ h2 {
 }
 
 /* Player, asset and activity views share one rail. */
-.game-sidebar {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  overflow-y: auto;
-  border-left: 1px solid var(--line);
-  background: var(--surface);
-}
-.panel-tabs {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  flex-shrink: 0;
-  padding: 12px 12px 0;
-  border-bottom: 1px solid var(--line);
-}
-.panel-tabs button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  min-height: 48px;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  background: transparent;
-  color: var(--muted);
-  font-size: 13px;
-}
-.panel-tabs button.active {
-  color: var(--green);
-  border-bottom-color: var(--green);
-  font-weight: 750;
-}
-.player-rail > header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  padding: 22px 20px 14px;
-}
-.player-rail > header span {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 13px;
-  font-weight: 750;
-}
-.player-rail > header small {
-  color: var(--green);
-  font-size: 11px;
-}
-.player-list {
-  padding: 0 12px 20px;
-}
-.player-row {
-  display: grid;
-  grid-template-columns: 16px 40px minmax(0, 1fr) auto;
-  gap: 8px;
-  align-items: center;
-  width: 100%;
-  min-height: 80px;
-  padding: 12px 8px;
-  position: relative;
-  border: 0;
-  border-bottom: 1px solid var(--line);
-  background: transparent;
-  text-align: left;
-}
-.player-row.is-current {
-  background: var(--surface-sunken);
-  box-shadow: inset 3px 0 var(--green);
-}
-.player-row.is-bankrupt {
-  opacity: 0.5;
-}
 .rank {
   color: var(--text-muted);
   font-size: 11px;
-}
-.player-token-small {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border: 2px solid;
-  border-radius: 50%;
-  background: var(--surface);
-}
-.player-token-small img,
-.player-token-small .token-fallback {
-  width: 31px;
-  height: 31px;
-  object-fit: contain;
-}
-.player-copy {
-  display: grid;
-  gap: 5px;
-  min-width: 0;
-}
-.player-copy strong {
-  font-size: 13px;
-  overflow-wrap: anywhere;
-}
-.player-copy small {
-  color: var(--muted);
-  font-size: 10px;
-  line-height: 1.5;
 }
 .cash {
   font-size: 13px;
   font-weight: 750;
   font-variant-numeric: tabular-nums;
-}
-.offline-dot {
-  position: absolute;
-  bottom: 6px;
-  right: 6px;
-  background: var(--red);
 }
 .waiting-pulse {
   display: block;
@@ -790,52 +678,6 @@ h2 {
   border-radius: 50%;
   background: var(--green);
   animation: pulse 1.5s infinite;
-}
-.asset-actions button {
-  background: var(--surface);
-  border-color: var(--line);
-  color: var(--ink);
-  font-size: 12px;
-  padding: 10px;
-}
-.asset-portfolio {
-  padding: 20px;
-}
-.asset-portfolio label {
-  display: grid;
-  gap: 8px;
-  color: var(--muted);
-  font-size: 12px;
-}
-.asset-portfolio select {
-  font-size: 14px;
-}
-.asset-row {
-  display: grid;
-  grid-template-columns: 5px minmax(0, 1fr) 18px;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 14px 0;
-  border: 0;
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-  background: transparent;
-}
-.asset-row > i {
-  height: 36px;
-  border-radius: 2px;
-}
-.asset-row > span {
-  display: grid;
-  gap: 5px;
-}
-.asset-row strong {
-  font-size: 14px;
-}
-.asset-row small {
-  font-size: 11px;
-  color: var(--muted);
 }
 .empty-state {
   display: grid;
@@ -900,20 +742,6 @@ h2 {
   font-size: 12px;
   line-height: 1.6;
 }
-.utility-rents {
-  padding: 0 20px 20px;
-}
-.utility-rents p {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 8px;
-  font-size: 12px;
-}
-.utility-rents small {
-  color: var(--muted);
-  font-size: 11px;
-}
 .landing-dialog.wheel-dialog {
   width: min(500px, 100%);
 }
@@ -968,7 +796,6 @@ h2 {
 .wheel-properties svg {
   color: var(--green);
 }
-.sidebar-mobile-head,
 .panel-backdrop {
   display: none;
 }
@@ -1222,54 +1049,6 @@ h2 {
   color: var(--muted);
   line-height: 1.6;
 }
-.detail-backdrop {
-  position: fixed;
-  z-index: var(--layer-popover-backdrop);
-  inset: 64px 350px 0 0;
-  background: var(--scrim);
-  border: 0;
-}
-.tile-detail {
-  position: fixed;
-  z-index: var(--layer-popover);
-  right: 374px;
-  top: 100px;
-  width: 350px;
-  max-height: calc(100dvh - 125px);
-  overflow-y: auto;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: var(--shadow);
-}
-.tile-detail > header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 18px;
-  border-bottom: 1px solid var(--line);
-}
-.tile-detail > header > div {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-.tile-detail > header > div > span {
-  width: 7px;
-  height: 40px;
-  border-radius: 3px;
-  flex-shrink: 0;
-}
-.tile-detail small {
-  color: var(--muted);
-  font-size: 11px;
-}
-.tile-detail h3 {
-  margin: 4px 0 0;
-  font-size: 21px;
-}
 .deed-summary {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1279,19 +1058,6 @@ h2 {
 .deed-summary strong {
   font-size: 14px;
   overflow-wrap: anywhere;
-}
-.asset-actions {
-  display: grid;
-  gap: 8px;
-  padding: 18px 20px;
-  border-top: 1px solid var(--line);
-}
-.special-rule {
-  margin: 0;
-  padding: 20px;
-  font-size: 13px;
-  line-height: 1.8;
-  color: var(--muted);
 }
 .connection-banner {
   position: fixed;
@@ -1358,15 +1124,6 @@ h2 {
     opacity: 1;
   }
 }
-
-@media (min-width: 1600px) {
-  .detail-backdrop {
-    right: 400px;
-  }
-  .tile-detail {
-    right: 424px;
-  }
-}
 @media (max-width: 1100px) {
   .entry-workspace {
     grid-template-columns: minmax(0, 1fr) 370px;
@@ -1375,12 +1132,6 @@ h2 {
   }
   .scene-caption h1 {
     font-size: 40px;
-  }
-  .tile-detail {
-    right: 338px;
-  }
-  .detail-backdrop {
-    right: 320px;
   }
   .die {
     width: 36px;
@@ -1529,32 +1280,6 @@ h2 {
   .route-list {
     overflow: visible;
   }
-  .game-sidebar {
-    display: none;
-    position: fixed;
-    z-index: var(--layer-panel);
-    top: auto;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    max-height: 82dvh;
-    padding-bottom: env(safe-area-inset-bottom);
-    border: 0;
-    border-radius: 8px 8px 0 0;
-    box-shadow: 0 -12px 40px #1f2a4420;
-  }
-  .game-sidebar.is-open {
-    display: flex;
-  }
-  .sidebar-mobile-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 20px 0;
-  }
-  .sidebar-mobile-head strong {
-    font-size: 16px;
-  }
   .panel-backdrop {
     display: block;
     position: fixed;
@@ -1562,27 +1287,6 @@ h2 {
     inset: 0;
     border: 0;
     background: var(--scrim);
-  }
-  .panel-tabs {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background: var(--surface);
-  }
-  .detail-backdrop {
-    inset: 0;
-    z-index: var(--layer-panel-backdrop);
-  }
-  .tile-detail {
-    z-index: var(--layer-panel);
-    top: auto;
-    right: 0;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    max-height: 78dvh;
-    padding-bottom: env(safe-area-inset-bottom);
-    border-radius: 8px 8px 0 0;
   }
   .landing-overlay {
     padding: 0;

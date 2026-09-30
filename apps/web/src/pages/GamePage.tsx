@@ -262,13 +262,14 @@ export function GamePage({
         )}
         {panel?.type === 'tile' && (
           <Modal label="地点详情" onDismiss={closePanel}>
-            <button className="detail-backdrop" aria-label="关闭地点详情" onClick={closePanel} />
+            <button className={styles.tileBackdrop} aria-label="关闭地点详情" onClick={closePanel} />
             <TileDetail
               game={game}
               tileIndex={panel.index}
               playerId={playerId}
               onCommand={onCommand}
               onClose={closePanel}
+              floating
             />
           </Modal>
         )}

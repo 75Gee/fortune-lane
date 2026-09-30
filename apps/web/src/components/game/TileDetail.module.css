@@ -1,0 +1,213 @@
+/* Tile detail as a title deed: page inside the info drawer, or a card floating over the board. */
+.deed {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: var(--surface);
+  color: var(--text);
+}
+.floating {
+  position: fixed;
+  z-index: var(--layer-popover);
+  top: 50%;
+  right: var(--space-6);
+  width: min(400px, calc(100vw - 48px));
+  max-height: calc(100dvh - 48px);
+  min-height: 0;
+  overflow-y: auto;
+  transform: translateY(-50%);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 14px 12px 18px;
+  border-bottom: 2px solid var(--line-ink);
+}
+.header > button:first-child {
+  margin-left: -8px;
+}
+.title {
+  flex: 1;
+  min-width: 0;
+}
+.title h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 900;
+}
+.title small {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+.hazard {
+  margin: 12px 18px 0;
+  padding: 8px 12px;
+  border: 1.5px dashed var(--accent);
+  border-radius: var(--radius-md);
+  color: var(--accent);
+  font-size: var(--text-md);
+  line-height: 1.6;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 18px 22px;
+}
+.facts {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.facts > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--line-strong);
+}
+.facts dt {
+  color: var(--text-muted);
+  font-size: var(--text-md);
+}
+.facts dt small {
+  display: block;
+  font-size: var(--text-xs);
+}
+.facts dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+.facts > .rent dd {
+  font-size: var(--text-3xl);
+}
+.note {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.actions {
+  display: grid;
+  gap: 6px;
+}
+.actions button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1.5px solid var(--line-ink);
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--text);
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+}
+.actions button:not(:disabled):hover {
+  background: var(--surface-muted);
+}
+.actions button strong {
+  font-family: var(--font-mono);
+}
+.actions small {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.rates {
+  font-size: var(--text-md);
+}
+.rates summary {
+  padding: 6px 0;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.rates > * + * {
+  margin-top: 10px;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  border-top: 2px solid var(--line-ink);
+}
+.table th {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  text-align: left;
+}
+.table th:last-child,
+.table td:last-child {
+  text-align: right;
+}
+.table td {
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+}
+.table td:last-child {
+  font-family: var(--font-mono);
+}
+.table .currentRow td {
+  font-weight: var(--weight-bold);
+}
+.table .currentRow td:first-child::before {
+  content: '▸ ';
+  color: var(--accent);
+}
+.utility p {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 6px;
+}
+.utility strong {
+  font-family: var(--font-mono);
+}
+.utility small {
+  color: var(--text-muted);
+}
+
+.rule {
+  margin: 0;
+  padding: 18px;
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+  line-height: 1.8;
+}
+
+@media (max-width: 800px) {
+  .floating {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: 86dvh;
+    transform: none;
+    border-width: 1px 0 0;
+    border-radius: 18px 18px 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .image {
+    aspect-ratio: 2 / 1;
+  }
+}
