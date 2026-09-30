@@ -15,6 +15,7 @@ import { GameInfoPanel, type InfoTab } from '../components/game/GameInfoPanel.js
 import { RouteView } from '../components/game/RouteView.js'
 import { TileDetail } from '../components/game/TileDetail.js'
 import { StockMarketPanel } from '../components/stocks/StockMarketPanel.js'
+import { formatMoney } from '../lib/format.js'
 import { usePersistentToggle } from '../lib/usePersistentToggle.js'
 import { Button } from '../ui/index.js'
 import { GameConfirmations, type GameConfirmation } from './game/GameConfirmations.js'
@@ -22,6 +23,7 @@ import styles from './game/GameHud.module.css'
 import { GameMenu } from './game/GameMenu.js'
 import { PlayerRail } from './game/PlayerRail.js'
 import { BoardViewSwitch, TurnTicket, type BoardView } from './game/TurnTicket.js'
+import { useMoneyFeedback } from './game/useMoneyFeedback.js'
 import { Wallet } from './game/Wallet.js'
 
 interface GamePageProps {
@@ -81,6 +83,7 @@ export function GamePage({
     presentedEvents,
     skipToLive,
   } = useGamePresentation(game, events, soundEnabled)
+  const money = useMoneyFeedback(presentedEvents, playerId)
   const visualGame = useMemo(() => ({ ...game, hazards: displayHazards }), [game, displayHazards])
   const clockOffset = useMemo(() => room.serverTime - Date.now(), [room.serverTime])
   const me = game.players.find((player) => player.id === playerId)
@@ -156,7 +159,12 @@ export function GamePage({
             <BoardViewSwitch view={boardView} onChange={setBoardView} />
           </div>
           <div className={styles.trail}>
-            <PlayerRail game={game} playerId={playerId} onOpenPlayer={(owner) => openInfo('assets', owner)} />
+            <PlayerRail
+              game={game}
+              playerId={playerId}
+              deltas={money.deltas}
+              onOpenPlayer={(owner) => openInfo('assets', owner)}
+            />
             <GameMenu
               roomCode={room.roomCode}
               connected={connected}
@@ -170,6 +178,21 @@ export function GamePage({
           </div>
         </header>
 
+        {money.notice && (
+          <button
+            key={money.notice.key}
+            className={`${styles.notice} ${money.notice.amount > 0 ? styles.noticeGain : styles.noticeLoss}`}
+            role="status"
+            onClick={money.dismissNotice}
+          >
+            <span className={styles.noticeStamp}>{money.notice.amount > 0 ? '收入' : '支出'}</span>
+            <strong>
+              {money.notice.amount > 0 ? '+' : '−'}
+              {formatMoney(Math.abs(money.notice.amount))}
+            </strong>
+            <span className={styles.noticeText}>{money.notice.message}</span>
+          </button>
+        )}
         {showRollResult && (
           <div className={styles.moveResult} role="status">
             骰点 {lastPresentedRoll?.dice?.join(' + ')}
@@ -206,6 +229,7 @@ export function GamePage({
           <Wallet
             game={game}
             playerId={playerId}
+            deltas={money.deltas[playerId]}
             onOpenAssets={openAssets}
             onOpenStocks={() => setPanel({ type: 'stocks' })}
             onOpenItems={() => setPanel({ type: 'items' })}

@@ -2,6 +2,8 @@ import { ITEMS, stockPortfolioSummary, type GameView } from '@fortune/game'
 import { stockPercent } from '../../components/stocks/format.js'
 import { formatMoney } from '../../lib/format.js'
 import styles from './GameHud.module.css'
+import { DeltaFloat } from './PlayerRail.js'
+import type { FloatingDelta } from './useMoneyFeedback.js'
 
 interface WalletProps {
   game: GameView
@@ -9,9 +11,10 @@ interface WalletProps {
   onOpenAssets: () => void
   onOpenStocks: () => void
   onOpenItems: () => void
+  deltas?: readonly FloatingDelta[] | undefined
 }
 
-export function Wallet({ game, playerId, onOpenAssets, onOpenStocks, onOpenItems }: WalletProps) {
+export function Wallet({ game, playerId, onOpenAssets, onOpenStocks, onOpenItems, deltas }: WalletProps) {
   const me = game.players.find((player) => player.id === playerId)
   const items = me?.items ?? []
   const quotaUsed = game.currentPlayerId === playerId && game.itemUsedThisTurn
@@ -23,6 +26,7 @@ export function Wallet({ game, playerId, onOpenAssets, onOpenStocks, onOpenItems
         <small>{me?.isBankrupt ? '观战中' : '我的现金'}</small>
         <strong>{formatMoney(me?.cash ?? 0)}</strong>
         <span className={styles.walletMore}>资产详情 ›</span>
+        <DeltaFloat deltas={deltas} />
       </button>
       {stocks && (
         <button

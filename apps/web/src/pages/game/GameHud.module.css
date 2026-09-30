@@ -166,8 +166,8 @@
   gap: 4px;
   min-width: 0;
   padding: 6px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  /* Visible so money deltas can float below each traveller; names hide on narrow screens instead. */
+  overflow: visible;
 }
 .traveller {
   display: flex;
@@ -658,4 +658,177 @@
   inset: 0;
   border: 0;
   background: color-mix(in srgb, var(--surface-ink) 18%, transparent);
+}
+
+/* ---------- Money feedback ---------- */
+
+.travellerText em {
+  margin-left: 6px;
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-style: normal;
+  color: var(--danger);
+}
+
+.traveller {
+  position: relative;
+}
+.flash {
+  animation: flash 1.2s var(--ease-out);
+}
+@keyframes flash {
+  0%,
+  60% {
+    background: var(--gold-soft);
+    border-color: var(--gold);
+  }
+}
+
+.deltas {
+  position: absolute;
+  z-index: 2;
+  right: 8px;
+  bottom: calc(100% - 6px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  pointer-events: none;
+}
+.deltas b {
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: var(--text-md);
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  animation: floatUp 2.4s var(--ease-out) forwards;
+}
+.gain {
+  background: var(--gold-soft);
+  color: var(--gold-ink);
+  border: 1px solid var(--gold);
+}
+.loss {
+  background: var(--surface-ink);
+  color: var(--text-on-ink);
+}
+@keyframes floatUp {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  12%,
+  75% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+.rail .deltas {
+  top: calc(100% + 4px);
+  bottom: auto;
+  right: 50%;
+  transform: translateX(50%);
+}
+.walletCash {
+  position: relative;
+}
+.walletCash .deltas {
+  right: 18px;
+  bottom: auto;
+  top: 10px;
+}
+
+.notice {
+  position: absolute;
+  z-index: var(--layer-board-overlay);
+  top: 84px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(560px, calc(100% - 48px));
+  padding: 10px 18px 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-lg);
+  text-align: left;
+  animation: noticeIn 0.3s var(--ease-out);
+}
+.noticeStamp {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border: 1.5px solid;
+  border-radius: var(--radius-xs);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  transform: rotate(-6deg);
+}
+.notice strong {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+.noticeGain .noticeStamp,
+.noticeGain strong {
+  color: var(--gold-ink);
+}
+.noticeGain {
+  border-color: var(--gold);
+}
+.noticeLoss .noticeStamp {
+  color: var(--text-secondary);
+}
+.noticeText {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: var(--text-md);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@keyframes noticeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flash,
+  .deltas b,
+  .notice {
+    animation: none;
+  }
+}
+
+@media (max-width: 800px) {
+  .travellerText em {
+    display: none;
+  }
+  .walletCash .deltas {
+    top: auto;
+    bottom: calc(100% + 6px);
+    right: 50%;
+    transform: translateX(50%);
+  }
+  .notice {
+    top: 196px;
+    max-width: calc(100% - 24px);
+    width: calc(100% - 24px);
+  }
+  .noticeText {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
 }
