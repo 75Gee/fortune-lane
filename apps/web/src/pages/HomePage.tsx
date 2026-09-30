@@ -93,6 +93,10 @@ export function HomePage({
         </div>
 
         <form className="entry-form" onSubmit={submit}>
+          <div className="entry-ticket-head" aria-hidden="true">
+            <span>WORLD TOUR · BOARDING PASS</span>
+            <strong>旅行登记</strong>
+          </div>
           <SavedRoomsList
             rooms={savedRooms}
             connected={connected}
