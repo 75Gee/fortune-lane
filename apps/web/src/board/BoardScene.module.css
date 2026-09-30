@@ -101,8 +101,9 @@
     top: 150px;
     left: var(--space-3);
   }
+  /* The turn ticket already names the action; keep only hazard warnings on phones. */
   .location strong {
-    font-size: var(--text-xl);
+    display: none;
   }
   .tools {
     top: 146px;

@@ -131,9 +131,48 @@
   font-weight: 600;
   white-space: nowrap;
 }
-.clock:global(.is-urgent) {
+.ticket {
+  position: relative;
+  overflow: hidden;
+}
+/* Shrinking strip along the bottom of the ticket: the whole turn's time at a glance. */
+.timeBar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: var(--line);
+}
+.timeBar i {
+  display: block;
+  height: 100%;
+  background: var(--surface-ink);
+  transform-origin: left;
+  transition: transform 0.25s linear;
+}
+.urgentTicket {
+  border-color: var(--accent);
+  animation: urgent 1s ease-in-out infinite;
+}
+.urgentTicket .clock {
   background: var(--accent);
   color: var(--text-on-accent);
+}
+.urgentTicket .timeBar i {
+  background: var(--accent);
+}
+@keyframes urgent {
+  50% {
+    box-shadow:
+      var(--shadow-md),
+      0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .urgentTicket {
+    animation: none;
+  }
 }
 
 /* Board view switch */
@@ -373,8 +412,10 @@
   color: var(--text);
   text-align: left;
 }
-.wallet button:hover {
-  background: var(--surface-raised);
+@media (hover: hover) {
+  .wallet button:hover {
+    background: var(--surface-raised);
+  }
 }
 .wallet small {
   font-size: var(--text-sm);

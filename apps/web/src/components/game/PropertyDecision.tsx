@@ -9,6 +9,7 @@ import {
 } from '@fortune/game'
 import { formatMoney } from '../../lib/format.js'
 import { tileSetLabel } from '../../lib/tiles.js'
+import { useMediaQuery } from '../../lib/useCountdown.js'
 import { Button } from '../../ui/index.js'
 import { CityImage, cityLatinName } from '../CityImage.js'
 import { StockPaymentHint } from '../stocks/StockPaymentHint.js'
@@ -46,6 +47,8 @@ export function PropertyDecision({
         )
   const activeTier = purchase ? 0 : level + 1
   const latin = cityLatinName(tile.name)
+  // Phones fold the rent ladder so the sheet leaves room for the board.
+  const compact = useMediaQuery('(max-width: 800px)')
 
   return (
     <section className={styles.ticket} aria-label={`${tile.name}${purchase ? '购买' : '升级'}决策`}>
@@ -71,10 +74,15 @@ export function PropertyDecision({
           </div>
         </dl>
         {tile.kind === 'property' && tile.rents && (
-          <div>
-            <span className={styles.label}>
+          <details className={styles.ladderBox} open={!compact}>
+            <summary
+              className={styles.label}
+              onClick={(event) => {
+                if (!compact) event.preventDefault()
+              }}
+            >
               各等级游览费{tile.buildCost ? ` · 每级建造 ${formatMoney(tile.buildCost)}` : ''}
-            </span>
+            </summary>
             <div className={styles.ladder}>
               {tile.rents.map((rent, tier) => (
                 <div key={tier} className={tier === activeTier ? styles.tierActive : undefined}>
@@ -83,7 +91,7 @@ export function PropertyDecision({
                 </div>
               ))}
             </div>
-          </div>
+          </details>
         )}
         <StockPaymentHint payment={quote.payment} />
         {!quote.allowed && (

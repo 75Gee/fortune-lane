@@ -12,6 +12,7 @@ import {
 import { Banknote, Building2, ChevronRight, CircleDollarSign, Dice5, ShieldCheck } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { formatMoney } from '../../lib/format.js'
+import { TokenImage } from '../TokenImage.js'
 import { Button } from '../../ui/index.js'
 import { actionDescription } from '../decisionState.js'
 import { StockPaymentHint } from '../stocks/StockPaymentHint.js'
@@ -30,10 +31,28 @@ interface ActionPanelProps {
   onWatch?: (() => void) | undefined
 }
 
-function WaitingSlip({ title, detail, action }: { title: string; detail?: string | undefined; action?: ReactNode }) {
+function WaitingSlip({
+  title,
+  detail,
+  action,
+  player,
+}: {
+  title: string
+  detail?: string | undefined
+  action?: ReactNode
+  /** Whose turn it is, shown as their token so spectators see at a glance who is acting. */
+  player?: GameView['players'][number] | undefined
+}) {
   return (
     <div className={styles.waiting} role="status">
-      <span className={styles.pulse} />
+      {player ? (
+        <span className={styles.actor} style={{ borderColor: player.color }}>
+          <TokenImage token={player.token} alt="" />
+          <span className={styles.pulse} />
+        </span>
+      ) : (
+        <span className={styles.pulse} />
+      )}
       <div>
         <strong>{title}</strong>
         {detail && <p>{detail}</p>}
@@ -96,6 +115,7 @@ export function ActionPanel({
         }
         detail={me?.isBankrupt ? '你正在观战' : !current?.connected ? '已离线，超时自动行动' : undefined}
         action={watchButton}
+        player={game.pendingAuction ? undefined : current}
       />
     )
   }

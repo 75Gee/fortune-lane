@@ -1,6 +1,6 @@
 import { rentGrowthStart, rentMultiplier, type GameView } from '@fortune/game'
-import { Map, Route } from 'lucide-react'
-import { TurnClock } from '../../board/GameBoard.js'
+import { Clock3, Map, Route } from 'lucide-react'
+import { useCountdown } from '../../lib/useCountdown.js'
 import { actionDescription } from '../../components/decisionState.js'
 import styles from './GameHud.module.css'
 
@@ -24,8 +24,13 @@ function ticketCopy(game: GameView, playerId: string) {
 export function TurnTicket({ game, playerId, turnDeadline, clockOffset }: TurnTicketProps) {
   const { sub, head } = ticketCopy(game, playerId)
   const rentGrowing = game.turnNumber >= rentGrowthStart(game.players.length)
+  const countdown = useCountdown(
+    game.phase === 'FINISHED' ? null : (game.pendingAuction?.deadline ?? turnDeadline),
+    clockOffset,
+  )
+  const urgent = !!countdown && countdown.seconds <= 10
   return (
-    <section className={`${styles.panel} ${styles.ticket}`} aria-label="当前回合">
+    <section className={`${styles.panel} ${styles.ticket} ${urgent ? styles.urgentTicket : ''}`} aria-label="当前回合">
       <div className={styles.round}>
         <small>ROUND</small>
         <strong>{game.turnNumber}</strong>
@@ -39,11 +44,21 @@ export function TurnTicket({ game, playerId, turnDeadline, clockOffset }: TurnTi
           </span>
         )}
       </div>
-      <TurnClock
-        className={styles.clock}
-        deadline={game.pendingAuction?.deadline ?? turnDeadline}
-        offset={clockOffset}
-      />
+      {countdown && (
+        <span
+          className={styles.clock}
+          role="timer"
+          aria-label={countdown.seconds ? `剩余 ${countdown.seconds} 秒` : '时间已到，等待系统处理'}
+        >
+          <Clock3 size={14} />
+          {countdown.seconds ? `${countdown.seconds}s` : '处理中'}
+        </span>
+      )}
+      {countdown && (
+        <span className={styles.timeBar} aria-hidden="true">
+          <i style={{ transform: `scaleX(${countdown.fraction})` }} />
+        </span>
+      )}
     </section>
   )
 }
