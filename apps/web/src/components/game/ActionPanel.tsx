@@ -7,6 +7,7 @@ import {
   stockPaymentQuote,
   type GameCommand,
   type GameView,
+  type ItemKind,
 } from '@fortune/game'
 import { Banknote, Building2, ChevronRight, CircleDollarSign, Dice5, ShieldCheck } from 'lucide-react'
 import type { ReactNode } from 'react'
@@ -25,7 +26,7 @@ interface ActionPanelProps {
   waitingLabel?: string
   onSkipToLive?: (() => void) | undefined
   onManageAssets: () => void
-  onOpenItems: () => void
+  onOpenItems: (item?: ItemKind) => void
   onWatch?: (() => void) | undefined
 }
 
@@ -189,7 +190,7 @@ export function ActionPanel({
             <span className={styles.label}>出发前可使用 1 张道具</span>
             <div className={styles.items}>
               {me.items.slice(0, 3).map((item, index) => (
-                <button key={`${item}-${index}`} onClick={onOpenItems}>
+                <button key={`${item}-${index}`} onClick={() => onOpenItems(item)}>
                   <img src={ITEMS[item].image} alt="" />
                   {ITEMS[item].name}
                 </button>

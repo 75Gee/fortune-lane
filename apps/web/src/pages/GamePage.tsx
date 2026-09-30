@@ -1,4 +1,4 @@
-import type { GameCommand, GameEvent, GameView } from '@fortune/game'
+import type { GameCommand, GameEvent, GameView, ItemKind } from '@fortune/game'
 import type { RoomSnapshot } from '@fortune/protocol'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { DicePresentation } from '../board/DicePresentation.js'
@@ -40,7 +40,7 @@ interface GamePageProps {
 type Panel =
   | { type: 'info'; tab: InfoTab; owner: string }
   | { type: 'tile'; index: number }
-  | { type: 'items' }
+  | { type: 'items'; item?: ItemKind }
   | { type: 'stocks' }
   | null
 
@@ -196,7 +196,7 @@ export function GamePage({
                 onCommand={onCommand}
                 busy={isPlaying || !canSend}
                 onManageAssets={openAssets}
-                onOpenItems={() => setPanel({ type: 'items' })}
+                onOpenItems={(item) => setPanel(item ? { type: 'items', item } : { type: 'items' })}
                 onWatch={decisionKey && !required ? () => setWatchedDecision(decisionKey) : undefined}
                 onSkipToLive={isPlaying && connected ? skipToLive : undefined}
                 waitingLabel={!connected ? '等待重连…' : commandPending ? '正在提交…' : '行动进行中…'}
@@ -244,6 +244,7 @@ export function GamePage({
 
         {panel?.type === 'items' && me && (
           <ItemInventory
+            initialItem={panel.item}
             game={game}
             playerId={playerId}
             available={available}

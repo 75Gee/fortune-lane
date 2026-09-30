@@ -349,167 +349,6 @@
     gap: 6px;
   }
 }
-.item-inventory {
-  width: min(620px, calc(100vw - 28px));
-  text-align: left;
-}
-.item-inventory .landing-dialog-head > button {
-  margin-left: auto;
-}
-.inventory-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  margin-block: 20px;
-}
-.inventory-grid > button {
-  display: grid;
-  gap: 6px;
-  padding: 6px 6px 10px;
-  border: 2px solid var(--line-soft);
-  border-radius: 10px;
-  background: var(--surface-raised);
-  color: var(--text-secondary);
-}
-.inventory-grid > button.selected {
-  border-color: var(--positive);
-  background: var(--surface-muted);
-}
-.inventory-grid > button.empty:not(.selected) {
-  color: var(--text-muted);
-}
-.inventory-grid img {
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: contain;
-  border-radius: 6px;
-}
-.inventory-grid strong {
-  font-size: 13px;
-}
-.inventory-grid small {
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-}
-.item-selection {
-  border-top: 1px solid var(--line-soft);
-  padding-top: 14px;
-}
-.item-selection h3 {
-  margin: 0;
-  font-size: 17px;
-}
-.item-selection > p,
-.item-catalog p {
-  line-height: 1.7;
-  font-size: 13px;
-  color: var(--text-muted);
-}
-.item-targets {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  margin-block: 14px;
-}
-.item-targets button {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  min-height: 64px;
-  padding: 8px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  text-align: left;
-  background: var(--surface-raised);
-}
-.item-targets img {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-}
-.item-targets span {
-  display: grid;
-  gap: 5px;
-  min-width: 0;
-}
-.item-targets strong {
-  font-size: 13px;
-  overflow-wrap: anywhere;
-}
-.item-targets small {
-  font-size: 11px;
-  color: var(--text-muted);
-}
-.item-targets button[aria-pressed='true'],
-.chosen-values button[aria-pressed='true'] {
-  background: var(--surface-subtle);
-  border-color: var(--positive);
-  color: var(--positive);
-}
-.chosen-values {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 8px;
-  margin-block: 16px;
-}
-.chosen-values button {
-  min-height: 52px;
-  padding: 8px 4px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface-raised);
-  color: var(--text-secondary);
-  font-size: 23px;
-  font-weight: 700;
-}
-.chosen-values small {
-  font-size: 10px;
-  margin-left: 3px;
-  font-weight: 400;
-}
-.item-selection > .item-preview,
-.item-status {
-  padding: 10px 12px;
-  border-radius: 6px;
-  background: var(--surface-subtle);
-  color: var(--text-secondary);
-  font-size: 12px;
-  line-height: 1.7;
-}
-.item-use {
-  width: 100%;
-  margin-top: 10px;
-  min-height: 46px;
-}
-.item-catalog {
-  padding: 16px;
-  text-align: left;
-}
-.item-catalog h3 {
-  margin: 0;
-  font-size: 16px;
-}
-.item-catalog article {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  padding-block: 12px;
-  border-bottom: 1px solid var(--line-soft);
-}
-.item-catalog article img {
-  width: 70px;
-  height: 70px;
-  object-fit: contain;
-  border-radius: 8px;
-  flex-shrink: 0;
-}
-.item-catalog article strong {
-  font-size: 14px;
-}
-.item-catalog article p {
-  margin: 5px 0 0;
-  font-size: 12px;
-}
 .activity-item {
   display: flex;
   gap: 9px;
@@ -530,27 +369,6 @@
 .route-stop .route-hazard {
   color: var(--accent);
   font-weight: 650;
-}
-@media (max-width: 800px) {
-  .item-inventory {
-    padding: 20px 15px;
-  }
-  .inventory-grid {
-    gap: 6px;
-  }
-  .inventory-grid strong {
-    font-size: 11px;
-  }
-  .item-targets {
-    gap: 6px;
-  }
-  .item-targets button {
-    gap: 5px;
-  }
-  .item-targets img {
-    width: 28px;
-    height: 28px;
-  }
 }
 
 .model-gallery {
@@ -689,8 +507,7 @@
 .landing-dialog {
   position: relative;
 }
-.deed-rates,
-.item-rules {
+.deed-rates {
   margin-top: 16px;
   padding-top: 12px;
   border-top: 1px solid var(--line-soft);
@@ -698,20 +515,9 @@
   color: var(--text-muted);
   font-size: 12px;
 }
-.deed-rates summary,
-.item-rules summary {
+.deed-rates summary {
   cursor: pointer;
   padding: 4px 0;
-}
-.item-rules p {
-  line-height: 1.7;
-}
-.inventory-grid {
-  grid-template-columns: repeat(auto-fit, minmax(82px, 112px));
-  justify-content: start;
-}
-.inventory-grid img {
-  max-height: 82px;
 }
 .property-landing-dialog .landing-price {
   font-variant-numeric: tabular-nums;
@@ -765,38 +571,10 @@
 .lobby-status {
   color: var(--text-muted);
 }
-@media (max-width: 800px) {
-  .inventory-grid {
-    grid-template-columns: repeat(auto-fit, minmax(74px, 1fr));
-  }
-}
-
-.item-inventory {
-  padding: 0 24px 24px;
-}
-.item-inventory .landing-dialog-head {
-  margin-inline: -24px;
-}
-.item-inventory > .choice-hint {
-  margin: 12px 0;
-  padding: 0;
-}
-.item-inventory .inventory-grid {
-  margin-block: 16px;
-}
 .entry-fields > .primary-command {
   width: 100%;
   min-height: 52px;
   justify-content: space-between;
-}
-@media (max-width: 800px) {
-  .item-inventory {
-    width: 100%;
-    padding: 0 16px max(16px, env(safe-area-inset-bottom));
-  }
-  .item-inventory .landing-dialog-head {
-    margin-inline: -16px;
-  }
 }
 
 .property-landing-dialog .deed-rates {
@@ -916,34 +694,4 @@
   width: 100%;
   margin-top: 5px;
   font-size: 13px;
-}
-.item-placements {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 6px;
-  margin-top: 18px;
-}
-.item-placements button {
-  display: grid;
-  align-content: center;
-  gap: 8px;
-  min-height: 98px;
-  padding: 10px 3px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--surface-muted);
-}
-.item-placements button[aria-pressed='true'] {
-  border-color: var(--positive);
-  background: var(--surface-subtle);
-  box-shadow: inset 0 0 0 1px #43835b;
-}
-.item-placements small,
-.item-placements span {
-  font-size: 10px;
-  color: var(--text-muted);
-}
-.item-placements strong {
-  font-size: 12px;
-  overflow-wrap: anywhere;
 }

@@ -12,9 +12,6 @@
   padding-top: 12px;
   border-top: 1px solid var(--ui-line);
 }
-.catalog-disclosure .item-catalog {
-  padding-inline: 0;
-}
 
 /* Edit each asset beside its proceeds, with one payment summary. */
 .liquidation-planner .portfolio-debt p {
@@ -379,67 +376,6 @@
   font-size: 13px;
   line-height: 1.7;
 }
-.item-inventory .inventory-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-.item-inventory .inventory-grid > button {
-  grid-template-columns: 38px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 6px;
-  padding: 8px;
-  min-height: 60px;
-  border-width: 1px;
-  border-radius: 6px;
-  text-align: left;
-}
-.item-inventory .inventory-grid img {
-  width: 38px;
-  height: 38px;
-}
-.item-inventory .inventory-grid strong {
-  font-size: 13px;
-}
-.item-inventory .inventory-grid small {
-  color: var(--ui-muted);
-}
-.item-inventory .item-selection {
-  padding-top: 0;
-  border-top: 0;
-}
-.item-inventory .item-effect {
-  margin: 18px 0 12px;
-}
-.item-inventory .item-targets button {
-  min-height: 56px;
-}
-.item-inventory .item-placements {
-  margin-top: 12px;
-}
-.item-inventory .item-selection > p {
-  font-size: 13px;
-  line-height: 1.65;
-  color: var(--ui-muted);
-}
-.item-inventory .item-selection > .item-preview.is-warning {
-  background: var(--surface-warm);
-  color: var(--gold-ink);
-}
-.item-confirm {
-  position: sticky;
-  bottom: 0;
-  z-index: 2;
-  padding: 10px 0;
-  background: var(--surface);
-}
-.item-confirm .item-use {
-  margin-top: 0;
-  min-height: 44px;
-}
-.item-inventory .item-rules {
-  margin-top: 4px;
-  color: var(--ui-muted);
-}
 .wheel-previous {
   margin: 16px 24px 0;
   color: var(--ui-muted);
@@ -604,25 +540,5 @@
     max-width: 108px;
     font-size: 11px;
     line-height: 1.5;
-  }
-  .item-placements {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .item-placements button {
-    min-height: 74px;
-  }
-}
-@media (max-width: 360px) {
-  .item-inventory .inventory-grid > button {
-    grid-template-columns: 30px minmax(0, 1fr) auto;
-    gap: 4px;
-    padding: 6px;
-  }
-  .item-inventory .inventory-grid img {
-    width: 30px;
-    height: 30px;
-  }
-  .item-inventory .inventory-grid strong {
-    font-size: 12px;
   }
 }
