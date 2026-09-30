@@ -734,19 +734,8 @@ h2 {
   color: var(--muted);
   line-height: 1.8;
 }
-.rent-notice {
-  margin: 0;
-  padding: 12px 20px;
-  background: var(--gold-soft);
-  color: var(--gold-ink);
-  font-size: 12px;
-  line-height: 1.6;
-}
 .landing-dialog.wheel-dialog {
   width: min(500px, 100%);
-}
-.wheel-dialog .landing-dialog-head {
-  padding: 18px 24px;
 }
 .wheel-outcome {
   min-height: 66px;
@@ -761,40 +750,6 @@ h2 {
   margin: 7px 0 0;
   font-size: 12px;
   color: var(--muted);
-}
-.wheel-properties {
-  display: grid;
-  gap: 0;
-  max-height: 180px;
-  overflow-y: auto;
-  margin: 8px 20px 20px;
-  border-top: 1px solid var(--line);
-}
-.wheel-properties button {
-  display: grid;
-  grid-template-columns: 20px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
-  min-height: 52px;
-  padding: 10px 6px;
-  border: 0;
-  border-bottom: 1px solid var(--line);
-  background: var(--surface);
-  text-align: left;
-}
-.wheel-properties button:hover:not(:disabled) {
-  background: var(--surface-muted);
-}
-.wheel-properties strong {
-  font-size: 13px;
-  overflow-wrap: anywhere;
-}
-.wheel-properties span {
-  font-size: 12px;
-  color: var(--muted);
-}
-.wheel-properties svg {
-  color: var(--green);
 }
 .panel-backdrop {
   display: none;
@@ -835,129 +790,6 @@ h2 {
   border-radius: 8px;
   box-shadow: 0 24px 80px #1f2a4430;
 }
-.landing-dialog-head {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 24px;
-  border-bottom: 1px solid var(--line);
-}
-.landing-dialog-head > span:not(.turn-clock) {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  background: var(--surface-sunken);
-  color: var(--green);
-  border-radius: 50%;
-}
-.landing-dialog-head > div {
-  min-width: 0;
-}
-.landing-dialog-head small {
-  color: var(--muted);
-  font-size: 12px;
-}
-.landing-dialog-head h2 {
-  font-size: 24px;
-  margin: 5px 0 0;
-}
-.landing-price {
-  margin-left: auto;
-  font-size: 23px;
-  flex-shrink: 0;
-}
-.landing-deed-summary {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 22px;
-  padding: 24px;
-}
-.landing-deed-summary > div,
-.deed-summary > div {
-  display: grid;
-  gap: 7px;
-}
-.landing-deed-summary span,
-.deed-summary span {
-  color: var(--muted);
-  font-size: 12px;
-}
-.landing-deed-summary strong {
-  font-size: 16px;
-  overflow-wrap: anywhere;
-}
-.landing-rent-track {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 4px;
-  padding: 0 24px 24px;
-}
-.landing-rent-track > div {
-  display: grid;
-  justify-items: center;
-  gap: 5px;
-  min-width: 0;
-  padding: 10px 3px;
-  background: var(--surface-page);
-  border-radius: 4px;
-}
-.landing-rent-track span {
-  font-size: 10px;
-  color: var(--muted);
-}
-.landing-rent-track strong {
-  max-width: 100%;
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
-  text-align: center;
-}
-.landing-rent-track > div.current {
-  background: var(--accent-soft);
-  color: var(--green);
-}
-.landing-rent-track > div.next {
-  background: var(--gold-soft);
-  color: var(--gold-ink);
-}
-.rent-tier-label {
-  display: flex;
-  align-items: center;
-  min-height: 20px;
-}
-.landing-rent-track .building-icons svg {
-  width: 13px;
-}
-.landing-actions {
-  position: sticky;
-  bottom: 0;
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 10px;
-  padding: 18px 24px 24px;
-  background: var(--surface);
-  border-top: 1px solid var(--line);
-}
-.landing-actions button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--surface);
-  font-size: 14px;
-  font-weight: 700;
-}
-.landing-actions button.accept {
-  background: var(--green);
-  border-color: var(--green);
-  color: var(--text-on-accent);
-}
 .deck-chance {
   --deck-color: #936707;
   --deck-paper: #ffc632;
@@ -971,16 +803,6 @@ h2 {
 .card-deck-symbol {
   display: inline-block;
   vertical-align: middle;
-}
-.card-choice-dialog .landing-dialog-head > span:not(.turn-clock) {
-  background: var(--deck-soft);
-  color: var(--deck-color);
-}
-.card-choice-dialog .landing-dialog-head > .turn-clock {
-  width: auto;
-  height: auto;
-  margin-left: auto;
-  background: transparent;
 }
 .card-library .segmented button {
   color: var(--deck-color);
@@ -997,25 +819,6 @@ h2 {
 .activity-card-deck svg {
   margin-top: 2px;
 }
-.card-choice-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-  padding: 30px;
-}
-.card-back-button {
-  display: grid;
-  gap: 12px;
-  border: 0;
-  border-radius: 7px;
-  padding: 0;
-  background: transparent;
-  min-width: 0;
-}
-.card-back-button:disabled {
-  opacity: 1;
-  cursor: default;
-}
 .travel-card-back {
   display: block;
   width: 100%;
@@ -1023,41 +826,6 @@ h2 {
   aspect-ratio: 8 / 11;
   object-fit: contain;
   transition: transform 0.2s;
-}
-.card-choice-caption {
-  color: var(--muted);
-  font-size: 12px;
-  text-align: center;
-}
-.card-choice-deadline {
-  margin: -6px 24px 20px;
-  color: var(--muted);
-  font-size: 11px;
-  text-align: center;
-}
-.card-back-button:not(:disabled):hover .travel-card-back {
-  transform: translateY(-6px) rotate(-2deg);
-}
-.card-back-button:focus-visible {
-  outline-color: var(--deck-color);
-  outline-offset: 5px;
-}
-.choice-hint {
-  margin: 0;
-  padding: 0 24px 24px;
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.6;
-}
-.deed-summary {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
-  padding: 20px;
-}
-.deed-summary strong {
-  font-size: 14px;
-  overflow-wrap: anywhere;
 }
 .connection-banner {
   position: fixed;
@@ -1298,15 +1066,6 @@ h2 {
     border-radius: 8px 8px 0 0;
     padding-bottom: env(safe-area-inset-bottom);
   }
-  .landing-dialog-head {
-    padding: 20px;
-  }
-  .landing-deed-summary {
-    padding: 20px;
-  }
-  .landing-actions {
-    padding: 16px 20px 20px;
-  }
 }
 @media (max-width: 430px) {
   .entry-header {
@@ -1390,28 +1149,6 @@ h2 {
     height: 28px;
     font-size: 24px;
     border-radius: 5px;
-  }
-  .landing-dialog-head {
-    gap: 10px;
-    padding: 18px;
-  }
-  .landing-dialog-head > span:not(.turn-clock) {
-    width: 36px;
-    height: 36px;
-  }
-  .landing-dialog-head h2 {
-    font-size: 21px;
-  }
-  .landing-price {
-    font-size: 20px;
-  }
-  .landing-rent-track {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    padding: 0 20px 20px;
-  }
-  .card-choice-grid {
-    padding: 24px 18px;
-    gap: 10px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

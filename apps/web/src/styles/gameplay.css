@@ -199,21 +199,6 @@
   background: var(--surface-muted);
   font-size: 13px;
 }
-.decision-timing {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  background: var(--surface-muted);
-  color: var(--text-muted);
-  font-size: 12px;
-  line-height: 1.6;
-}
-.decision-timing .turn-clock {
-  font-size: 13px;
-}
 .portfolio-debt {
   margin: 10px 16px;
   padding: 14px;
@@ -246,10 +231,6 @@
   }
   .activity-entry p {
     font-size: 13px;
-  }
-  .decision-timing {
-    font-size: 11px;
-    padding: 8px 12px;
   }
 }
 @media (max-height: 620px) and (min-width: 801px) {
@@ -499,37 +480,8 @@
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
-.decision-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
 .landing-dialog {
   position: relative;
-}
-.deed-rates {
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line-soft);
-  text-align: left;
-  color: var(--text-muted);
-  font-size: 12px;
-}
-.deed-rates summary {
-  cursor: pointer;
-  padding: 4px 0;
-}
-.property-landing-dialog .landing-price {
-  font-variant-numeric: tabular-nums;
-  color: var(--text-secondary);
-}
-.property-landing-dialog .landing-deed-summary {
-  margin: 20px 0;
-}
-.decision-timing {
-  background: transparent;
-  padding: 6px 0;
-  color: var(--text-muted);
 }
 .entry-screen,
 .lobby-screen {
@@ -575,10 +527,6 @@
   width: 100%;
   min-height: 52px;
   justify-content: space-between;
-}
-
-.property-landing-dialog .deed-rates {
-  margin-inline: 20px;
 }
 
 /* Eight readable sectors, with a moving pointer and one central start control. */
@@ -653,9 +601,6 @@
 .wheel-dialog .wheel-outcome {
   min-height: 50px;
   padding-top: 8px;
-}
-.wheel-dialog > .decision-timing {
-  margin: 0 16px 18px;
 }
 @keyframes wheel-light {
   to {

@@ -19,10 +19,15 @@ export function PropertyDecision({
   game,
   playerId,
   onCommand,
+  waitingFor,
+  onClose,
 }: {
   game: GameView
   playerId: string
   onCommand: (command: GameCommand) => void
+  /** Spectator view: name of the deciding player; commands are replaced by a waiting note. */
+  waitingFor?: string | undefined
+  onClose?: (() => void) | undefined
 }) {
   const decision = game.pendingDecision!
   const purchase = decision.type === 'purchase'
@@ -92,27 +97,38 @@ export function PropertyDecision({
           <span className={styles.label}>{purchase ? '地价' : '升级费用'}</span>
           <div className={styles.price}>{formatMoney(quote.amount)}</div>
         </div>
-        <div className={styles.commands}>
-          <Button
-            variant="primary"
-            size="lg"
-            disabled={!quote.allowed}
-            title={quote.reason ?? undefined}
-            onClick={() => onCommand({ type: action, stockFunding: quote.payment.stockFunding })}
-          >
-            {quote.allowed && quote.payment.stockFunding ? '卖股并' : ''}
-            {purchase ? '购买' : '升级'}
-            <span className={styles.mobileOnly}> {formatMoney(quote.amount)}</span>
-          </Button>
-          <Button
-            variant="outline"
-            className={styles.secondaryCommand}
-            onClick={() => onCommand({ type: purchase ? 'SKIP_PURCHASE' : 'SKIP_UPGRADE' })}
-          >
-            {purchase ? '交给竞拍' : '暂不升级'}
-          </Button>
-          <span className={styles.hint}>{purchase ? '超时将交由其他玩家竞拍' : '超时暂不升级'}</span>
-        </div>
+        {waitingFor ? (
+          <div className={styles.commands}>
+            <span className={styles.hint}>等待 {waitingFor} 作出决定</span>
+            {onClose && (
+              <Button variant="outline" onClick={onClose}>
+                关闭
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className={styles.commands}>
+            <Button
+              variant="primary"
+              size="lg"
+              disabled={!quote.allowed}
+              title={quote.reason ?? undefined}
+              onClick={() => onCommand({ type: action, stockFunding: quote.payment.stockFunding })}
+            >
+              {quote.allowed && quote.payment.stockFunding ? '卖股并' : ''}
+              {purchase ? '购买' : '升级'}
+              <span className={styles.mobileOnly}> {formatMoney(quote.amount)}</span>
+            </Button>
+            <Button
+              variant="outline"
+              className={styles.secondaryCommand}
+              onClick={() => onCommand({ type: purchase ? 'SKIP_PURCHASE' : 'SKIP_UPGRADE' })}
+            >
+              {purchase ? '交给竞拍' : '暂不升级'}
+            </Button>
+            <span className={styles.hint}>{purchase ? '超时将交由其他玩家竞拍' : '超时暂不升级'}</span>
+          </div>
+        )}
       </div>
     </section>
   )

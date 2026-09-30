@@ -41,6 +41,9 @@ const scenes = [
   { name: 'auction-bid', url: `${game}&decision=auction&viewer=muzi` },
   { name: 'decision-debt', url: `${game}&decision=debt` },
   { name: 'card-chance', url: `${game}&deck=chance` },
+  { name: 'card-wheel', url: `${game}&card=chance-wheel-one` },
+  { name: 'card-downgrade', url: `${game}&card=fate-downgrade` },
+  { name: 'watch-purchase', url: `${game}&decision=purchase&viewer=alan`, click: ['text=查看'] },
   { name: 'card-fate', url: `${game}&deck=fate` },
   { name: 'result', url: `${game}&result` },
 ]

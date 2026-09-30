@@ -376,30 +376,6 @@
   font-size: 13px;
   line-height: 1.7;
 }
-.wheel-previous {
-  margin: 16px 24px 0;
-  color: var(--ui-muted);
-  font-size: 12px;
-}
-.wheel-previous > summary {
-  cursor: pointer;
-}
-.card-property-dialog > p {
-  margin: 16px 20px;
-  font-size: 13px;
-  color: var(--ui-muted);
-  line-height: 1.7;
-}
-.wheel-properties button > span {
-  display: grid;
-  gap: 4px;
-  text-align: right;
-}
-.wheel-properties button > span small {
-  font-size: 11px;
-  color: var(--ui-muted);
-  font-weight: 400;
-}
 .activity-entry-meta > span {
   color: var(--ui-muted);
 }
