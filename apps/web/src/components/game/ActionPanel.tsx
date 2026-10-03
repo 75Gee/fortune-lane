@@ -215,7 +215,9 @@ export function ActionPanel({
     return (
       <Ticket
         compact
-        phone={canUseItem || turtle ? 'foldable' : 'title'}
+        // Phones skip the heading: the travellers row already marks whose turn it is and the
+        // button says what to do. What stays is what to prepare before rolling, if anything.
+        phone={canUseItem || turtle ? 'full' : 'bare'}
         stub={
           <Button
             variant="primary"
@@ -227,12 +229,12 @@ export function ActionPanel({
           </Button>
         }
       >
-        <span className={styles.eyebrow}>当前位置 · {getTile(me.position).name}</span>
-        <h2 className={styles.title}>轮到你了</h2>
+        <span className={`${styles.eyebrow} ${styles.wideOnly}`}>当前位置 · {getTile(me.position).name}</span>
+        <h2 className={`${styles.title} ${styles.wideOnly}`}>轮到你了</h2>
         {turtle && <p className={styles.note}>乌龟效果：本次只掷一颗骰子，剩余 {me.turtleRollsRemaining} 次</p>}
         {canUseItem && (
           <div>
-            <span className={styles.label}>出发前可使用 1 张道具</span>
+            <span className={`${styles.label} ${styles.wideOnly}`}>出发前可使用 1 张道具</span>
             <div className={styles.items}>
               {me.items.slice(0, 3).map((item, index) => (
                 <button key={`${item}-${index}`} onClick={() => onOpenItems(item)}>
@@ -252,16 +254,19 @@ export function ActionPanel({
     const difference = Math.max(0, debt.amount - me.cash)
     const payment = stockPaymentQuote(game, playerId, debt.amount)
     const creditor = game.players.find((player) => player.id === debt.creditorId)?.name ?? '银行'
+    // Short of cash, raising money is the way forward, so it takes the primary slot.
+    const short = !payment.allowed
     return (
       <Ticket
         phone="full"
         stub={
           <div className={styles.commands}>
             <Button
-              variant="primary"
+              variant={short ? 'outline' : 'primary'}
               size="lg"
+              className={short ? styles.secondaryCommand : undefined}
               icon={<CircleDollarSign size={18} />}
-              disabled={!payment.allowed}
+              disabled={short}
               onClick={() =>
                 onCommand(
                   payment.stockFunding
@@ -272,7 +277,13 @@ export function ActionPanel({
             >
               {payment.stockFunding && payment.allowed ? '卖股并付款' : '支付欠款'}
             </Button>
-            <Button variant="outline" icon={<Building2 size={17} />} onClick={onManageAssets}>
+            <Button
+              variant={short ? 'primary' : 'outline'}
+              size="lg"
+              className={short ? undefined : styles.secondaryCommand}
+              icon={<Building2 size={17} />}
+              onClick={onManageAssets}
+            >
               筹款 / 管理资产
             </Button>
             <button className={styles.giveUp} onClick={() => onCommand({ type: 'DECLARE_BANKRUPTCY' })}>

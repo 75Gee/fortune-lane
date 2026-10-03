@@ -508,93 +508,135 @@
 }
 
 @media (max-width: 800px) {
-  /* One row up top: round and clock, the travellers, the menu. */
+  /* One 44px row up top: round and clock, the travellers, the menu — all on the floating surface. */
   .top {
     top: calc(var(--space-2) + env(safe-area-inset-top));
-    left: var(--space-2);
-    right: var(--space-2);
+    left: var(--gutter);
+    right: var(--gutter);
+    height: 44px;
     align-items: stretch;
     gap: 6px;
+  }
+  .top .panel {
+    border: var(--float-border);
+    border-radius: var(--float-radius);
+    background: var(--float-bg);
+    box-shadow: var(--float-shadow);
   }
   .lead {
     flex: none;
   }
+  /* Round number over the countdown; the label only shows when no clock is running. */
   .ticket {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 3px;
-    min-width: 54px;
-    height: 100%;
-    padding: 4px 6px 8px;
+    width: 44px;
+    height: 44px;
+    padding: 0 0 3px;
   }
   .round {
     padding: 0;
     border-right: 0;
     align-items: center;
+    gap: 0;
   }
   .round small {
     font-size: var(--text-2xs);
+    line-height: 1.1;
+  }
+  .ticket:has(.clock) .round small {
+    display: none;
   }
   .round strong {
-    font-size: var(--text-xl);
+    font-size: var(--type-strong);
   }
-  /* The bottom sheet already says whose move it is and what it is. */
   .ticketBody {
     display: none;
   }
-  .clock {
+  .clock,
+  .urgentTicket .clock {
     margin: 0;
-    padding: 1px 6px;
-    font-size: var(--text-xs);
+    padding: 0;
+    background: none;
+    color: var(--text-muted);
+    font-size: var(--type-meta);
+    line-height: 1.2;
+  }
+  .urgentTicket .clock {
+    color: var(--accent);
   }
   .clock svg {
     display: none;
+  }
+  .timeBar {
+    height: 3px;
   }
   .trail {
     flex: 1;
     align-items: stretch;
     gap: 6px;
+    min-width: 0;
   }
   .rail {
     flex: 1;
-    display: grid;
-    grid-auto-columns: minmax(0, 1fr);
-    grid-auto-flow: column;
-    gap: 2px;
-    padding: 3px;
-    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    justify-content: space-around;
+    gap: 0;
+    padding: 0 2px;
   }
-  .traveller {
+  /* The current traveller is marked by a ring on their token, not a box. */
+  .traveller,
+  .traveller.isCurrent {
+    flex: 1 1 0;
     flex-direction: column;
     justify-content: center;
-    gap: 1px;
-    min-height: 50px;
-    padding: 3px 0;
+    gap: 2px;
+    min-width: 0;
+    max-width: 80px;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
     text-align: center;
   }
   .token {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     border-width: 2px;
   }
+  .traveller.isCurrent .token {
+    box-shadow:
+      0 0 0 2px var(--float-bg),
+      0 0 0 3.5px var(--accent);
+  }
   .token img {
-    width: 19px;
-    height: 19px;
+    width: 16px;
+    height: 16px;
+  }
+  .tokenBadge {
+    right: -8px;
+    bottom: -5px;
   }
   .tokenBadge img {
-    width: 15px;
-    height: 15px;
+    width: 13px;
+    height: 13px;
+  }
+  .tokenBadge b {
+    font-size: 9px;
   }
   .travellerText span {
-    font-size: var(--text-2xs);
+    font-size: var(--type-meta);
+    line-height: 1.1;
+  }
+  .traveller.isCurrent .travellerText span {
+    font-weight: var(--weight-semibold);
   }
   .menu {
     display: flex;
   }
   .menuButton {
-    width: 40px;
-    height: auto;
+    width: 44px;
+    height: 44px;
   }
 
   /* The action sheet, then one slim line of my cash, stocks and items. */
@@ -607,6 +649,9 @@
       'action'
       'wallet';
     row-gap: 0;
+  }
+  .wideOnly {
+    display: none;
   }
   .wallet {
     /* Stock value carries a percentage too; the item count needs little room. */
@@ -627,7 +672,7 @@
     display: flex;
     flex-direction: row;
     align-items: baseline;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 6px;
     grid-column: auto;
     min-width: 0;
@@ -637,7 +682,7 @@
   .wallet .walletItems {
     align-items: center;
     min-height: 36px;
-    padding: 0 6px;
+    padding: 0 var(--pad);
     border: 0;
     color: var(--text-on-ink);
   }
@@ -683,8 +728,8 @@
   .activity {
     position: fixed;
     top: calc(var(--hud-top, 70px) + var(--space-2));
-    left: var(--space-2);
-    right: 56px;
+    left: var(--gutter);
+    right: calc(var(--gutter) + var(--icon-button) + var(--space-2));
     animation: toast 4.5s var(--ease-out) forwards;
   }
   .moveResult {
@@ -891,8 +936,8 @@
   /* Phones have one toast slot under the top row; a money notice takes it over from the activity line. */
   .notice {
     top: calc(var(--hud-top, 70px) + var(--space-2));
-    left: var(--space-2);
-    right: 56px;
+    left: var(--gutter);
+    right: calc(var(--gutter) + var(--icon-button) + var(--space-2));
     gap: 8px;
     max-width: none;
     min-height: 36px;

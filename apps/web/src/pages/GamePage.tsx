@@ -1,6 +1,6 @@
 import type { GameCommand, GameEvent, GameView, ItemKind } from '@fortune/game'
 import type { RoomSnapshot } from '@fortune/protocol'
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { DicePresentation } from '../board/DicePresentation.js'
 import { GameBoard } from '../board/GameBoard.js'
 import { useGamePresentation } from '../board/useGamePresentation.js'
@@ -67,6 +67,16 @@ export function GamePage({
     topRef = useRef<HTMLElement>(null),
     bottomRef = useRef<HTMLElement>(null)
   const viewInsets = useHudInsets(shellRef, topRef, bottomRef)
+  // On the root, not the shell: reactions and dialogs render into <body> but still dodge the HUD.
+  useEffect(() => {
+    const root = document.documentElement.style
+    root.setProperty('--hud-top', `${viewInsets?.top ?? 70}px`)
+    root.setProperty('--hud-bottom', `${viewInsets?.bottom ?? 160}px`)
+    return () => {
+      root.removeProperty('--hud-top')
+      root.removeProperty('--hud-bottom')
+    }
+  }, [viewInsets])
   // Phones open each new action folded; dragging the board folds it again.
   const [sheetFolded, setSheetFolded] = useState(true)
   const sheetFold = useMemo(() => ({ folded: sheetFolded, setFolded: setSheetFolded }), [sheetFolded])
@@ -136,16 +146,7 @@ export function GamePage({
 
   return (
     <CommandAvailabilityContext.Provider value={available}>
-      <main
-        className={styles.shell}
-        ref={shellRef}
-        style={
-          {
-            '--hud-top': `${viewInsets?.top ?? 70}px`,
-            '--hud-bottom': `${viewInsets?.bottom ?? 160}px`,
-          } as CSSProperties
-        }
-      >
+      <main className={styles.shell} ref={shellRef}>
         <div className={styles.board}>
           <GameBoard
             active

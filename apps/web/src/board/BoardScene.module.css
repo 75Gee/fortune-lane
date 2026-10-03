@@ -131,25 +131,49 @@
 
 @media (max-width: 800px) {
   .location {
-    left: var(--space-3);
+    top: calc(var(--inset-top) + var(--space-2));
+    left: var(--gutter);
   }
   /* The turn strip already names the action; keep only hazard warnings on phones. */
   .location strong {
     display: none;
   }
-  /* Pinch zooms on phones; only overview and quarter turns keep a button. */
+  /*
+   * A column of round floating buttons under the top row. Pinch zooms, so only overview and
+   * quarter turns stay; 回到棋子 joins the top of the column, in the accent colour, once the
+   * player has moved the view.
+   */
   .tools {
     top: calc(var(--inset-top) + var(--space-2));
-    right: var(--space-3);
+    right: var(--gutter);
     transform: none;
-    padding: 2px;
-    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    gap: var(--space-2);
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
   }
   .tools button {
-    width: 36px;
-    height: 36px;
+    width: var(--icon-button);
+    height: var(--icon-button);
+    border: var(--float-border);
+    border-radius: 50%;
+    background: var(--float-bg);
+    box-shadow: var(--float-shadow);
   }
-  .tools .wideOnly {
+  .tools button svg {
+    width: 17px;
+    height: 17px;
+  }
+  .tools .wideOnly,
+  .tools .follow,
+  .backToToken {
     display: none;
+  }
+  .tools .follow.detached {
+    display: grid;
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--text-on-accent);
   }
 }

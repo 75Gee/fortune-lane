@@ -23,7 +23,15 @@ export function Wallet({ game, playerId, onOpenAssets, onOpenStocks, onOpenItems
   return (
     <nav className={`${styles.panel} ${styles.wallet}`} aria-label="我的资源" data-stocks={stocks ? 'true' : 'false'}>
       <button className={styles.walletCash} aria-label="我的资产" onClick={onOpenAssets}>
-        <small>{me?.isBankrupt ? '观战中' : '我的现金'}</small>
+        <small>
+          {me?.isBankrupt ? (
+            '观战中'
+          ) : (
+            <>
+              <span className={styles.wideOnly}>我的</span>现金
+            </>
+          )}
+        </small>
         <strong>{formatMoney(me?.cash ?? 0)}</strong>
         <span className={styles.walletMore}>资产详情 ›</span>
         <DeltaFloat deltas={deltas} />
@@ -34,7 +42,9 @@ export function Wallet({ game, playerId, onOpenAssets, onOpenStocks, onOpenItems
           aria-label={`打开股市，持仓市值 ${formatMoney(stocks.marketValue)}，持仓涨跌 ${stockPercent(stocks.returnRate)}`}
           onClick={onOpenStocks}
         >
-          <small>股票市值</small>
+          <small>
+            股票<span className={styles.wideOnly}>市值</span>
+          </small>
           <span className={styles.walletFigure}>
             <strong>{formatMoney(stocks.marketValue)}</strong>
             {stocks.returnRate !== null && <span className={tone}>{stockPercent(stocks.returnRate)}</span>}

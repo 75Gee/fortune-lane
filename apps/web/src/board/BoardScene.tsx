@@ -84,9 +84,9 @@ export default function BoardScene(props: BoardSceneProps) {
           )}
           <div className={styles.tools} role="group" aria-label="场景视角">
             <button
-              className={styles.wideOnly}
-              title="跟随棋子"
-              aria-label="跟随棋子"
+              className={`${styles.follow} ${mode === 'free' ? styles.detached : ''}`}
+              title="回到棋子"
+              aria-label="回到棋子"
               aria-pressed={mode === 'follow'}
               onClick={() => navigate('follow')}
             >

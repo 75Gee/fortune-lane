@@ -216,13 +216,22 @@
 .reaction-ui:not(.in-dialog) {
   bottom: 270px;
 }
+/* Phones: bottom of the right-hand column, just above the action sheet. */
 @media (max-width: 800px) {
   .reaction-ui:not(.in-dialog) {
-    top: 200px;
-    right: 12px;
-    bottom: auto;
+    top: auto;
+    right: var(--gutter);
+    bottom: calc(var(--hud-bottom, 160px) + var(--space-2));
     left: auto;
     justify-items: end;
+  }
+  .reaction-trigger {
+    width: var(--icon-button);
+    height: var(--icon-button);
+  }
+  .reaction-trigger svg {
+    width: 17px;
+    height: 17px;
   }
 }
 @media (max-width: 800px) {
