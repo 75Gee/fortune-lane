@@ -181,9 +181,6 @@ export function GamePage({
               onOpenInfo={(tab) => openInfo(tab)}
               onSurrender={() => setConfirm('surrender')}
               onLeave={() => setConfirm('leave')}
-              itemCount={me?.items.length ?? 0}
-              onOpenItems={() => setPanel({ type: 'items' })}
-              onOpenStocks={game.stockMarket ? () => setPanel({ type: 'stocks' }) : undefined}
             />
           </div>
         </header>

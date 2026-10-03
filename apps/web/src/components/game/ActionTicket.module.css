@@ -405,11 +405,7 @@
     float: none;
     display: flex;
     width: calc(100% - 24px);
-    margin: 0 12px calc(10px + env(safe-area-inset-bottom));
-  }
-  .ticket,
-  .compact {
-    padding-bottom: env(safe-area-inset-bottom);
+    margin: 0 12px 10px;
   }
 
   .foldHandle {

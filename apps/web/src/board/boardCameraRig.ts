@@ -53,7 +53,7 @@ export function boardCameraRig(camera: THREE.PerspectiveCamera) {
     height = 1,
     virtualHeight = 1,
     following = true,
-    followZoom = 1,
+    zoomChosen = false,
     holding = false,
     settled = false
   const raycaster = new THREE.Raycaster(),
@@ -71,7 +71,7 @@ export function boardCameraRig(camera: THREE.PerspectiveCamera) {
     return (WORLD_SIZE * 1.05 * virtualHeight) / (2 * tanHalf() * Math.min(area.width, area.height))
   }
   const compact = () => width < 700
-  const followDistance = () => (compact() ? 30 : 26) * followZoom
+  const followDistance = () => (compact() ? 30 : 26)
   const maxDistance = () => Math.max(fitDistance() * 1.2, followDistance() * 1.5)
   const pitchAt = (distance: number) => {
     const follow = compact() ? 30 : 26
@@ -185,7 +185,8 @@ export function boardCameraRig(camera: THREE.PerspectiveCamera) {
       goal.x = anchor.x - inward.x * TILE_SIZE * FOLLOW_LEAD
       goal.z = anchor.z - inward.z * TILE_SIZE * FOLLOW_LEAD
       goal.yaw = current.yaw + shortestAngle(current.yaw, Math.atan2(inward.x, inward.z))
-      goal.distance = followDistance()
+      // Zoom is the player's own: following only pans and turns. The default applies until they first zoom.
+      if (!zoomChosen) goal.distance = followDistance()
       if (snap) Object.assign(current, goal)
     },
     startFollowing() {
@@ -199,6 +200,7 @@ export function boardCameraRig(camera: THREE.PerspectiveCamera) {
       goal.x = 0
       goal.z = 0
       goal.distance = fitDistance()
+      zoomChosen = true
       // Square the board to the screen so the whole loop reads at a glance.
       goal.yaw = Math.round(current.yaw / (Math.PI / 2)) * (Math.PI / 2)
     },
@@ -211,8 +213,8 @@ export function boardCameraRig(camera: THREE.PerspectiveCamera) {
     /** Button zoom: keeps following if it was, and centres on the focus. */
     zoomBy(factor: number) {
       settled = false
-      if (following) followZoom = THREE.MathUtils.clamp(followZoom * factor, MIN_DISTANCE / 26, 2.5)
-      else goal.distance = clampDistance(goal.distance * factor)
+      zoomChosen = true
+      goal.distance = clampDistance(goal.distance * factor)
     },
 
     // ---- direct manipulation: state moves with the fingers, no easing ----
@@ -234,6 +236,7 @@ export function boardCameraRig(camera: THREE.PerspectiveCamera) {
     },
     /** Zoom so the ground under (px, py) stays put. */
     zoomAt(distance: number, anchor: THREE.Vector3, px: number, py: number) {
+      zoomChosen = true
       current.distance = goal.distance = clampDistance(distance)
       anchorTo(anchor, px, py, false)
     },
