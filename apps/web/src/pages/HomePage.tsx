@@ -6,6 +6,7 @@ import { Brand } from '../components/Brand.js'
 import { SavedRoomsList } from '../components/SavedRoomsList.js'
 import { TokenImage } from '../components/TokenImage.js'
 import { TOKEN_META } from '../components/tokenMeta.js'
+import './HomePage.css'
 
 const DebugPanel = lazy(() => import('../components/DebugPanel.js'))
 

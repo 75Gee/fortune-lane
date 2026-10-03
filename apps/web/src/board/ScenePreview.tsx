@@ -3,6 +3,7 @@ import { publicGameState } from '@fortune/protocol'
 import { ArrowLeft, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import BoardScene from './BoardScene.js'
+import '../styles/dev.css'
 
 const previewLocations: Record<string, string> = {
   cairo: '开罗',

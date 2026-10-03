@@ -24,6 +24,8 @@ const game = '/?scene=game'
 const menu = '[aria-label="对局菜单"]'
 const scenes = [
   { name: 'home', url: '/' },
+  { name: 'lobby', url: '/?scene=lobby' },
+  { name: 'lobby-full', url: '/?scene=lobby&full' },
   { name: 'game', url: game },
   { name: 'game-settings', url: game, click: [menu] },
   { name: 'game-assets', url: game, click: ['[aria-label="我的资产"]'] },

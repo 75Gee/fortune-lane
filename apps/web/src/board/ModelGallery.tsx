@@ -4,6 +4,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { MODEL_ASSETS } from './ModelAssets.js'
 import { disposeScene } from './sceneUtils.js'
 import { contactShadows } from './ContactShadows.js'
+import '../styles/dev.css'
 
 function ModelView({ model }: { model: (typeof MODEL_ASSETS)[number] }) {
   const host = useRef<HTMLDivElement>(null)

@@ -3,6 +3,7 @@ import { Check, Copy, Crown, Link, LogOut, Play, Users } from 'lucide-react'
 import { useLayoutEffect, useState } from 'react'
 import { Brand } from '../components/Brand.js'
 import { TokenImage } from '../components/TokenImage.js'
+import './LobbyPage.css'
 
 interface LobbyPageProps {
   room: RoomSnapshot

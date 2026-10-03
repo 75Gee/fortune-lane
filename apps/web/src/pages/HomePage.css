@@ -1,0 +1,428 @@
+.entry-debug {
+  padding: 20px;
+  text-align: center;
+}
+.connection-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.entry-workspace {
+  position: relative;
+  isolation: isolate;
+  min-height: calc(100dvh - 72px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  align-items: center;
+  gap: 48px;
+  padding: 48px max(40px, calc((100% - 1200px) / 2));
+  overflow: hidden;
+  background: var(--surface-muted);
+}
+.entry-scene {
+  align-self: start;
+  padding-top: 26px;
+}
+.scene-board {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+.scene-board > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 55%;
+}
+.scene-caption {
+  max-width: 560px;
+  color: var(--text);
+}
+.scene-caption > span {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 8px 0;
+}
+.scene-caption h1 {
+  max-width: 520px;
+  font-size: 52px;
+  line-height: 1.18;
+  margin: 14px 0 16px;
+  text-shadow: 0 2px 18px #ffffffb3;
+}
+.scene-caption p {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  text-shadow: 0 1px 8px #fff;
+}
+.entry-form {
+  display: grid;
+  gap: 21px;
+  padding: 30px;
+}
+.room-code-input {
+  font-family: ui-monospace, monospace;
+}
+.token-picker {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.token-picker legend {
+  padding: 0;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 650;
+}
+.token-picker > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.token-picker button {
+  display: grid;
+  place-items: center;
+  gap: 3px;
+  min-width: 0;
+  padding: 8px 4px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface-page);
+  font-size: 11px;
+  color: var(--muted);
+}
+.token-picker button > span {
+  color: var(--ink);
+  font-weight: 650;
+}
+.token-picker button > small {
+  font-size: 10px;
+  line-height: 13px;
+}
+.token-picker img,
+.token-picker .token-fallback {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+.entry-form > .primary-command {
+  width: 100%;
+  min-height: 52px;
+  justify-content: space-between;
+}
+@media (max-width: 1100px) {
+  .entry-workspace {
+    grid-template-columns: minmax(0, 1fr) 370px;
+    padding: 32px;
+    gap: 30px;
+  }
+  .scene-caption h1 {
+    font-size: 40px;
+  }
+}
+@media (max-width: 800px) {
+  .entry-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-height: calc(100dvh - 64px);
+    padding: 0;
+    background: var(--surface-page);
+    overflow: visible;
+  }
+  .entry-scene {
+    position: relative;
+    isolation: isolate;
+    width: 100%;
+    min-height: 245px;
+    padding: 28px 24px 80px;
+  }
+  .scene-board {
+    overflow: hidden;
+  }
+  .scene-board > img {
+    object-position: center 50%;
+  }
+  .scene-caption h1 {
+    font-size: 34px;
+    margin: 10px 0 12px;
+    max-width: none;
+  }
+  .scene-caption p {
+    font-size: 15px;
+  }
+  .entry-form {
+    width: min(500px, calc(100% - 32px));
+    position: relative;
+    margin: -36px auto 32px;
+    padding: 24px;
+    gap: 20px;
+    background: var(--surface);
+  }
+  .token-picker > div {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+  }
+  .token-picker button {
+    height: 88px;
+    grid-template-rows: 35px 16px 13px;
+    padding: 7px 4px;
+  }
+  .token-picker img {
+    width: 32px;
+    height: 32px;
+  }
+}
+@media (max-width: 430px) {
+  .entry-header {
+    padding: 12px 16px;
+  }
+  .connection-pill {
+    font-size: 10px;
+    gap: 6px;
+  }
+  .entry-scene {
+    padding: 26px 20px 76px;
+  }
+  .scene-caption h1 {
+    font-size: 30px;
+  }
+  .entry-form {
+    padding: 22px 18px;
+  }
+  .token-picker > div {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+  }
+  .token-picker button {
+    height: 88px;
+  }
+  .token-picker img {
+    width: 35px;
+    height: 35px;
+  }
+}
+.resume-rooms {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.resume-rooms > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.resume-rooms > header > strong {
+  font-size: 14px;
+}
+.resume-rooms > header > small,
+.saved-room-resume small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.saved-room-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+.saved-room-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.saved-room-resume {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px 0;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: var(--green);
+}
+.saved-room-resume > span {
+  display: grid;
+  flex: 1;
+  gap: 5px;
+  min-width: 0;
+}
+.saved-room-resume strong {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.saved-room-resume > svg {
+  flex-shrink: 0;
+}
+.saved-room-remove {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--muted);
+}
+.saved-room-remove:hover {
+  background: var(--surface-subtle);
+  color: var(--ink);
+}
+.saved-room-more {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 5px;
+  color: var(--green);
+  background: var(--surface-muted);
+  font-size: 12px;
+}
+.saved-room-more[aria-expanded='true'] > svg {
+  transform: rotate(180deg);
+}
+.saved-room-list.is-expanded {
+  max-height: 260px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.saved-room-finished {
+  padding-top: 4px;
+}
+.saved-room-finished > summary {
+  cursor: pointer;
+  color: var(--muted);
+  padding: 7px 0;
+  font-size: 12px;
+}
+.saved-room-finished .saved-room-more {
+  margin-top: 8px;
+}
+.saved-room-undo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--surface-subtle);
+  font-size: 12px;
+  color: var(--muted);
+}
+.saved-room-undo > button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 32px;
+  padding: 5px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--green);
+  font-size: 12px;
+}
+.entry-form {
+  position: relative;
+  border-top: 0;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+.entry-ticket-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: -30px -30px 4px;
+  padding: 16px 30px 18px;
+  border-bottom: 2px dashed var(--line-strong);
+  background: var(--surface-ink);
+  color: var(--text-on-ink);
+}
+.entry-ticket-head span {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.16em;
+  opacity: 0.8;
+}
+.entry-ticket-head strong {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 900;
+}
+.token-picker button.selected {
+  border-color: var(--line-ink);
+  background: var(--surface-raised);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--line-ink);
+}
+@media (max-width: 800px) {
+  .entry-ticket-head {
+    margin: -24px -24px 0;
+    padding: 12px 24px 14px;
+  }
+}
+@media (max-width: 430px) {
+  .entry-ticket-head {
+    margin: -22px -18px 0;
+    padding: 12px 18px 14px;
+  }
+}
+.entry-fields {
+  display: grid;
+  gap: 20px;
+}
+.scene-caption > p {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.entry-fields > .primary-command {
+  width: 100%;
+  min-height: 52px;
+  justify-content: space-between;
+}
+.entry-new-room {
+  border-top: 1px solid var(--ui-line);
+  padding-top: 18px;
+  margin-top: 18px;
+}
+.entry-new-room > span {
+  font-size: 12px;
+  color: var(--ui-muted);
+}
+.entry-new-room > div {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.entry-new-room button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 42px;
+  background: var(--surface);
+  border: 1px solid var(--ui-line);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+.token-picker button {
+  grid-template-rows: 40px 16px;
+  height: 80px;
+  padding-block: 8px;
+}

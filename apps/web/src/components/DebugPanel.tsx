@@ -3,6 +3,7 @@ import { WHEEL_LABELS, WHEEL_SECTORS, WHEEL_SPIN_MS, type PendingWheel } from '@
 import { Modal } from './Modal.js'
 
 import { FlatWheel } from './FlatWheel.js'
+import '../styles/dev.css'
 // Preview seeds only need to vary between throws; LAN HTTP has no randomUUID API.
 let previewSequence = 0
 const readyWheel = (): PendingWheel => ({
