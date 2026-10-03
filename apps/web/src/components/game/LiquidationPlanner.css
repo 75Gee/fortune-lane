@@ -1,0 +1,133 @@
+.portfolio-debt {
+  margin: 10px 16px;
+  padding: 14px;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  background: var(--surface-warm);
+  font-size: 13px;
+}
+.portfolio-debt p {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--gold-ink);
+}
+.liquidation-planner .portfolio-debt {
+  margin: 12px 0;
+}
+.liquidation-summary {
+  position: sticky;
+  bottom: 0;
+  padding: 16px 0 4px;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+.liquidation-summary > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 9px;
+  font-size: 13px;
+}
+.liquidation-summary > p {
+  font-size: 12px;
+  color: var(--danger);
+}
+.liquidation-summary > button {
+  width: 100%;
+  margin-top: 5px;
+  font-size: 13px;
+}
+.liquidation-planner .portfolio-debt p {
+  margin: 6px 0 0;
+}
+.liquidation-stocks > header h3 {
+  margin: 0;
+  font-size: 14px;
+}
+.liquidation-stocks > header button {
+  min-height: 36px;
+  font-size: 12px;
+}
+.liquidation-planner .liquidation-stock {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  padding: 6px 0;
+}
+.liquidation-stock-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  min-width: 0;
+}
+.liquidation-stock-name strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+.liquidation-stock-name small {
+  color: var(--ui-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.liquidation-stock .liquidation-stock-proceeds {
+  display: block;
+  text-align: right;
+  color: var(--ui-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.liquidation-options {
+  border-top: 1px solid var(--ui-line);
+}
+.liquidation-options > summary {
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 16px 0;
+}
+.liquidation-options > summary > span {
+  float: right;
+  color: var(--positive);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.liquidation-property {
+  padding: 0 0 14px;
+}
+.liquidation-property > label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.liquidation-property > label > span {
+  color: var(--ui-muted);
+  font-size: 12px;
+}
+.liquidation-property > select {
+  min-height: 42px;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+.liquidation-property.is-selected > select {
+  border-color: var(--positive);
+  background: var(--surface-muted);
+}
+.liquidation-property > p {
+  margin: 6px 0 0;
+  color: var(--ui-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.liquidation-summary {
+  z-index: 2;
+  padding-bottom: 12px;
+  margin-top: 4px;
+}
+.liquidation-summary > div:last-of-type {
+  font-size: 15px;
+}
+.liquidation-summary > button {
+  min-height: 44px;
+}

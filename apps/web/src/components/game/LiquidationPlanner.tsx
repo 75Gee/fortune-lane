@@ -16,6 +16,7 @@ import { CommandAvailabilityContext } from '../Modal.js'
 import { stockPrice } from '../stocks/format.js'
 import { StockQuantitySlider } from '../stocks/StockQuantitySlider.js'
 import { formatMoney } from '../../lib/format.js'
+import './LiquidationPlanner.css'
 
 export function LiquidationPlanner({
   game,

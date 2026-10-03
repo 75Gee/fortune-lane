@@ -7,6 +7,7 @@ import type { DiceFrame } from './DicePhysics.js'
 import { contactShadows } from './ContactShadows.js'
 import { sceneRenderLoop } from './SceneRenderLoop.js'
 import { disposeScene } from './sceneUtils.js'
+import './Dice.css'
 
 const pips: Record<number, [number, number][]> = {
   1: [[0, 0]],

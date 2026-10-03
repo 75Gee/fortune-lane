@@ -41,6 +41,7 @@ const scenes = [
   { name: 'auction-bid', url: `${game}&decision=auction&viewer=muzi` },
   { name: 'decision-debt', url: `${game}&decision=debt` },
   { name: 'decision-end', url: `${game}&decision=end` },
+  { name: 'debt-planner', url: `${game}&decision=debt&stocks`, click: ['text=筹款 / 管理资产'] },
   { name: 'card-chance', url: `${game}&deck=chance` },
   { name: 'card-wheel', url: `${game}&card=chance-wheel-one` },
   { name: 'card-downgrade', url: `${game}&card=fate-downgrade` },

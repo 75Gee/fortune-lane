@@ -552,60 +552,6 @@ h2 {
   color: var(--red);
   fill: #cf506418;
 }
-.dice-stage {
-  position: relative;
-  width: 100%;
-  height: 136px;
-  flex-shrink: 0;
-  margin: -8px 0 -12px;
-}
-.dice-scene,
-.dice-canvas {
-  width: 100%;
-  height: 100%;
-}
-.dice-scene {
-  position: relative;
-}
-.dice-canvas canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-.dice-scene.has-fallback .dice-canvas {
-  display: none;
-}
-.dice-fallback {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  width: 100%;
-  height: 100%;
-}
-.dice-fallback svg {
-  width: 58px;
-  height: 58px;
-}
-.dice-fallback.is-rolling svg {
-  animation: dice-roll 0.4625s ease-in-out 4;
-}
-.die {
-  display: grid;
-  place-items: center;
-  width: 45px;
-  height: 45px;
-  border: 1px solid var(--line-strong);
-  border-radius: 7px;
-  background: var(--surface);
-  color: var(--text-secondary);
-  font-size: 38px;
-  line-height: 1;
-  box-shadow: 0 4px 0 #b7cad8;
-}
-.is-rolling .die {
-  animation: dice-roll 0.56s ease-out;
-}
 /* Player, asset and activity views share one rail. */
 .rank {
   color: var(--text-muted);
@@ -632,53 +578,6 @@ h2 {
   padding: 38px 0;
   color: var(--text-muted);
   font-size: 13px;
-}
-.card-library {
-  padding: 20px;
-}
-.deck-status {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 16px 24px 0;
-  color: var(--muted);
-  font-size: 11px;
-}
-.card-library .deck-status {
-  padding: 16px 0;
-}
-.library-card {
-  border-bottom: 1px solid var(--line);
-}
-.library-card summary {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 48px;
-  cursor: pointer;
-  list-style: none;
-  font-size: 13px;
-}
-.library-card summary::-webkit-details-marker {
-  display: none;
-}
-.library-card summary > svg:first-child {
-  color: var(--text-muted);
-}
-.library-card summary > svg:last-child {
-  margin-left: auto;
-  color: var(--text-muted);
-}
-.library-card[open] summary > svg:last-child {
-  transform: rotate(180deg);
-}
-.library-card p {
-  margin: 0;
-  padding: 0 0 16px 27px;
-  font-size: 12px;
-  color: var(--muted);
-  line-height: 1.8;
 }
 .landing-dialog.wheel-dialog {
   width: min(500px, 100%);
@@ -736,34 +635,9 @@ h2 {
   border-radius: 8px;
   box-shadow: 0 24px 80px #1f2a4430;
 }
-.deck-chance {
-  --deck-color: #936707;
-  --deck-paper: #ffc632;
-  --deck-soft: #fff7d9;
-}
-.deck-fate {
-  --deck-color: #b33e60;
-  --deck-paper: #ef7595;
-  --deck-soft: #fff0f4;
-}
 .card-deck-symbol {
   display: inline-block;
   vertical-align: middle;
-}
-.card-library .segmented button {
-  color: var(--deck-color);
-}
-.card-library .segmented button.active {
-  background: var(--deck-soft);
-}
-.activity-entry > .activity-card-deck {
-  display: flex;
-  align-items: flex-start;
-  gap: 4px;
-  color: var(--deck-color);
-}
-.activity-card-deck svg {
-  margin-top: 2px;
 }
 .travel-card-back {
   display: block;
@@ -818,17 +692,7 @@ h2 {
   border: 0;
   background: transparent;
 }
-@keyframes dice-roll {
-  0% {
-    transform: translateY(-12px) rotate(-20deg);
-  }
-  55% {
-    transform: translateY(3px) rotate(12deg);
-  }
-  100% {
-    transform: none;
-  }
-}
+
 @keyframes pulse {
   0%,
   100% {
@@ -846,11 +710,6 @@ h2 {
   }
   .scene-caption h1 {
     font-size: 40px;
-  }
-  .die {
-    width: 36px;
-    height: 36px;
-    font-size: 30px;
   }
 }
 @media (max-width: 800px) {
@@ -970,19 +829,6 @@ h2 {
     width: 36px;
     height: 36px;
   }
-  .die {
-    width: 34px;
-    height: 34px;
-    font-size: 29px;
-  }
-  .dice-stage {
-    height: 88px;
-    margin: -6px 0 -12px;
-  }
-  .dice-fallback svg {
-    width: 40px;
-    height: 40px;
-  }
   .landing-overlay.wheel-overlay {
     padding: 12px;
     place-items: center;
@@ -1086,12 +932,6 @@ h2 {
   .game-header .icon-command {
     width: 34px;
     height: 34px;
-  }
-  .die {
-    width: 28px;
-    height: 28px;
-    font-size: 24px;
-    border-radius: 5px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

@@ -22,6 +22,7 @@ import {
 import { useState } from 'react'
 import { CARD_DECK_ART, CardDeckSymbol } from './CardDeckArt.js'
 import { formatMoney } from '../lib/format.js'
+import './CardLibrary.css'
 
 function effectLabel(effect: CardEffect): string {
   switch (effect.type) {

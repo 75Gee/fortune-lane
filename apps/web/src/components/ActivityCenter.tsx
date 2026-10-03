@@ -3,6 +3,7 @@ import { History } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { CARD_DECK_ART, CardDeckSymbol } from './CardDeckArt.js'
 import broadcastStyles from './ActivityBroadcast.module.css'
+import './ActivityHistory.css'
 
 const quietEvents = new Set([
   'DICE_ROLLED',

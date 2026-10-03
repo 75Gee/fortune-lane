@@ -2,6 +2,7 @@ import { WHEEL_LABELS, WHEEL_SECTORS, WHEEL_SPIN_MS, type PendingWheel } from '@
 import { useEffect, useId, useRef, useState } from 'react'
 import { playWheelTick } from '../audio/sound.js'
 import { sceneRenderLoop } from '../board/SceneRenderLoop.js'
+import './FlatWheel.css'
 
 const prizes = {
   gain_cash: ['+2,000', '获得现金'],

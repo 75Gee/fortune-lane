@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Smile, X } from 'lucide-react'
 import { REACTIONS, type ReactionId, type RoomReaction, type RoomSnapshot } from '@fortune/protocol'
 import { TokenImage } from './TokenImage.js'
+import './Reactions.css'
 
 export function Reactions({
   room,

@@ -1,5 +1,6 @@
 import { DICE_ROLL_MS, type DiceValues, type GameEvent } from '@fortune/game'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import './Dice.css'
 
 const DiceScene = lazy(() => import('./DiceScene.js'))
 const purposeLabels = {

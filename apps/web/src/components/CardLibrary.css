@@ -1,0 +1,88 @@
+.card-library {
+  padding: 20px;
+}
+.deck-status {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 16px 24px 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+.card-library .deck-status {
+  padding: 16px 0;
+}
+.library-card {
+  border-bottom: 1px solid var(--line);
+}
+.library-card summary {
+  min-height: 48px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 13px;
+}
+.library-card summary::-webkit-details-marker {
+  display: none;
+}
+.library-card summary > svg:first-child {
+  color: var(--text-muted);
+}
+.library-card summary > svg:last-child {
+  margin-left: auto;
+  color: var(--text-muted);
+}
+.library-card[open] summary > svg:last-child {
+  transform: rotate(180deg);
+}
+.library-card p {
+  margin: 0;
+  padding: 0 0 16px 27px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.deck-chance {
+  --deck-color: #936707;
+  --deck-paper: #ffc632;
+  --deck-soft: #fff7d9;
+}
+.deck-fate {
+  --deck-color: #b33e60;
+  --deck-paper: #ef7595;
+  --deck-soft: #fff0f4;
+}
+.card-library .segmented button {
+  color: var(--deck-color);
+}
+.card-library .segmented button.active {
+  background: var(--deck-soft);
+}
+.library-card summary {
+  display: grid;
+  grid-template-columns: 17px minmax(0, 1fr) auto 15px;
+  align-items: center;
+  gap: 9px;
+}
+.library-card summary strong {
+  font-size: 13px;
+}
+.card-effect-label {
+  font-size: 12px;
+  color: var(--ui-muted);
+  text-align: right;
+}
+.library-card > p {
+  font-size: 13px;
+  line-height: 1.7;
+}
+@media (max-width: 600px) {
+  .library-card summary {
+    gap: 8px;
+  }
+  .card-effect-label {
+    max-width: 108px;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+}
