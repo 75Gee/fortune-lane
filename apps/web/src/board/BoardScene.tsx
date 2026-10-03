@@ -1,6 +1,6 @@
 import { BOARD } from '@fortune/game'
-import { Focus, LocateFixed, Minus, Plus } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { Focus, LocateFixed, Minus, Plus, RotateCw } from 'lucide-react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import styles from './BoardScene.module.css'
 import { createBoardScene } from './BoardSceneController.js'
 import type { BoardSceneProps, CameraMode, ViewAction } from './boardSceneTypes.js'
@@ -16,16 +16,14 @@ export default function BoardScene(props: BoardSceneProps) {
     (player) => player.id === (props.focusPlayerId ?? props.game.currentPlayerId),
   )
   const focusIndex = focusPlayer ? (props.displayPositions[focusPlayer.id] ?? focusPlayer.position) : 0
-  const navigate = (action: ViewAction) => {
-    if (action !== 'in' && action !== 'out') setMode(action)
-    controller.current?.setView(action)
-  }
+  const navigate = (action: ViewAction) => controller.current?.setView(action)
 
   useEffect(() => {
     const scene = createBoardScene(
       host.current!,
       () => latest.current,
       () => setFailed(true),
+      setMode,
     )
     controller.current = scene
     return () => {
@@ -43,19 +41,28 @@ export default function BoardScene(props: BoardSceneProps) {
     props.eventStartedAt,
     props.focusPlayerId,
     props.teleportPlayerId,
+    props.viewInsets,
   ])
   useEffect(() => {
     controller.current?.setEnabled(props.active ?? true)
   }, [props.active])
   return (
-    <div className={styles.wrap}>
+    <div
+      className={styles.wrap}
+      style={
+        {
+          '--inset-top': `${props.viewInsets?.top ?? 0}px`,
+          '--inset-bottom': `${props.viewInsets?.bottom ?? 0}px`,
+        } as CSSProperties
+      }
+    >
       <div className={styles.scene} ref={host} aria-label="世界之旅三维场景">
         {failed && <p className={styles.fallback}>3D 画面暂不可用，可通过底部操作栏和玩家面板继续游戏。</p>}
       </div>
       {!failed && (
         <>
           <div className={styles.location}>
-            <strong>{mode === 'overview' ? '世界棋盘' : BOARD[focusIndex]?.name}</strong>
+            {mode === 'follow' && <strong>{BOARD[focusIndex]?.name}</strong>}
             {props.game.hazards.some((hazard) => hazard.tileIndex === focusIndex) && (
               <small>
                 此处有
@@ -66,8 +73,15 @@ export default function BoardScene(props: BoardSceneProps) {
               </small>
             )}
           </div>
+          {mode === 'free' && (
+            <button className={styles.backToToken} onClick={() => navigate('follow')}>
+              <LocateFixed size={16} />
+              回到棋子
+            </button>
+          )}
           <div className={styles.tools} role="group" aria-label="场景视角">
             <button
+              className={styles.wideOnly}
               title="跟随棋子"
               aria-label="跟随棋子"
               aria-pressed={mode === 'follow'}
@@ -75,18 +89,16 @@ export default function BoardScene(props: BoardSceneProps) {
             >
               <LocateFixed size={18} />
             </button>
-            <button
-              title="查看全景"
-              aria-label="查看全景"
-              aria-pressed={mode === 'overview'}
-              onClick={() => navigate('overview')}
-            >
+            <button title="查看全景" aria-label="查看全景" onClick={() => navigate('overview')}>
               <Focus size={18} />
             </button>
-            <button title="拉近" aria-label="拉近" onClick={() => navigate('in')}>
+            <button title="旋转视角" aria-label="旋转视角" onClick={() => navigate('rotate-right')}>
+              <RotateCw size={18} />
+            </button>
+            <button className={styles.wideOnly} title="拉近" aria-label="拉近" onClick={() => navigate('in')}>
               <Plus size={18} />
             </button>
-            <button title="拉远" aria-label="拉远" onClick={() => navigate('out')}>
+            <button className={styles.wideOnly} title="拉远" aria-label="拉远" onClick={() => navigate('out')}>
               <Minus size={18} />
             </button>
           </div>

@@ -1,6 +1,7 @@
 import { type GameEvent, type GameView } from '@fortune/game'
 import { Clock3 } from 'lucide-react'
 import { lazy, Suspense, useEffect, useState } from 'react'
+import type { ViewInsets } from './boardCameraRig.js'
 import styles from './BoardScene.module.css'
 
 const BoardScene = lazy(() => import('./BoardScene.js'))
@@ -14,6 +15,7 @@ interface GameBoardProps {
   activeEvent: GameEvent | null
   activeEventStartedAt: number
   active: boolean
+  viewInsets?: ViewInsets | undefined
 }
 
 export function TurnClock({
@@ -50,6 +52,7 @@ export function GameBoard({
   activeEvent,
   activeEventStartedAt,
   active,
+  viewInsets,
 }: GameBoardProps) {
   const movingPlayerId =
     activeEvent &&
@@ -80,6 +83,7 @@ export function GameBoard({
           focusPlayerId={movingPlayerId ?? game.currentPlayerId}
           teleportPlayerId={fastTravel ? (activeEvent?.playerId ?? null) : null}
           onSelectTile={onSelectTile}
+          viewInsets={viewInsets}
         />
       </Suspense>
     </div>

@@ -22,6 +22,7 @@ import styles from './game/GameHud.module.css'
 import { GameMenu } from './game/GameMenu.js'
 import { PlayerRail } from './game/PlayerRail.js'
 import { TurnTicket } from './game/TurnTicket.js'
+import { useHudInsets } from './game/useHudInsets.js'
 import { useMoneyFeedback } from './game/useMoneyFeedback.js'
 import { Wallet } from './game/Wallet.js'
 
@@ -61,6 +62,10 @@ export function GamePage({
   const [watchedDecision, setWatchedDecision] = useState<string | null>(null)
   const [resultReviewed, setResultReviewed] = useState(false)
   const [soundEnabled, setSoundEnabled] = usePersistentToggle('fortune-sound')
+  const shellRef = useRef<HTMLElement>(null),
+    topRef = useRef<HTMLElement>(null),
+    bottomRef = useRef<HTMLElement>(null)
+  const viewInsets = useHudInsets(shellRef, topRef, bottomRef)
 
   const connected = connectionStatus === 'connected'
   const canSend = connected && !commandPending
@@ -126,7 +131,7 @@ export function GamePage({
 
   return (
     <CommandAvailabilityContext.Provider value={available}>
-      <main className={styles.shell}>
+      <main className={styles.shell} ref={shellRef}>
         <div className={styles.board}>
           <GameBoard
             active
@@ -137,10 +142,11 @@ export function GamePage({
             onSelectTile={selectTile}
             activeEvent={activeEvent}
             activeEventStartedAt={activeEventStartedAt}
+            viewInsets={viewInsets}
           />
         </div>
 
-        <header className={styles.top}>
+        <header className={styles.top} ref={topRef}>
           <div className={styles.lead}>
             <TurnTicket game={game} playerId={playerId} turnDeadline={room.turnDeadline} clockOffset={clockOffset} />
           </div>
@@ -186,7 +192,7 @@ export function GamePage({
           </div>
         )}
 
-        <footer className={styles.bottom}>
+        <footer className={styles.bottom} ref={bottomRef}>
           <ActivityBroadcast
             className={styles.activity}
             events={presentedEvents}

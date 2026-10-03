@@ -14,15 +14,24 @@ import { tokenModel } from './TokenModel.js'
 import { worldLandscape } from './WorldLandscape.js'
 import { inwardAt, TILE_SIZE, TILE_TOP, worldPosition } from './worldRoute.js'
 
-import { cameraDestination } from './boardCamera.js'
-import { bindBoardInput } from './boardInput.js'
+import { boardCameraRig, type ViewInsets } from './boardCameraRig.js'
+import { bindBoardGestures } from './boardGestures.js'
+import { tilePicker } from './boardInput.js'
 import type { BoardSceneProps, CameraMode, ViewAction } from './boardSceneTypes.js'
 import { movementFrame } from './presentationTimings.js'
+
+/** Events that put a token in motion; the camera returns to it for each one. */
+const MOVEMENT_EVENTS = new Set(['DICE_ROLLED', 'TOKEN_MOVED', 'PLAYER_SENT_TO_JAIL', 'PLAYER_SENT_TO_HOSPITAL'])
 
 // About 2.4 million device pixels: large desktop canvases drop resolution while moving; phones do not.
 const MOTION_PIXEL_BUDGET = 2_400_000
 
-export function createBoardScene(container: HTMLDivElement, getProps: () => BoardSceneProps, onFailure: () => void) {
+export function createBoardScene(
+  container: HTMLDivElement,
+  getProps: () => BoardSceneProps,
+  onFailure: () => void,
+  onCameraMode: (mode: CameraMode) => void,
+) {
   let renderer: THREE.WebGLRenderer
   try {
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
@@ -42,13 +51,14 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
   const buildStart = performance.now(),
     buildMs: Record<string, number> = {}
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 700)
-  const cameraTarget = new THREE.Vector3()
-  renderer.domElement.style.touchAction = 'pan-y'
-  let cameraMode: CameraMode = 'follow',
-    zoom = 1,
-    compact = container.clientWidth < 700
-  const mobileViewport = matchMedia('(max-width: 800px)')
-  const defaultZoom = () => (cameraMode === 'overview' ? 1 : 1.2 ** (mobileViewport.matches ? 6 : 3))
+  const rig = boardCameraRig(camera)
+  let reportedMode: CameraMode = 'follow'
+  const reportMode = () => {
+    const mode = rig.following ? 'follow' : 'free'
+    if (mode !== reportedMode) onCameraMode((reportedMode = mode))
+  }
+  let insets: ViewInsets = { top: 0, right: 0, bottom: 0, left: 0 },
+    followedEvent = 0
   let initialized = false
   let loop: ReturnType<typeof sceneRenderLoop> | undefined
   const positions = BOARD.map((tile) => worldPosition(tile.index))
@@ -56,8 +66,6 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
   const tokenTarget = new THREE.Vector3(),
     tangent = new THREE.Vector3(),
     occupancyOffset = new THREE.Vector3()
-  const desiredCamera = new THREE.Vector3(),
-    desired = new THREE.Vector3()
   scene.add(new THREE.HemisphereLight('#f3faff', '#74937d', 1.7))
   const sun = new THREE.DirectionalLight('#fff0d5', 2.4)
   sun.position.set(-30, 48, 24)
@@ -123,7 +131,17 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
   scene.add(explosion.group)
   const buildingStates = new Map<number, string>()
   const update = () => {
-    const { game, selectedTile } = getProps()
+    const { game, selectedTile, viewInsets, activeEvent, eventStartedAt = 0 } = getProps()
+    if (viewInsets && (Object.keys(insets) as (keyof ViewInsets)[]).some((edge) => insets[edge] !== viewInsets[edge])) {
+      insets = { ...viewInsets }
+      rig.setInsets(insets, !initialized)
+      loop?.invalidate()
+    }
+    if (activeEvent && MOVEMENT_EVENTS.has(activeEvent.type) && eventStartedAt !== followedEvent) {
+      followedEvent = eventStartedAt
+      rig.startFollowing()
+      reportMode()
+    }
     ownership.update(game)
     for (const [id, model] of hazardModels) {
       if (game.hazards.some((hazard) => hazard.id === id)) continue
@@ -208,43 +226,43 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
     }
     loop?.invalidate()
   }
-  update()
   if (profile) buildMs.scene = performance.now() - buildStart
   const setView = (action: ViewAction) => {
+    if (action === 'in' || action === 'out') rig.zoomBy(action === 'in' ? 0.8 : 1.25)
+    else if (action === 'follow') rig.startFollowing()
+    else if (action === 'overview') rig.overview()
+    else rig.rotate(action === 'rotate-left' ? -1 : 1)
+    reportMode()
     loop?.invalidate()
-    if (action === 'in' || action === 'out') {
-      const factor = action === 'in' ? 0.83 : 1.2
-      zoom = THREE.MathUtils.clamp(zoom * factor, 0.65 / defaultZoom(), 1.7)
-      return
-    }
-    cameraMode = action
-    zoom = 1
   }
-  const unbindInput = bindBoardInput(
-    container,
-    renderer.domElement,
-    camera,
-    () => [
-      board.tiles,
-      ...ownership.objects.filter((object) => object.visible),
-      ...landscape.objects,
-      ...hazardModels.values(),
-    ],
-    (index) => getProps().onSelectTile(index),
-  )
-  const resize = () => {
+  const pick = tilePicker(renderer.domElement, camera, () => [
+    board.tiles,
+    ...ownership.objects.filter((object) => object.visible),
+    ...landscape.objects,
+    ...hazardModels.values(),
+  ])
+  const unbindGestures = bindBoardGestures(renderer.domElement, rig, {
+    onTap(x, y) {
+      const index = pick(x, y)
+      if (index !== null) getProps().onSelectTile(index)
+    },
+    onChange() {
+      reportMode()
+      loop?.invalidate()
+    },
+  })
+  function resize() {
     const w = container.clientWidth,
       h = container.clientHeight
     if (!w || !h) return
-    compact = w < 700
     renderer.setSize(w, h, false)
-    camera.aspect = w / h
-    camera.updateProjectionMatrix()
+    rig.resize(w, h)
     loop?.invalidate()
   }
   const observer = new ResizeObserver(resize)
   observer.observe(container)
   resize()
+  update()
   loop = sceneRenderLoop(container, 'board', ({ time, delta: dt, reducedMotion: reduced }) => {
     let animating = false
     const { game, displayPositions, focusPlayerId } = getProps()
@@ -316,35 +334,10 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
     const actor = game.players.find((player) => player.id === actorId)
     const index = actor ? (displayPositions[actor.id] ?? actor.position) : 0
     const actorModel = actor ? tokens.get(actor.id) : null
-    cameraDestination(
-      camera,
-      cameraMode,
-      zoom * defaultZoom(),
-      compact,
-      index,
-      actorModel?.position ?? positions[index]!,
-      desired,
-      desiredCamera,
-    )
-    const easing = !initialized || reduced ? 1 : 1 - Math.exp(-(cameraMode === 'follow' ? 6.5 : 3.8) * dt)
-    cameraTarget.lerp(desired, easing)
-    camera.position.lerp(desiredCamera, easing)
-    if (camera.position.distanceToSquared(desiredCamera) > 0.0001 || cameraTarget.distanceToSquared(desired) > 0.0001)
-      animating = true
-    else {
-      camera.position.copy(desiredCamera)
-      cameraTarget.copy(desired)
-    }
-    camera.lookAt(cameraTarget)
-    // Millimetre-thin board details z-fight at overview distance unless near scales with it.
-    const near = THREE.MathUtils.clamp(camera.position.distanceTo(cameraTarget) * 0.05, 0.1, 10)
-    if (Math.abs(camera.near - near) > camera.near * 0.01) {
-      camera.near = near
-      camera.updateProjectionMatrix()
-    }
+    rig.follow(actorModel?.position ?? positions[index]!, facings[index]!, !initialized)
+    if (rig.step(dt, !initialized || reduced)) animating = true
     initialized = true
-    camera.updateMatrixWorld()
-    ownership.resize(camera, container.clientHeight)
+    ownership.resize(camera, rig.lensHeight)
     // Moving frames stay within a pixel budget; the settled frame restores full sharpness.
     const pixelRatio = animating
       ? Math.max(
@@ -388,7 +381,7 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
     loop?.dispose()
     landscape.dispose()
     observer.disconnect()
-    unbindInput()
+    unbindGestures()
     renderer.domElement.removeEventListener('webglcontextlost', lost)
     ownership.dispose()
     disposeScene(scene)
