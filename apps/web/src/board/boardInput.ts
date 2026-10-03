@@ -27,7 +27,24 @@ export function bindBoardInput(
     pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1, (-(event.clientY - rect.top) / rect.height) * 2 + 1)
     raycaster.setFromCamera(pointer, camera)
     const hit = raycaster.intersectObjects(objects(), true)[0]
-    if (hit && Number.isInteger(hit.object.userData.tileIndex)) onSelectTile(hit.object.userData.tileIndex)
+    if (!hit) return
+    const instanceId = hit.batchId ?? hit.instanceId
+    let tileIndex =
+      instanceId === undefined
+        ? hit.object.userData.tileIndex
+        : (hit.object.userData.tileIndices?.[instanceId] ?? hit.object.userData.tileIndex)
+    const ranges = hit.object.userData.tileFaceRanges as { end: number; tileIndex: number }[] | undefined
+    if (ranges && hit.faceIndex !== undefined && hit.faceIndex !== null) {
+      let low = 0,
+        high = ranges.length
+      while (low < high) {
+        const middle = (low + high) >>> 1
+        if (hit.faceIndex < ranges[middle]!.end) high = middle
+        else low = middle + 1
+      }
+      tileIndex = ranges[low]?.tileIndex
+    }
+    if (Number.isInteger(tileIndex)) onSelectTile(tileIndex)
   }
   const cancel = () => {
     downId = -1

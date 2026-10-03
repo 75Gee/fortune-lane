@@ -41,7 +41,17 @@ export function optimizeStaticModel(root: THREE.Group, moving: Set<THREE.Object3
   for (const batch of batches.values()) {
     if (batch.length < 2) continue
     const parts = batch.map((mesh) => {
-      const geometry = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone()
+      // Keep indices; a sequential index is far cheaper to build than welding with mergeVertices.
+      const geometry = mesh.geometry.clone()
+      if (!geometry.index) {
+        const count = geometry.getAttribute('position').count
+        geometry.setIndex(
+          new THREE.BufferAttribute(
+            Uint32Array.from({ length: count }, (_, i) => i),
+            1,
+          ),
+        )
+      }
       return geometry.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inverse, mesh.matrixWorld))
     })
     const geometry = mergeGeometries(parts, false)

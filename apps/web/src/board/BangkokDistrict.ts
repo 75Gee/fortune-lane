@@ -1,6 +1,6 @@
 import * as THREE from 'three'
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
-import { disposeScene, solid } from './sceneUtils.js'
+import { solid } from './sceneUtils.js'
+import { optimizeStaticModel } from './optimizeStaticModel.js'
 
 const stone = '#eee9d9',
   trim = '#c6ac6c',
@@ -144,28 +144,7 @@ export function bangkokDistrict() {
   solid(boat, new THREE.BoxGeometry(0.64, 0.025, 0.25), '#efd3a5', 0, 0.06)
   for (const x of [-0.22, 0.22]) solid(boat, new THREE.BoxGeometry(0.025, 0.25, 0.025), trim, x, 0.2)
   solid(boat, new THREE.BoxGeometry(0.6, 0.04, 0.36), jade, 0, 0.34)
-  // Bake static architecture by material; the animated boat retains its own transform.
-  group.remove(boat)
-  group.updateMatrixWorld(true)
-  const batches = new Map<string, { material: THREE.MeshStandardMaterial; geometries: THREE.BufferGeometry[] }>()
-  group.traverse((object) => {
-    if (!(object instanceof THREE.Mesh) || !(object.material instanceof THREE.MeshStandardMaterial)) return
-    const key = `${object.material.color.getHex()}:${object.material.roughness}:${object.material.metalness}`
-    if (!batches.has(key)) batches.set(key, { material: object.material.clone(), geometries: [] })
-    const geometry = object.geometry.index ? object.geometry.toNonIndexed() : object.geometry.clone()
-    batches.get(key)!.geometries.push(geometry.applyMatrix4(object.matrixWorld))
-  })
-  disposeScene(group)
-  group.clear()
-  for (const { material, geometries } of batches.values()) {
-    const geometry = mergeGeometries(geometries)
-    if (geometry) {
-      const mesh = new THREE.Mesh(geometry, material)
-      mesh.castShadow = mesh.receiveShadow = true
-      group.add(mesh)
-    } else material.dispose()
-    geometries.forEach((piece) => piece.dispose())
-  }
-  group.add(boat)
+  // Keep shared materials alive and indices intact; the boat retains its own transform.
+  optimizeStaticModel(group, new Set([boat]), true)
   return { group, boat }
 }

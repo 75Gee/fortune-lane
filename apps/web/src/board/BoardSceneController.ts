@@ -1,6 +1,7 @@
-import { BOARD, BOARD_SIDE_STEPS } from '@fortune/game'
+import { BOARD } from '@fortune/game'
 import * as THREE from 'three'
 import { bombExplosion } from './BombExplosion.js'
+import { boardTiles } from './BoardTiles.js'
 import { contactShadows } from './ContactShadows.js'
 import { hazardModel } from './ItemModels.js'
 import { optimizeStaticModel } from './optimizeStaticModel.js'
@@ -8,7 +9,7 @@ import { ownershipMarkers } from './OwnershipMarkers.js'
 import { BOMB_EXPLOSION_MS } from './presentationTimings.js'
 import { propertyBuildings } from './PropertyBuildings.js'
 import { sceneRenderLoop } from './SceneRenderLoop.js'
-import { canvasTexture, disposeScene, solid } from './sceneUtils.js'
+import { disposeScene, solid } from './sceneUtils.js'
 import { tokenModel } from './TokenModel.js'
 import { worldLandscape } from './WorldLandscape.js'
 import { inwardAt, TILE_SIZE, TILE_TOP, worldPosition } from './worldRoute.js'
@@ -18,6 +19,9 @@ import { bindBoardInput } from './boardInput.js'
 import type { BoardSceneProps, CameraMode, ViewAction } from './boardSceneTypes.js'
 import { movementFrame } from './presentationTimings.js'
 
+// About 2.4 million device pixels: large desktop canvases drop resolution while moving; phones do not.
+const MOTION_PIXEL_BUDGET = 2_400_000
+
 export function createBoardScene(container: HTMLDivElement, getProps: () => BoardSceneProps, onFailure: () => void) {
   let renderer: THREE.WebGLRenderer
   try {
@@ -26,7 +30,8 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
     onFailure()
     return null
   }
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+  const fullPixelRatio = () => Math.min(devicePixelRatio, 2)
+  renderer.setPixelRatio(fullPixelRatio())
   renderer.shadowMap.enabled = false
   renderer.toneMapping = THREE.ACESFilmicToneMapping
   renderer.toneMappingExposure = 0.98
@@ -34,6 +39,8 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
   const scene = new THREE.Scene()
   scene.matrixWorldAutoUpdate = false
   const profile = import.meta.env.DEV && new URLSearchParams(location.search).has('renderStats')
+  const buildStart = performance.now(),
+    buildMs: Record<string, number> = {}
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 700)
   const cameraTarget = new THREE.Vector3()
   renderer.domElement.style.touchAction = 'pan-y'
@@ -56,89 +63,42 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
   sun.position.set(-30, 48, 24)
   scene.add(sun)
   const grounding = contactShadows(scene)
-  const landscape = worldLandscape(scene, grounding)
-  const houses = new Map<number, ReturnType<typeof propertyBuildings>>()
-  const houseGrounding = new Map<number, ReturnType<typeof grounding.add>[]>()
-  const tiles: THREE.Mesh[] = [],
-    rings: THREE.Mesh[] = []
-  const tileGeometry = new THREE.BoxGeometry(TILE_SIZE - 0.06, 0.2, TILE_SIZE - 0.06)
-  const half = TILE_SIZE / 2 - 0.06,
-    inner = half - 0.055
-  const outline = new THREE.Shape()
-  outline.moveTo(-half, -half)
-  outline.lineTo(half, -half)
-  outline.lineTo(half, half)
-  outline.lineTo(-half, half)
-  outline.closePath()
-  const hole = new THREE.Path()
-  hole.moveTo(-inner, -inner)
-  hole.lineTo(-inner, inner)
-  hole.lineTo(inner, inner)
-  hole.lineTo(inner, -inner)
-  hole.closePath()
-  outline.holes.push(hole)
-  const ringGeometry = new THREE.ShapeGeometry(outline)
-  const nameGeometry = new THREE.PlaneGeometry(TILE_SIZE * 0.8, TILE_SIZE * 0.3)
-  for (const tile of BOARD) {
-    const mesh = solid(scene, tileGeometry, '#e5e8db')
-    mesh.position.copy(worldPosition(tile.index))
-    mesh.position.y = TILE_TOP - 0.1
-    mesh.userData.tileIndex = tile.index
-    tiles.push(mesh)
-    const ring = solid(scene, ringGeometry, '#c6d1b8', mesh.position.x, TILE_TOP + 0.006, mesh.position.z)
-    ring.rotation.x = -Math.PI / 2
-    rings.push(ring)
-    const nameTexture = canvasTexture(512, 192, (ctx) => {
-      let size = 76
-      ctx.font = `600 ${size}px sans-serif`
-      size = Math.min(size, (size * 456) / Math.max(1, ctx.measureText(tile.name).width))
-      ctx.font = `600 ${size}px sans-serif`
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      ctx.fillStyle = '#2c5045'
-      const price = tile.price
-        ? `¥${tile.price.toLocaleString('zh-CN')}`
-        : tile.taxAmount
-          ? `缴税 ¥${tile.taxAmount.toLocaleString('zh-CN')}`
-          : ''
-      ctx.fillText(tile.name, 256, price ? 56 : 96)
-      if (price) {
-        ctx.font = '500 48px sans-serif'
-        ctx.fillStyle = '#597261'
-        ctx.fillText(price, 256, 145)
-      }
-    })
-    const name = new THREE.Mesh(
-      nameGeometry,
-      new THREE.MeshBasicMaterial({ map: nameTexture, transparent: true, depthWrite: false, toneMapped: false }),
+  const initial = getProps(),
+    initialActor = initial.game.players.find(
+      (player) => player.id === (initial.focusPlayerId ?? initial.game.currentPlayerId),
     )
-    const inward = inwardAt(tile.index),
-      corner = tile.index % BOARD_SIDE_STEPS === 0
-    name.position
-      .copy(worldPosition(tile.index))
-      .addScaledVector(inward, corner ? 0.8 : TILE_SIZE * (tile.price ? 0.24 : 0.3))
-    name.position.y = TILE_TOP + 0.012
-    // The bottom of the text faces the reader on the inside of each board edge.
-    name.rotation.set(-Math.PI / 2, 0, Math.atan2(inward.x, inward.z))
-    if (corner) name.scale.setScalar(0.78)
-    scene.add(name)
+  const landscape = worldLandscape(scene, grounding, {
+    multiDraw: renderer.extensions.has('WEBGL_multi_draw'),
+    focusIndex: initialActor ? (initial.displayPositions[initialActor.id] ?? initialActor.position) : 0,
+    eagerSteps: 4,
+    onChange(ready) {
+      if (profile && ready) buildMs.landmarksReady = performance.now() - buildStart
+      loop?.invalidate()
+    },
+  })
+  if (profile) buildMs.landscape = performance.now() - buildStart
+  const buildings = propertyBuildings(BOARD.filter((tile) => tile.kind === 'property').length)
+  scene.add(buildings.group)
+  const houses = new Map<number, ReturnType<typeof buildings.addRow>>()
+  const houseGrounding = new Map<number, ReturnType<typeof grounding.add>[]>()
+  const board = boardTiles()
+  scene.add(board.group)
+  for (const tile of BOARD) {
     if (tile.kind === 'property') {
-      const row = propertyBuildings()
-      row.group.position.copy(worldPosition(tile.index)).addScaledVector(inward, -TILE_SIZE * 0.31)
-      row.group.rotation.y = Math.atan2(inward.x, inward.z)
-      scene.add(row.group)
+      const inward = inwardAt(tile.index)
+      const rotation = Math.atan2(inward.x, inward.z)
+      const row = buildings.addRow(worldPosition(tile.index).addScaledVector(inward, -TILE_SIZE * 0.31), rotation)
       houses.set(tile.index, row)
       houseGrounding.set(
         tile.index,
-        row.footprints.map((local) => {
-          const at = row.group.localToWorld(local.clone())
+        row.footprints.map((at) => {
           return grounding.add({
             x: at.x,
             y: at.y - 0.002,
             z: at.z,
             width: 0.78,
             depth: 0.72,
-            rotation: row.group.rotation.y,
+            rotation,
             shape: 'rounded',
             opacity: 0,
           })
@@ -225,10 +185,9 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
     for (const tile of BOARD) {
       const asset = game.tiles[tile.index]!,
         owner = game.players.find((player) => player.id === asset.ownerId)
-      ;(tiles[tile.index]!.material as THREE.MeshStandardMaterial).color.set(
+      board.setColors(
+        tile.index,
         selectedTile === tile.index ? '#b1efd1' : asset.mortgaged ? '#a0aaa3' : '#e5e8db',
-      )
-      ;(rings[tile.index]!.material as THREE.MeshStandardMaterial).color.set(
         owner?.color ??
           (tile.kind === 'chance'
             ? '#cba955'
@@ -250,6 +209,7 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
     loop?.invalidate()
   }
   update()
+  if (profile) buildMs.scene = performance.now() - buildStart
   const setView = (action: ViewAction) => {
     loop?.invalidate()
     if (action === 'in' || action === 'out') {
@@ -265,10 +225,9 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
     renderer.domElement,
     camera,
     () => [
-      ...tiles,
+      board.tiles,
       ...ownership.objects.filter((object) => object.visible),
-      ...landscape.lots,
-      ...landscape.models,
+      ...landscape.objects,
       ...hazardModels.values(),
     ],
     (index) => getProps().onSelectTile(index),
@@ -377,16 +336,37 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
       cameraTarget.copy(desired)
     }
     camera.lookAt(cameraTarget)
+    // Millimetre-thin board details z-fight at overview distance unless near scales with it.
+    const near = THREE.MathUtils.clamp(camera.position.distanceTo(cameraTarget) * 0.05, 0.1, 10)
+    if (Math.abs(camera.near - near) > camera.near * 0.01) {
+      camera.near = near
+      camera.updateProjectionMatrix()
+    }
     initialized = true
     camera.updateMatrixWorld()
     ownership.resize(camera, container.clientHeight)
+    // Moving frames stay within a pixel budget; the settled frame restores full sharpness.
+    const pixelRatio = animating
+      ? Math.max(
+          1,
+          Math.min(
+            fullPixelRatio(),
+            Math.sqrt(MOTION_PIXEL_BUDGET / Math.max(1, container.clientWidth * container.clientHeight)),
+          ),
+        )
+      : fullPixelRatio()
+    if (renderer.getPixelRatio() !== pixelRatio) renderer.setPixelRatio(pixelRatio)
     const renderStart = profile ? performance.now() : 0
     scene.updateMatrixWorld(true)
     renderer.render(scene, camera)
+    if (profile) buildMs.firstRender ??= performance.now() - renderStart
     if (profile)
       container.dataset.renderStats = JSON.stringify({
+        buildMs,
         shadowPasses: 0,
         mainCalls: renderer.info.render.calls,
+        pixelRatio,
+        landmarkBatching: landscape.stats,
         submissionMs: performance.now() - renderStart,
       })
     return animating
@@ -406,6 +386,7 @@ export function createBoardScene(container: HTMLDivElement, getProps: () => Boar
   renderer.domElement.addEventListener('webglcontextlost', lost)
   const dispose = () => {
     loop?.dispose()
+    landscape.dispose()
     observer.disconnect()
     unbindInput()
     renderer.domElement.removeEventListener('webglcontextlost', lost)

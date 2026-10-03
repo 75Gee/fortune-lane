@@ -1,7 +1,8 @@
 import * as THREE from 'three'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
 import { BOARD, BOARD_GRID_SIZE, BOARD_SIDE_STEPS } from '@fortune/game'
-import { canvasTexture, solid } from './sceneUtils.js'
+import { canvasTexture, solid, withSolidMaterialCache } from './sceneUtils.js'
+import { batchStaticLandmarks } from './batchStaticLandmarks.js'
 import { bangkokDistrict } from './BangkokDistrict.js'
 import { CORNER_CELL_SIZE, cornerFootprint, cornerLandmark } from './CornerLandmarks.js'
 import {
@@ -34,20 +35,65 @@ import { cairoLandmark, hongKongLandmark } from './ExpansionLandmarks.js'
 import { optimizeStaticModel } from './optimizeStaticModel.js'
 import type { ContactShadows } from './ContactShadows.js'
 
-export function worldLandscape(scene: THREE.Scene, grounding: ContactShadows) {
+interface LandscapeOptions {
+  multiDraw: boolean
+  /** Landmarks this close to the focus tile (in route steps) are built before the first frame. */
+  focusIndex: number
+  eagerSteps: number
+  /** Called whenever more of the landscape becomes visible; `ready` once it is complete and batched. */
+  onChange: (ready: boolean) => void
+}
+
+const CITY_LANDMARKS: Record<string, () => THREE.Group> = {
+  曼谷: () => bangkokDistrict().group,
+  新加坡: singaporeLandmark,
+  东京: tokyoLandmark,
+  首尔: seoulLandmark,
+  悉尼: sydneyLandmark,
+  墨尔本: melbourneLandmark,
+  迪拜: dubaiLandmark,
+  伊斯坦布尔: istanbulLandmark,
+  开罗: cairoLandmark,
+  雅典: athensLandmark,
+  罗马: romeLandmark,
+  维也纳: viennaLandmark,
+  柏林: berlinLandmark,
+  阿姆斯特丹: amsterdamLandmark,
+  巴塞罗那: barcelonaLandmark,
+  巴黎: parisLandmark,
+  伦敦: londonLandmark,
+  多伦多: torontoLandmark,
+  纽约: newYorkLandmark,
+  洛杉矶: losAngelesLandmark,
+  旧金山: sanFranciscoLandmark,
+  香港: hongKongLandmark,
+  上海: shanghaiLandmark,
+  北京: beijingLandmark,
+}
+
+export function worldLandscape(scene: THREE.Scene, grounding: ContactShadows, options: LandscapeOptions) {
+  const materials = new Map<string, THREE.MeshStandardMaterial>()
+  const cached = <T>(build: () => T) => withSolidMaterialCache(build, materials)
   scene.background = new THREE.Color('#b8d9e1')
   scene.fog = new THREE.Fog('#b8d9e1', 180, 450)
-  const water = solid(scene, new THREE.PlaneGeometry(700, 700), '#7bbac5', 0, -0.95)
-  water.rotation.x = -Math.PI / 2
-  solid(scene, new RoundedBoxGeometry(WORLD_SIZE + 4, 0.7, WORLD_SIZE + 4, 2, 1), '#a9bca0', 0, -0.48)
-  solid(scene, new RoundedBoxGeometry(BOARD_SIZE + 0.15, 0.38, BOARD_SIZE + 0.15, 2, 0.12), '#557e70', 0, -0.06)
-  solid(
-    scene,
-    new THREE.BoxGeometry(TILE_SIZE * (BOARD_GRID_SIZE - 2), 0.08, TILE_SIZE * (BOARD_GRID_SIZE - 2)),
-    '#8faf9e',
-    0,
-    0.14,
+  const water = new THREE.Mesh(
+    new THREE.PlaneGeometry(700, 700),
+    new THREE.MeshStandardMaterial({ map: seaTexture(), roughness: 0.38, metalness: 0.05 }),
   )
+  water.rotation.x = -Math.PI / 2
+  water.position.y = -0.95
+  scene.add(water)
+  cached(() => {
+    solid(scene, new RoundedBoxGeometry(WORLD_SIZE + 4, 0.7, WORLD_SIZE + 4, 2, 1), '#a9bca0', 0, -0.48)
+    solid(scene, new RoundedBoxGeometry(BOARD_SIZE + 0.15, 0.38, BOARD_SIZE + 0.15, 2, 0.12), '#557e70', 0, -0.06)
+    solid(
+      scene,
+      new THREE.BoxGeometry(TILE_SIZE * (BOARD_GRID_SIZE - 2), 0.08, TILE_SIZE * (BOARD_GRID_SIZE - 2)),
+      '#8faf9e',
+      0,
+      0.14,
+    )
+  })
   const centerMap = canvasTexture(1024, 1024, (ctx) => {
     ctx.fillStyle = '#8faf9e'
     ctx.fillRect(0, 0, 1024, 1024)
@@ -85,10 +131,15 @@ export function worldLandscape(scene: THREE.Scene, grounding: ContactShadows) {
   const lotMaterial = new THREE.MeshStandardMaterial({ color: '#c2ccbb', roughness: 1 })
   const padMaterial = new THREE.MeshStandardMaterial({ color: '#b3c4a5', roughness: 1 })
   const models: THREE.Group[] = []
-  const airport = airportLandmark(),
-    utility = utilityLandmark()
-  const symbols = { chance: eventLandmark('chance'), fate: eventLandmark('fate') }
-  const district = bangkokDistrict()
+  // Shared prototypes are built on first use, so deferred tiles do not pay for them up front.
+  const once = <T>(make: () => T) => {
+    let value: T | undefined
+    return () => (value ??= make())
+  }
+  const airport = once(airportLandmark),
+    utility = once(utilityLandmark),
+    chance = once(() => eventLandmark('chance')),
+    fate = once(() => eventLandmark('fate'))
   const place = (model: THREE.Group, index: number) => {
     const bounds = new THREE.Box3().setFromObject(model)
     // Preserve the authored central axis; asymmetric details must not shift the building.
@@ -113,6 +164,7 @@ export function worldLandscape(scene: THREE.Scene, grounding: ContactShadows) {
     scene.add(display)
     models.push(display)
   }
+  const jobs: { index: number; build: () => void }[] = []
   for (const tile of BOARD) {
     const position = landmarkPosition(tile.index)
     if (tile.kind === 'go' || tile.kind === 'jail' || tile.kind === 'hospital' || tile.kind === 'go_to_jail') {
@@ -126,16 +178,22 @@ export function worldLandscape(scene: THREE.Scene, grounding: ContactShadows) {
       lot.userData.tileIndex = tile.index
       scene.add(lot)
       lots.push(lot)
-      const model = cornerLandmark(tile.kind)
-      model.scale.setScalar(TILE_SIZE / CORNER_CELL_SIZE)
-      model.position.copy(position)
-      model.position.y = 0.155
-      model.rotation.y = angle
-      model.traverse((object) => {
-        object.userData.tileIndex = tile.index
+      const kind = tile.kind
+      jobs.push({
+        index: tile.index,
+        build() {
+          const model = cornerLandmark(kind)
+          model.scale.setScalar(TILE_SIZE / CORNER_CELL_SIZE)
+          model.position.copy(position)
+          model.position.y = 0.155
+          model.rotation.y = angle
+          model.traverse((object) => {
+            object.userData.tileIndex = tile.index
+          })
+          scene.add(model)
+          models.push(model)
+        },
       })
-      scene.add(model)
-      models.push(model)
       for (const [x, z] of [
         [0, 0],
         [-TILE_SIZE, 0],
@@ -164,41 +222,25 @@ export function worldLandscape(scene: THREE.Scene, grounding: ContactShadows) {
     scene.add(lot)
     lots.push(lot)
     grounding.add({ x: position.x, y: 0.147, z: position.z, width: 3.98, depth: 3.98, shape: 'rounded', opacity: 0.22 })
-    let model: THREE.Group | null = null
-    if (tile.id === '曼谷') model = district.group
-    else if (tile.id === '新加坡') model = singaporeLandmark()
-    else if (tile.id === '东京') model = tokyoLandmark()
-    else if (tile.id === '首尔') model = seoulLandmark()
-    else if (tile.id === '悉尼') model = sydneyLandmark()
-    else if (tile.id === '墨尔本') model = melbourneLandmark()
-    else if (tile.id === '迪拜') model = dubaiLandmark()
-    else if (tile.id === '伊斯坦布尔') model = istanbulLandmark()
-    else if (tile.id === '开罗') model = cairoLandmark()
-    else if (tile.id === '雅典') model = athensLandmark()
-    else if (tile.id === '罗马') model = romeLandmark()
-    else if (tile.id === '维也纳') model = viennaLandmark()
-    else if (tile.id === '柏林') model = berlinLandmark()
-    else if (tile.id === '阿姆斯特丹') model = amsterdamLandmark()
-    else if (tile.id === '巴塞罗那') model = barcelonaLandmark()
-    else if (tile.id === '巴黎') model = parisLandmark()
-    else if (tile.id === '伦敦') model = londonLandmark()
-    else if (tile.id === '多伦多') model = torontoLandmark()
-    else if (tile.id === '纽约') model = newYorkLandmark()
-    else if (tile.id === '洛杉矶') model = losAngelesLandmark()
-    else if (tile.id === '旧金山') model = sanFranciscoLandmark()
-    else if (tile.id === '香港') model = hongKongLandmark()
-    else if (tile.id === '上海') model = shanghaiLandmark()
-    else if (tile.id === '北京') model = beijingLandmark()
-    else if (tile.kind === 'item') model = itemLandmark()
-    else if (tile.kind === 'tax') model = taxLandmark(tile.id === 'income' ? 'income' : 'maintenance')
-    else if (tile.kind === 'airport') model = airport.clone(true)
-    else if (tile.kind === 'utility') {
-      model = utility.clone(true)
-      model.add(utilityBadge(tile.utilityKind ?? 'water'))
-    } else if (tile.kind === 'chance' || tile.kind === 'fate') {
-      model = symbols[tile.kind].clone(true)
-    }
-    if (model) place(model, tile.index)
+    const create: (() => THREE.Group) | undefined =
+      CITY_LANDMARKS[tile.id] ??
+      (tile.kind === 'item'
+        ? itemLandmark
+        : tile.kind === 'tax'
+          ? () => taxLandmark(tile.id === 'income' ? 'income' : 'maintenance')
+          : tile.kind === 'airport'
+            ? () => airport().clone(true)
+            : tile.kind === 'utility'
+              ? () =>
+                  utility()
+                    .clone(true)
+                    .add(utilityBadge(tile.utilityKind ?? 'water'))
+              : tile.kind === 'chance'
+                ? () => chance().clone(true)
+                : tile.kind === 'fate'
+                  ? () => fate().clone(true)
+                  : undefined)
+    if (create) jobs.push({ index: tile.index, build: () => place(create(), tile.index) })
     else {
       const pad = new THREE.Mesh(padGeometry, padMaterial)
       pad.position.y = 0.073
@@ -207,26 +249,203 @@ export function worldLandscape(scene: THREE.Scene, grounding: ContactShadows) {
       lot.add(pad)
     }
   }
+  const scenery = cached(seaScenery)
+  scene.add(scenery)
 
-  // Background scenery stays beyond the complete ring of landmark lots.
-  for (let i = 0; i < 16; i++) {
-    const angle = (i / 16) * Math.PI * 2,
-      distance = WORLD_SIZE * 1.3
-    const mountain = solid(
-      scene,
-      new THREE.ConeGeometry(5 + (i % 3), 4 + (i % 4), 5),
-      i % 2 ? '#87b5b3' : '#96bebb',
-      Math.sin(angle) * distance,
-      -0.6,
-      Math.cos(angle) * distance,
-    )
-    mountain.rotation.y = angle
-    mountain.scale.z = 0.75
+  // Landmarks in view come first; the rest follow in idle slices so loading never blocks for long.
+  const steps = (index: number) => {
+    const distance = Math.abs(index - options.focusIndex) % BOARD.length
+    return Math.min(distance, BOARD.length - distance)
   }
-  // Decorative scenery rests while players think; gameplay objects animate separately.
-  models.forEach((model) => optimizeStaticModel(model, new Set()))
+  jobs.sort((a, b) => steps(a.index) - steps(b.index))
+  const run = (job: (typeof jobs)[number]) =>
+    cached(() => {
+      const before = models.length
+      job.build()
+      // Decorative scenery rests while players think; gameplay objects animate separately.
+      for (const model of models.slice(before)) optimizeStaticModel(model, new Set())
+    })
+  let next = 0
+  while (next < jobs.length && steps(jobs[next]!.index) <= options.eagerSteps) run(jobs[next++]!)
+
+  let batched: ReturnType<typeof batchStaticLandmarks> | undefined
+  let pending = 0,
+    disposed = false
+  const finish = () => {
+    batched = batchStaticLandmarks(scene, [...lots, ...models, scenery], options.multiDraw)
+    options.onChange(true)
+  }
+  const slice = (remaining: () => number) => {
+    pending = 0
+    if (disposed) return
+    // Always progress at least one landmark, even when the idle deadline has already passed.
+    do run(jobs[next++]!)
+    while (next < jobs.length && remaining() > 4)
+    if (next < jobs.length) {
+      options.onChange(false)
+      schedule()
+    } else finish()
+  }
+  // Safari has no requestIdleCallback; a short timer slice stands in for it.
+  const idleCallbacks = typeof requestIdleCallback === 'function'
+  const schedule = () => {
+    if (idleCallbacks)
+      pending = requestIdleCallback((deadline) => slice(() => deadline.timeRemaining()), { timeout: 250 })
+    else
+      pending = window.setTimeout(() => {
+        const end = performance.now() + 8
+        slice(() => end - performance.now())
+      }, 16)
+  }
+  if (next < jobs.length) schedule()
+  else finish()
   return {
-    models,
-    lots,
+    get ready() {
+      return batched !== undefined
+    },
+    get objects(): THREE.Object3D[] {
+      return batched?.objects ?? [...lots, ...models]
+    },
+    get stats() {
+      return batched?.stats ?? { mode: 'building', built: next, total: jobs.length }
+    },
+    dispose() {
+      disposed = true
+      if (!pending) return
+      if (idleCallbacks) cancelIdleCallback(pending)
+      else window.clearTimeout(pending)
+    },
   }
+}
+
+/** Shallow turquoise at the shore deepening towards the horizon, with a soft foam line. */
+function seaTexture() {
+  const size = 512,
+    shore = WORLD_SIZE / 2 + 2
+  const texture = canvasTexture(size, size, (ctx) => {
+    const image = ctx.createImageData(size, size)
+    // Canvas pixels are sRGB, so stops are interpolated as sRGB bytes rather than linear THREE.Colors.
+    const stops = (
+      [
+        [0, '#cfe9e2'],
+        [1.6, '#96d0cc'],
+        [12, '#86c3c9'],
+        [40, '#7bbac5'],
+        [110, '#74b0c0'],
+      ] as const
+    ).map(([at, hex]) => [at, [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))] as const)
+    for (let y = 0; y < size; y++)
+      for (let x = 0; x < size; x++) {
+        const wx = ((x + 0.5) / size - 0.5) * 700,
+          wz = ((y + 0.5) / size - 0.5) * 700
+        // A rounded-square distance follows the island outline.
+        const distance = (Math.abs(wx) ** 6 + Math.abs(wz) ** 6) ** (1 / 6) - shore
+        let i = 0
+        while (i < stops.length - 2 && distance > stops[i + 1]![0]) i++
+        const [from, a] = stops[i]!,
+          [to, b] = stops[i + 1]!
+        const t = THREE.MathUtils.clamp((distance - from) / (to - from), 0, 1)
+        const offset = (y * size + x) * 4
+        for (let c = 0; c < 3; c++) image.data[offset + c] = a[c]! + (b[c]! - a[c]!) * t
+        image.data[offset + 3] = 255
+      }
+    ctx.putImageData(image, 0, 0)
+  })
+  return texture
+}
+
+/** Islets and boats in the strip of sea that the follow camera sees beyond the landmarks. */
+function seaScenery() {
+  const group = new THREE.Group()
+  const shore = WORLD_SIZE / 2 + 2
+  const hull = new THREE.Shape()
+  hull.moveTo(-1, 0.25)
+  hull.lineTo(1.15, 0.25)
+  hull.lineTo(0.8, -0.15)
+  hull.lineTo(-0.85, -0.15)
+  hull.closePath()
+  const hullGeometry = new THREE.ExtrudeGeometry(hull, { depth: 0.6, bevelEnabled: false }).translate(0, 0, -0.3)
+  const sail = new THREE.Shape()
+  sail.moveTo(0, 0)
+  sail.lineTo(0.9, 0)
+  sail.lineTo(0, 1.15)
+  sail.closePath()
+  const sailGeometry = new THREE.ExtrudeGeometry(sail, { depth: 0.03, bevelEnabled: false })
+  const boat = (x: number, z: number, heading: number) => {
+    const piece = new THREE.Group()
+    solid(piece, hullGeometry, '#f0e9d5')
+    solid(piece, new THREE.BoxGeometry(1.9, 0.08, 0.62), '#9b584d', 0.05, 0.2)
+    solid(piece, new THREE.CylinderGeometry(0.04, 0.04, 1.35, 6), '#9b7a52', -0.05, 0.88)
+    solid(piece, sailGeometry, '#f7f3e6', 0, 0.35)
+    piece.position.set(x, -0.95, z)
+    piece.rotation.y = heading
+    group.add(piece)
+  }
+  const islet = (x: number, z: number, radius: number, palms: number, lighthouse = false) => {
+    const piece = new THREE.Group()
+    // A shallow lagoon ring grounds the islet in the water instead of letting it float.
+    solid(piece, new THREE.CylinderGeometry(radius * 1.7, radius * 1.7, 0.04, 20), '#a8dbd3', 0, 0.02)
+    solid(piece, new THREE.CylinderGeometry(radius, radius * 1.18, 0.5, 14), '#e8d9ae', 0, -0.05)
+    solid(piece, new THREE.CylinderGeometry(radius * 0.72, radius * 0.82, 0.3, 14), '#a9c88f', 0, 0.3)
+    for (let i = 0; i < palms; i++) {
+      const angle = (i / palms) * Math.PI * 2 + radius
+      const px = Math.cos(angle) * radius * 0.38,
+        pz = Math.sin(angle) * radius * 0.38
+      solid(piece, new THREE.CylinderGeometry(0.07, 0.1, 1.1, 6), '#9b7a52', px, 0.95, pz)
+      solid(piece, new THREE.ConeGeometry(0.55, 0.5, 6), '#5f9a6e', px, 1.6, pz)
+    }
+    if (lighthouse) {
+      solid(piece, new THREE.CylinderGeometry(0.22, 0.32, 1.9, 10), '#f7f3e6', 0, 1.35)
+      solid(piece, new THREE.CylinderGeometry(0.24, 0.24, 0.3, 10), '#c95b54', 0, 1.9)
+      solid(piece, new THREE.ConeGeometry(0.3, 0.35, 10), '#c95b54', 0, 2.5)
+    }
+    piece.position.set(x, -0.95, z)
+    group.add(piece)
+  }
+  // Just offshore, so they sit in the strip above the landmarks and clear of the phone HUD.
+  // Each side gets one islet and two boats, varied so sides do not repeat.
+  const layouts = [
+    {
+      islet: [-12, 5.5, 1.6, 3, true],
+      boats: [
+        [6, 4, 0.4],
+        [17, 7.5, -0.3],
+      ],
+    },
+    {
+      islet: [10, 6, 1.4, 2, false],
+      boats: [
+        [-8, 4.5, 2.6],
+        [-19, 8, 3.3],
+      ],
+    },
+    {
+      islet: [-4, 6.5, 1.7, 3, false],
+      boats: [
+        [12, 4.5, 1.2],
+        [-15, 3.5, 0.9],
+      ],
+    },
+    {
+      islet: [15, 5, 1.4, 2, true],
+      boats: [
+        [-3, 4, -1.1],
+        [3, 8.5, 2.2],
+      ],
+    },
+  ] as const
+  layouts.forEach((layout, side) => {
+    const turn = (side * Math.PI) / 2
+    const at = (along: number, offshore: number) =>
+      new THREE.Vector3(along, 0, shore + offshore).applyAxisAngle(new THREE.Vector3(0, 1, 0), turn)
+    const [along, offshore, radius, palms, lighthouse] = layout.islet
+    const spot = at(along, offshore)
+    islet(spot.x, spot.z, radius, palms, lighthouse)
+    for (const [boatAlong, boatOffshore, heading] of layout.boats) {
+      const place = at(boatAlong, boatOffshore)
+      boat(place.x, place.z, heading + turn)
+    }
+  })
+  optimizeStaticModel(group, new Set())
+  return group
 }

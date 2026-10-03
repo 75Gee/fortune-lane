@@ -1,10 +1,22 @@
 import * as THREE from 'three'
 import { MAX_PROPERTY_LEVEL } from '@fortune/game'
 
-export function propertyBuildings() {
+// One pool for the whole board; only occupied buildings are submitted.
+export function propertyBuildings(propertyCount: number) {
   const group = new THREE.Group()
-  const slotGeometry = new THREE.BoxGeometry(0.72, 0.025, 0.72)
-  const insetGeometry = new THREE.BoxGeometry(0.62, 0.012, 0.62)
+  const capacity = propertyCount * MAX_PROPERTY_LEVEL
+  const make = (geometry: THREE.BufferGeometry, color: string, roughness: number, dynamic = false) => {
+    const mesh = new THREE.InstancedMesh(geometry, new THREE.MeshStandardMaterial({ color, roughness }), capacity)
+    mesh.count = 0
+    mesh.castShadow = dynamic
+    mesh.receiveShadow = true
+    if (dynamic) mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
+    group.add(mesh)
+    return mesh
+  }
+  const slots = make(new THREE.BoxGeometry(0.72, 0.025, 0.72), '#a9b9a5', 1)
+  const insets = make(new THREE.BoxGeometry(0.62, 0.012, 0.62), '#d4ddcb', 1)
+  insets.receiveShadow = false
   const wallGeometry = new THREE.BoxGeometry(0.46, 0.26, 0.4)
   const roofShape = new THREE.Shape()
   roofShape.moveTo(-0.29, 0)
@@ -16,52 +28,65 @@ export function propertyBuildings() {
     0.27,
     -0.24,
   )
-  const doorGeometry = new THREE.BoxGeometry(0.09, 0.16, 0.012)
-  const windowGeometry = new THREE.BoxGeometry(0.085, 0.075, 0.012)
-  const slotMaterial = new THREE.MeshStandardMaterial({ color: '#a9b9a5', roughness: 1 })
-  const insetMaterial = new THREE.MeshStandardMaterial({ color: '#d4ddcb', roughness: 1 })
-  const houseMaterial = new THREE.MeshStandardMaterial({ color: '#42a477', roughness: 0.8 })
-  const houseRoof = new THREE.MeshStandardMaterial({ color: '#267c59', roughness: 0.8 })
-  const hotelMaterial = new THREE.MeshStandardMaterial({ color: '#db6862', roughness: 0.8 })
-  const hotelRoof = new THREE.MeshStandardMaterial({ color: '#b84746', roughness: 0.8 })
-  const doorMaterial = new THREE.MeshStandardMaterial({ color: '#e3ead8', roughness: 0.9 })
-  const windowsMaterial = new THREE.MeshStandardMaterial({ color: '#d1e9e7', roughness: 0.6 })
-  const models: THREE.Group[] = []
-  for (let i = 0; i < MAX_PROPERTY_LEVEL; i++) {
-    const slot = new THREE.Mesh(slotGeometry, slotMaterial)
-    slot.position.set((i - (MAX_PROPERTY_LEVEL - 1) / 2) * 0.82, 0.014, 0)
-    slot.receiveShadow = true
-    group.add(slot)
-    const inset = new THREE.Mesh(insetGeometry, insetMaterial)
-    inset.position.y = 0.019
-    slot.add(inset)
-    const model = new THREE.Group()
-    model.position.set(slot.position.x, 0.045, 0)
-    group.add(model)
-    models.push(model)
-    const hotel = i === MAX_PROPERTY_LEVEL - 1
-    const wall = new THREE.Mesh(wallGeometry, hotel ? hotelMaterial : houseMaterial)
-    wall.position.y = 0.14
-    model.add(wall)
-    model.add(new THREE.Mesh(roofGeometry, hotel ? hotelRoof : houseRoof))
-    const door = new THREE.Mesh(doorGeometry, doorMaterial)
-    door.position.set(-0.085, 0.09, 0.206)
-    model.add(door)
-    const window = new THREE.Mesh(windowGeometry, windowsMaterial)
-    window.position.set(0.09, 0.18, 0.206)
-    model.add(window)
-    model.traverse((piece) => {
-      if (piece instanceof THREE.Mesh) piece.castShadow = piece.receiveShadow = true
-    })
-    model.visible = false
+  const walls = [make(wallGeometry, '#42a477', 0.8, true), make(wallGeometry, '#db6862', 0.8, true)]
+  const roofs = [make(roofGeometry, '#267c59', 0.8, true), make(roofGeometry, '#b84746', 0.8, true)]
+  const doors = make(new THREE.BoxGeometry(0.09, 0.16, 0.012), '#e3ead8', 0.9, true)
+  const windows = make(new THREE.BoxGeometry(0.085, 0.075, 0.012), '#d1e9e7', 0.6, true)
+  const dynamicMeshes = [...walls, ...roofs, doors, windows]
+  const rows: { matrix: THREE.Matrix4; level: number; mortgaged: boolean }[] = []
+  const local = new THREE.Matrix4(),
+    matrix = new THREE.Matrix4()
+  const place = (mesh: THREE.InstancedMesh, transform: THREE.Matrix4, x: number, y: number, z = 0) => {
+    matrix.multiplyMatrices(transform, local.makeTranslation(x, y, z))
+    mesh.setMatrixAt(mesh.count++, matrix)
+  }
+  const refresh = (meshes: THREE.InstancedMesh[]) => {
+    for (const mesh of meshes) {
+      mesh.instanceMatrix.needsUpdate = true
+      mesh.computeBoundingSphere()
+    }
+  }
+  const rebuild = () => {
+    for (const mesh of dynamicMeshes) mesh.count = 0
+    for (const row of rows) {
+      if (row.mortgaged) continue
+      for (let i = 0; i < Math.min(row.level, MAX_PROPERTY_LEVEL); i++) {
+        const x = (i - (MAX_PROPERTY_LEVEL - 1) / 2) * 0.82
+        const hotel = i === MAX_PROPERTY_LEVEL - 1 ? 1 : 0
+        place(walls[hotel]!, row.matrix, x, 0.185)
+        place(roofs[hotel]!, row.matrix, x, 0.045)
+        place(doors, row.matrix, x - 0.085, 0.135, 0.206)
+        place(windows, row.matrix, x + 0.09, 0.225, 0.206)
+      }
+    }
+    refresh(dynamicMeshes)
   }
   return {
     group,
-    footprints: models.map((model) => model.position.clone()),
-    setLevel(level: number, mortgaged: boolean) {
-      models.forEach((model, index) => {
-        model.visible = !mortgaged && index < level
-      })
+    addRow(position: THREE.Vector3, rotation: number) {
+      const anchor = new THREE.Group()
+      anchor.position.copy(position)
+      anchor.rotation.y = rotation
+      anchor.updateMatrix()
+      const row = { matrix: anchor.matrix.clone(), level: 0, mortgaged: false }
+      rows.push(row)
+      const footprints: THREE.Vector3[] = []
+      for (let i = 0; i < MAX_PROPERTY_LEVEL; i++) {
+        const x = (i - (MAX_PROPERTY_LEVEL - 1) / 2) * 0.82
+        place(slots, row.matrix, x, 0.014)
+        place(insets, row.matrix, x, 0.033)
+        footprints.push(new THREE.Vector3(x, 0.045, 0).applyMatrix4(row.matrix))
+      }
+      refresh([slots, insets])
+      return {
+        footprints,
+        setLevel(level: number, mortgaged: boolean) {
+          if (row.level === level && row.mortgaged === mortgaged) return
+          row.level = level
+          row.mortgaged = mortgaged
+          rebuild()
+        },
+      }
     },
   }
 }
