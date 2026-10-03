@@ -97,6 +97,33 @@
   --shadow-md: 0 10px 30px #1f2a4429;
   --shadow-lg: 0 18px 48px #1f2a4442;
 
+  /*
+   * Roles — what new and reworked components size themselves by. Desktop keeps the roomy values
+   * the passport layout was drawn with; phones (≤800px, below) switch to one compact scale:
+   * five type sizes, three control heights, three radii and one gutter.
+   */
+  --type-meta: var(--text-sm); /* captions, labels, secondary facts */
+  --type-body: var(--text-md); /* running text, list rows, ordinary buttons */
+  --type-strong: var(--text-base); /* primary buttons, emphasised values */
+  --type-title: var(--text-2xl); /* panel and sheet titles */
+  --type-figure: var(--text-3xl); /* the one number the current step is about */
+  --control-primary: var(--control-height-lg);
+  --control: var(--control-height);
+  --control-small: 36px;
+  --icon-button: 40px;
+  --icon-button-small: 32px;
+  --radius-control: var(--radius-sm);
+  --radius-card: var(--radius-lg);
+  --radius-sheet: var(--radius-xl);
+  --gutter: var(--space-6); /* screen edge to floating UI */
+  --pad: var(--space-5); /* inside panels and sheets */
+  --gap: var(--space-2);
+  /* Everything that floats over the board shares one surface. */
+  --float-bg: var(--surface);
+  --float-border: 1px solid var(--line);
+  --float-shadow: var(--shadow-sm);
+  --float-radius: var(--radius-card);
+
   /* Motion */
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   --duration-fast: 0.16s;
@@ -132,6 +159,25 @@
   --yellow: var(--warning);
   --blue: var(--info);
   --shadow: var(--shadow-lg);
+}
+
+/* Phones: the compact scale. */
+@media (max-width: 800px) {
+  :root {
+    --type-meta: var(--text-xs); /* 11 */
+    --type-body: var(--text-md); /* 13 */
+    --type-strong: 15px;
+    --type-title: var(--text-xl); /* 18 */
+    --type-figure: var(--text-2xl); /* 22 */
+    --control-primary: 44px;
+    --control: 36px;
+    --control-small: 28px;
+    --icon-button: 36px;
+    --icon-button-small: 28px;
+    --radius-sheet: 16px;
+    --gutter: var(--space-3);
+    --pad: var(--space-3);
+  }
 }
 
 /*

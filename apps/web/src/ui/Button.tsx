@@ -36,7 +36,8 @@ export interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonEle
   /** Accessible name; also shown as the tooltip. */
   label: string
   icon: ReactNode
-  variant?: 'outline' | 'ghost'
+  /** `float`: round, on the shared floating surface, for controls over the board. */
+  variant?: 'outline' | 'ghost' | 'float'
   size?: 'sm' | 'md'
 }
 

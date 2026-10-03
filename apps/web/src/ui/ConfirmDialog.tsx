@@ -39,13 +39,13 @@ export function ConfirmDialog({
           <h2 className={styles.title}>{title}</h2>
           <p className={styles.description}>{description}</p>
           <div className={styles.actions}>
-            <Button size="lg" autoFocus disabled={locked} onClick={onCancel}>
+            <Button size="lg" variant="outline" autoFocus disabled={locked} onClick={onCancel}>
               {cancelLabel}
             </Button>
             <Button
               size="lg"
               variant={tone}
-              icon={tone === 'danger' ? <TriangleAlert size={18} /> : undefined}
+              icon={tone === 'danger' ? <TriangleAlert size={16} /> : undefined}
               disabled={confirmDisabled || locked}
               onClick={onConfirm}
             >
