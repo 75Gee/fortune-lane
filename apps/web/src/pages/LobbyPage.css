@@ -6,7 +6,7 @@
   flex-shrink: 0;
   padding: 0;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: var(--surface);
 }
 .icon-command:hover {
@@ -32,7 +32,7 @@
 }
 .lobby-status {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--text-base);
 }
 .room-invite-actions {
   display: flex;
@@ -47,11 +47,11 @@
   gap: 16px;
   min-height: 52px;
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 .room-code span {
   color: var(--muted);
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 .room-code strong {
   font-size: 25px;
@@ -94,11 +94,11 @@
   gap: 9px;
 }
 .seat-info strong {
-  font-size: 16px;
+  font-size: var(--text-lg);
   overflow-wrap: anywhere;
 }
 .seat-info span {
-  font-size: 12px;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .host-crown {
@@ -160,10 +160,10 @@
     height: 38px;
   }
   .seat-info strong {
-    font-size: 13px;
+    font-size: var(--text-md);
   }
   .seat-info span {
-    font-size: 11px;
+    font-size: var(--text-xs);
   }
   .lobby-actions {
     position: fixed;
@@ -195,7 +195,7 @@
     width: calc(100% - 32px);
     margin-top: 16px;
     padding: 20px 16px;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
   }
   .lobby-heading h1 {
     font-size: 25px;
@@ -215,7 +215,7 @@
   }
   .invite-command {
     padding: 10px 12px;
-    font-size: 12px;
+    font-size: var(--text-sm);
   }
   .player-seat {
     grid-template-columns: 1fr;
@@ -229,7 +229,7 @@
     gap: 5px;
   }
   .game-header .brand {
-    font-size: 13px;
+    font-size: var(--text-md);
     gap: 6px;
   }
   .game-header .icon-command {
@@ -268,13 +268,13 @@
   margin-top: 24px;
   padding: 14px 18px;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: var(--surface-subtle);
   text-align: left;
 }
 .lobby-rules summary {
   cursor: pointer;
-  font-size: 13px;
+  font-size: var(--text-md);
   font-weight: 650;
   color: var(--text-secondary);
 }
@@ -284,7 +284,7 @@
 }
 .lobby-rules li {
   padding: 5px 0;
-  font-size: 12px;
+  font-size: var(--text-sm);
   line-height: 1.8;
   color: var(--text-muted);
 }
@@ -292,16 +292,16 @@
   min-height: 40px;
   padding: 8px 12px;
   border: 0;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   background: var(--surface-subtle);
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: var(--text-md);
 }
 .invite-command {
   background: transparent;
   border: 0;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 .room-code strong {
   user-select: text;
@@ -310,7 +310,7 @@
   color: var(--text-muted);
 }
 .lobby-table {
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
 }
 .lobby-actions {
   flex-wrap: wrap;
@@ -319,7 +319,7 @@
   flex-basis: 100%;
   margin: 0 0 2px;
   color: var(--ui-muted);
-  font-size: 13px;
+  font-size: var(--text-md);
   line-height: 1.6;
   text-align: center;
 }
@@ -331,10 +331,10 @@
   min-height: 48px;
   padding: 12px 24px;
   border: 1px solid var(--ui-line);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: var(--text-base);
 }
 @media (min-width: 801px) {
   .lobby-table {

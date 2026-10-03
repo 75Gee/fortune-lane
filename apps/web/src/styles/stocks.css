@@ -8,7 +8,7 @@
   font-variant-numeric: tabular-nums;
 }
 .stock-account strong small {
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 500;
   white-space: nowrap;
 }
@@ -26,7 +26,7 @@
   margin-bottom: 6px;
 }
 .stock-account-details dd {
-  font-size: 14px;
+  font-size: var(--text-base);
 }
 .stock-selector {
   margin-bottom: 18px;
@@ -55,7 +55,7 @@
 }
 .stock-workspace .stock-order {
   grid-area: order;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: var(--surface-subtle);
 }
 .stock-workspace .stock-detail {
@@ -70,24 +70,24 @@
 }
 .stock-order-available {
   padding: 12px 0;
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 .stock-order > label,
 .stock-order > label span {
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 .stock-quantity-heading {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 4px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   color: var(--ui-muted);
 }
 .stock-order-total > div {
   display: grid;
   gap: 6px;
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 .stock-order-note:empty {
   margin: 0;
@@ -103,7 +103,7 @@
 }
 .stock-help-content h3 {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--text-sm);
   color: var(--ink);
 }
 /*
@@ -295,7 +295,7 @@
   color: #9fd8b8;
 }
 .stock-selector > button.is-selected .stock-neutral {
-  color: #c7cbd6;
+  color: var(--text-on-ink-muted);
 }
 
 /* Selected stock */

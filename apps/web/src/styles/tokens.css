@@ -14,6 +14,7 @@
   --text-subtle: #6a6252;
   --text-on-accent: #fff;
   --text-on-ink: #f7f2e8;
+  --text-on-ink-muted: #c7cbd6;
 
   /* Surfaces */
   --surface: #f7f2e8;
@@ -24,6 +25,7 @@
   --surface-page: #e9e2d3;
   --surface-warm: #f4dcc0;
   --surface-ink: #1f2a44;
+  --surface-ink-hover: #2a3656;
   --scrim: #1f2a4480;
 
   /* Lines */
@@ -31,6 +33,7 @@
   --line-soft: #ece4d3;
   --line-strong: #cbbd9f;
   --line-ink: #1f2a44;
+  --line-on-ink: #3a4560; /* dividers on ink surfaces */
   --focus-ring: #b8452c99;
 
   /* Brand & status */

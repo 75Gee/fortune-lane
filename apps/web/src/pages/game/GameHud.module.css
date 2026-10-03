@@ -226,7 +226,7 @@
   background: var(--surface-ink);
   color: var(--text-on-ink);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: var(--text-2xs);
 }
 .travellerText {
   display: flex;
@@ -312,7 +312,7 @@
   min-height: 42px;
   padding: 8px 10px;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: transparent;
   color: var(--text);
   font-size: var(--text-md);
@@ -691,17 +691,17 @@
   }
   .wallet button + button,
   .walletStock + .walletItems {
-    border-left: 1px solid #3a4560;
+    border-left: 1px solid var(--line-on-ink);
   }
   @media (hover: hover) {
     .wallet button:hover {
-      background: #2a3656;
+      background: var(--surface-ink-hover);
     }
   }
   .wallet small {
     flex-shrink: 0;
     font-size: var(--text-2xs);
-    color: #c7cbd6;
+    color: var(--text-on-ink-muted);
   }
   .wallet strong,
   .walletCash strong {

@@ -35,7 +35,7 @@
   line-height: 1.15;
 }
 .wheel-start span {
-  font-size: 10px;
+  font-size: var(--text-2xs);
 }
 .wheel-start:disabled {
   opacity: 1;

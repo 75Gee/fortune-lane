@@ -35,7 +35,7 @@
   width: 45px;
   height: 45px;
   border: 1px solid var(--line-strong);
-  border-radius: 7px;
+  border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--text-secondary);
   font-size: 38px;
@@ -68,7 +68,7 @@
     width: 28px;
     height: 28px;
     font-size: 24px;
-    border-radius: 5px;
+    border-radius: var(--radius-sm);
   }
 }
 .dice-presentation {
@@ -104,9 +104,9 @@
   max-width: 100%;
   padding: 9px 14px;
   border: 1px solid var(--line);
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   background: #f7faf2ed;
-  font-size: 13px;
+  font-size: var(--text-md);
   line-height: 1.6;
 }
 .dice-stage-caption strong {
@@ -127,7 +127,7 @@
     height: 245px;
   }
   .dice-stage-caption {
-    font-size: 12px;
+    font-size: var(--text-sm);
     padding: 7px 10px;
     gap: 6px;
   }
