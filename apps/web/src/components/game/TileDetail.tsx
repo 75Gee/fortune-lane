@@ -67,6 +67,7 @@ export function TileDetail({
             autoFocus
           />
         )}
+        <CityImage city={tile.name} className={styles.thumb} thumbnail />
         <div className={styles.title}>
           <h3>{tile.name}</h3>
           <small>{subtitle}</small>

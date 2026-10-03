@@ -137,6 +137,7 @@
   font-size: var(--text-sm);
 }
 
+/* Phones: a bottom sheet on the compact scale with a one-line header — title, then whose/which. */
 @media (max-width: 800px) {
   .overlay {
     padding: 0;
@@ -146,9 +147,62 @@
   .wide {
     width: 100%;
     max-height: 90dvh;
-    border-radius: 18px 18px 0 0;
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  }
+  .header {
+    gap: var(--gap);
+    padding: 10px var(--pad);
+    border-bottom-width: 1px;
+  }
+  .header > div {
+    display: flex;
+    align-items: baseline;
+    gap: var(--gap);
+  }
+  .header h2 {
+    order: -1;
+    flex-shrink: 0;
+    font-size: var(--type-title);
+  }
+  .header small {
+    overflow: hidden;
+    font-size: var(--type-meta);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .icon {
+    width: 28px;
+    height: 28px;
+    border-width: 1px;
+  }
+  .icon svg {
+    width: 16px;
+    height: 16px;
+  }
+  .clock {
+    padding: 2px 8px;
+    font-size: var(--type-meta);
   }
   .body {
-    padding: 14px 16px calc(18px + env(safe-area-inset-bottom));
+    gap: var(--gap);
+    padding: 12px var(--pad) calc(12px + env(safe-area-inset-bottom));
+  }
+  .note {
+    font-size: var(--type-meta);
+  }
+  .strong {
+    font-size: var(--type-strong);
+  }
+  .choices button {
+    padding: 8px 12px;
+  }
+  .choices strong {
+    font-size: var(--type-strong);
+  }
+  .levels {
+    font-size: var(--type-body);
+  }
+  .choices small {
+    font-size: var(--type-meta);
   }
 }

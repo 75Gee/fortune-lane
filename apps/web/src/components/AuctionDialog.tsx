@@ -11,6 +11,7 @@ import { Clock3, Gavel, X } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
 import { formatMoney } from '../lib/format.js'
 import { tileSetLabel } from '../lib/tiles.js'
+import { useMediaQuery } from '../lib/useCountdown.js'
 import { Button, IconButton } from '../ui/index.js'
 import styles from './AuctionDialog.module.css'
 import { CityImage } from './CityImage.js'
@@ -35,6 +36,8 @@ export function AuctionDialog({
   onClose?: (() => void) | undefined
 }) {
   const available = useContext(CommandAvailabilityContext)
+  // Phones fold the bidder list to a one-line count; the bid itself is what this step is about.
+  const compact = useMediaQuery('(max-width: 800px)')
   const tile = getTile(auction.tileIndex)
   const minimumBid = auctionMinimumBid(auction.tileIndex)
   const [amount, setAmount] = useState(() => String(minimumBid))
@@ -171,11 +174,11 @@ export function AuctionDialog({
                   </p>
                 )}
                 {valid && <StockPaymentHint payment={payment} onWin />}
-                <p className={styles.rule}>
-                  {funds < minimumBid
-                    ? `现金与持股不足，还差 ${formatMoney(minimumBid - funds)}`
-                    : '出价提交后不可修改；超时视为放弃。'}
-                </p>
+                {funds < minimumBid ? (
+                  <p className={styles.error}>现金与持股不足，还差 {formatMoney(minimumBid - funds)}</p>
+                ) : (
+                  <p className={`${styles.rule} ${styles.wideOnly}`}>出价提交后不可修改；超时视为放弃。</p>
+                )}
                 <div className={styles.commands}>
                   <Button variant="outline" size="lg" disabled={locked} onClick={() => submit(0)}>
                     放弃竞拍
@@ -200,43 +203,52 @@ export function AuctionDialog({
               </>
             )}
 
-            <table className={styles.ledger} aria-label="竞拍玩家可用资金与出价状态">
-              <thead>
-                <tr>
-                  <th scope="col">竞拍玩家</th>
-                  <th scope="col">现金＋持股</th>
-                  <th scope="col">状态</th>
-                </tr>
-              </thead>
-              <tbody>
-                {auction.participantIds.map((id) => {
-                  const player = game.players.find((candidate) => candidate.id === id)
-                  const capacity = stockPaymentCapacity(game, id)
-                  const hasBid = Object.hasOwn(auction.bids, id)
-                  return (
-                    <tr key={id} className={id === playerId ? styles.me : undefined}>
-                      <td>
-                        <span className={styles.who}>
-                          {player && <TokenImage token={player.token} alt="" />}
-                          {player?.name ?? '玩家'}
-                          {id === playerId ? ' · 你' : ''}
-                        </span>
-                      </td>
-                      <td className={styles.money}>{player ? formatMoney(capacity) : '—'}</td>
-                      <td>
-                        {hasBid ? (
-                          <span className={styles.sealed}>已密封出价</span>
-                        ) : capacity < minimumBid ? (
-                          <span className={styles.short}>资金不足</span>
-                        ) : (
-                          <span className={styles.thinking}>思考中…</span>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+            <details className={styles.ledgerBox} open={!compact}>
+              <summary
+                onClick={(event) => {
+                  if (!compact) event.preventDefault()
+                }}
+              >
+                竞拍玩家 · {Object.keys(auction.bids).length}/{auction.participantIds.length} 已出价
+              </summary>
+              <table className={styles.ledger} aria-label="竞拍玩家可用资金与出价状态">
+                <thead>
+                  <tr>
+                    <th scope="col">竞拍玩家</th>
+                    <th scope="col">现金＋持股</th>
+                    <th scope="col">状态</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {auction.participantIds.map((id) => {
+                    const player = game.players.find((candidate) => candidate.id === id)
+                    const capacity = stockPaymentCapacity(game, id)
+                    const hasBid = Object.hasOwn(auction.bids, id)
+                    return (
+                      <tr key={id} className={id === playerId ? styles.me : undefined}>
+                        <td>
+                          <span className={styles.who}>
+                            {player && <TokenImage token={player.token} alt="" />}
+                            {player?.name ?? '玩家'}
+                            {id === playerId ? ' · 你' : ''}
+                          </span>
+                        </td>
+                        <td className={styles.money}>{player ? formatMoney(capacity) : '—'}</td>
+                        <td>
+                          {hasBid ? (
+                            <span className={styles.sealed}>已密封出价</span>
+                          ) : capacity < minimumBid ? (
+                            <span className={styles.short}>资金不足</span>
+                          ) : (
+                            <span className={styles.thinking}>思考中…</span>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </details>
 
             <details className={styles.rules}>
               <summary>竞拍规则</summary>

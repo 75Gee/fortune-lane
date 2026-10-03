@@ -333,6 +333,13 @@
   margin: 6px 0 0;
 }
 
+.ledgerBox > summary {
+  display: none;
+}
+/*
+ * Phones: the bid is the step. Starting price, my funds, the input and the commands lead; the
+ * cover art, stamp, notes and per-player ledger step back (the ledger folds to a count).
+ */
 @media (max-width: 800px) {
   .overlay {
     padding: 0;
@@ -342,30 +349,37 @@
     flex-direction: column;
     width: 100%;
     max-height: 92dvh;
-    border-radius: 18px 18px 0 0;
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
   }
-  .cover {
-    width: 100%;
-    height: 120px;
-  }
-  .stamp {
-    left: auto;
-    right: 16px;
-    bottom: 14px;
-    padding: 6px 12px;
-  }
-  .stamp strong {
-    font-size: var(--text-lg);
+  .cover,
+  .stamp,
+  .kicker,
+  .facts .factNote,
+  .wideOnly {
+    display: none;
   }
   .content {
-    gap: 14px;
-    padding: 16px;
+    gap: var(--space-3);
+    padding: 12px var(--pad) calc(12px + env(safe-area-inset-bottom));
   }
   .titleRow h2 {
-    font-size: var(--text-3xl);
+    font-size: var(--type-title);
   }
   .facts dd {
-    font-size: var(--text-xl);
+    font-size: var(--type-strong);
+  }
+  .facts > div {
+    padding: 8px 12px;
+  }
+  .facts dt {
+    font-size: var(--type-meta);
+  }
+  .bidField {
+    height: var(--control-primary);
+  }
+  .bidField span,
+  .bidField input {
+    font-size: var(--type-figure);
   }
   .bidRow {
     flex-wrap: wrap;
@@ -375,7 +389,16 @@
   }
   .quick {
     flex: 1;
-    min-height: 44px;
+    min-height: var(--control-small);
+  }
+  .ledgerBox > summary {
+    display: list-item;
+    color: var(--text-secondary);
+    font-size: var(--type-meta);
+    cursor: pointer;
+  }
+  .ledger {
+    margin-top: var(--space-2);
   }
   .ledger th:last-child,
   .ledger td:last-child {

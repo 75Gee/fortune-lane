@@ -394,23 +394,98 @@
   overflow-y: auto;
 }
 
+/*
+ * Phones: a sheet on the compact scale. The room code lives in the menu, so the header is just the
+ * title; rows, chips and thumbnails drop a size so lists show more at once.
+ */
 @media (max-width: 800px) {
   .drawer {
     top: auto;
     width: 100%;
     max-height: 88dvh;
     border-left: 0;
-    border-radius: 18px 18px 0 0;
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
     padding-bottom: env(safe-area-inset-bottom);
   }
   .header {
-    padding: 14px 16px 10px;
+    align-items: center;
+    padding: 10px 8px 10px var(--pad);
+  }
+  .header h2 {
+    font-size: var(--type-title);
+  }
+  .header span {
+    display: none;
+  }
+  .tabs {
+    padding: 0 var(--space-2);
+  }
+  .tabs button {
+    min-height: var(--control);
+    font-size: var(--type-body);
   }
   .section {
-    padding: 14px 16px 20px;
+    padding: 12px var(--pad) 16px;
+  }
+  .ledgerHead,
+  .copy small,
+  .figures dt,
+  .listHeading span,
+  .assetCopy small {
+    font-size: var(--type-meta);
+  }
+  .traveller {
+    min-height: 48px;
+    padding: 6px 4px;
+  }
+  .rank,
+  .copy strong,
+  .worth,
+  .stocks,
+  .empty,
+  .debt {
+    font-size: var(--type-body);
+  }
+  .token {
+    width: 28px;
+    height: 28px;
+  }
+  .token img {
+    width: 19px;
+    height: 19px;
   }
   .owners {
-    margin-inline: -16px;
-    padding-inline: 16px;
+    margin-inline: calc(-1 * var(--pad));
+    padding-inline: var(--pad);
+  }
+  .owners button {
+    min-height: var(--control);
+    font-size: var(--type-body);
+  }
+  .owners .token {
+    width: 26px;
+    height: 26px;
+  }
+  .owners .token img {
+    width: 17px;
+    height: 17px;
+  }
+  .figures > div {
+    padding: 8px 10px;
+  }
+  .figures dd {
+    font-size: var(--type-strong);
+  }
+  .listHeading,
+  .assetCopy strong {
+    font-size: var(--type-strong);
+  }
+  .asset {
+    padding: 4px 8px 4px 4px;
+  }
+  .assetImage {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-control);
   }
 }

@@ -194,6 +194,14 @@
   line-height: 1.8;
 }
 
+.thumb {
+  display: none;
+}
+
+/*
+ * Phones: what this tile costs a visitor leads; price and mortgage step down, the city photo
+ * shrinks to a header thumbnail.
+ */
 @media (max-width: 800px) {
   .floating {
     top: auto;
@@ -204,10 +212,60 @@
     max-height: 86dvh;
     transform: none;
     border-width: 1px 0 0;
-    border-radius: 18px 18px 0 0;
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
     padding-bottom: env(safe-area-inset-bottom);
   }
   .image {
-    aspect-ratio: 2 / 1;
+    display: none;
+  }
+  .thumb {
+    display: block;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: var(--radius-control);
+    object-fit: cover;
+  }
+  .header {
+    gap: var(--gap);
+    padding: 10px 8px 10px var(--pad);
+    border-bottom-width: 1px;
+  }
+  .header > button:first-child {
+    margin-left: -4px;
+  }
+  .title h3 {
+    font-size: var(--type-title);
+  }
+  .title small {
+    font-size: var(--type-meta);
+  }
+  .hazard {
+    margin: var(--space-3) var(--pad) 0;
+    font-size: var(--type-meta);
+  }
+  .content {
+    gap: var(--space-3);
+    padding: 12px var(--pad) 16px;
+  }
+  .facts dt,
+  .note,
+  .actions small {
+    font-size: var(--type-meta);
+  }
+  .facts dd {
+    font-size: var(--type-body);
+  }
+  .facts > .rent dd {
+    font-size: var(--type-figure);
+  }
+  .actions button {
+    min-height: var(--control);
+    padding: 0 12px;
+    font-size: var(--type-body);
+  }
+  .rule {
+    padding: var(--pad);
+    font-size: var(--type-body);
   }
 }

@@ -12,6 +12,7 @@ import {
 } from '@fortune/game'
 import { ArrowDownUp, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { IconButton } from '../../ui/index.js'
 import { Modal } from '../Modal.js'
 import { StockChart } from './StockChart.js'
 import { StockQuantitySlider } from './StockQuantitySlider.js'
@@ -111,9 +112,7 @@ export function StockMarketPanel({
             <h2>股市</h2>
             <span>{game.phase === 'FINISHED' ? '本局已收盘' : `第 ${market.updatedTurn} 回合行情`}</span>
           </div>
-          <button className="icon-command" onClick={onClose} aria-label="关闭股市">
-            <X size={20} />
-          </button>
+          <IconButton variant="ghost" label="关闭股市" icon={<X size={18} />} onClick={onClose} />
         </header>
         <div className="stock-panel-body">
           <section className="stock-account" aria-label="我的持仓">

@@ -49,8 +49,16 @@
 }
 
 @media (max-width: 800px) {
+  /* The cards are the whole decision; their numbers add nothing. */
   .cards {
-    gap: 8px;
+    gap: var(--gap);
+    padding: 0 var(--space-3);
+  }
+  .cards button {
+    padding: 4px;
+  }
+  .cards button > span:last-child {
+    display: none;
   }
   .passOverlay {
     padding: 0;

@@ -415,9 +415,6 @@
   .lobby-actions .lobby-status {
     grid-column: 1 / -1;
   }
-  .stock-panel {
-    width: calc(100vw - 24px);
-  }
 }
 @media (max-width: 600px) {
   .player-seat {
@@ -430,84 +427,6 @@
   }
   .lobby-screen {
     padding-bottom: calc(132px + env(safe-area-inset-bottom));
-  }
-  .stock-panel {
-    width: 100%;
-    border-radius: 10px 10px 0 0;
-  }
-  .stock-panel-body {
-    padding: 16px;
-  }
-  .stock-account {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    padding-bottom: 12px;
-  }
-  .stock-account > div > strong {
-    font-size: 18px;
-  }
-  .stock-account strong small {
-    font-size: 11px;
-  }
-  .stock-account-details {
-    grid-column: 1 / -1;
-  }
-  .stock-account-details summary {
-    width: fit-content;
-    padding-block: 3px;
-  }
-  .stock-selector {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 5px;
-    margin-bottom: 14px;
-  }
-  .stock-selector > button {
-    padding: 9px 6px;
-  }
-  .stock-selector strong {
-    font-size: 12px;
-  }
-  .stock-selector b {
-    font-size: 13px;
-  }
-  .stock-selector > button > div {
-    display: grid;
-    gap: 4px;
-    margin-top: 6px;
-  }
-  .stock-selector > button > div small {
-    font-size: 11px;
-  }
-  .stock-selected {
-    margin-bottom: 12px;
-  }
-  .stock-selected > strong {
-    font-size: 21px;
-  }
-  .stock-selected p {
-    font-size: 11px;
-  }
-  .stock-workspace {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: 'order' 'chart';
-    gap: 14px;
-  }
-  .stock-help-content {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 16px;
-  }
-  .stock-help {
-    margin-top: 9px;
-    padding-top: 12px;
-  }
-  .stock-order-available {
-    padding: 10px 0;
-  }
-  .stock-order-total {
-    margin: 12px 0;
-  }
-  .stock-order-note {
-    margin-bottom: 0;
   }
   .library-card summary {
     gap: 8px;

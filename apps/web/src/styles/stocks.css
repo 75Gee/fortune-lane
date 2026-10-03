@@ -570,6 +570,10 @@
   }
 }
 
+/*
+ * Phones: the selected stock and its order form are the step. Holdings shrink to one line, the
+ * four tickers to one row, and everything sits on the compact scale.
+ */
 @media (max-width: 800px) {
   .stock-panel {
     top: auto;
@@ -578,49 +582,106 @@
     transform: none;
     width: 100%;
     max-height: 92dvh;
-    border-radius: 18px 18px 0 0;
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
   }
   .stock-panel-header {
-    padding: 12px 16px;
+    padding: 10px 8px 10px var(--pad);
   }
   .stock-panel-header h2 {
-    font-size: var(--text-2xl);
+    font-size: var(--type-title);
+  }
+  .stock-panel-header span {
+    font-size: var(--type-meta);
   }
   .stock-panel-body {
-    gap: 14px;
-    padding: 14px 16px 20px;
+    gap: var(--space-3);
+    padding: 12px var(--pad) calc(16px + env(safe-area-inset-bottom));
   }
   .stock-account {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+    align-items: center;
+    gap: var(--gap);
+    padding-bottom: var(--space-3);
   }
-  .stock-account-details {
-    grid-column: 1 / -1;
+  .stock-account > div > span {
+    font-size: var(--type-meta);
   }
   .stock-account > div > strong {
-    font-size: var(--text-xl);
+    font-size: var(--type-strong);
+  }
+  .stock-account > div > strong small {
+    font-size: var(--type-meta);
+  }
+  .stock-account-details summary {
+    min-height: var(--control-small);
+    padding: 4px 10px;
+    font-size: var(--type-meta);
+  }
+  .stock-account-details[open] {
+    grid-column: 1 / -1;
   }
   .stock-selector {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 6px;
   }
   .stock-selector > button {
-    padding: 8px 10px;
+    gap: 2px;
+    padding: 6px 8px;
+    border-width: 1px;
+  }
+  .stock-selector strong,
+  .stock-selector small {
+    font-size: var(--type-meta);
   }
   .stock-selector b {
-    font-size: var(--text-base);
+    font-size: var(--type-body);
   }
   .stock-selected h3 {
-    font-size: var(--text-2xl);
+    font-size: var(--type-title);
+  }
+  .stock-selected p {
+    font-size: var(--type-meta);
   }
   .stock-selected > strong {
-    font-size: var(--text-2xl);
+    font-size: var(--type-figure);
   }
   .stock-workspace {
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: var(--space-3);
   }
   .stock-order {
     order: 0;
-    padding: 14px;
+    gap: var(--gap);
+    padding: 12px;
+    border-width: 1px;
+  }
+  .stock-workspace {
+    grid-template-areas: 'order' 'chart';
+  }
+  .stock-help-content {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+  .stock-order-available {
+    padding: 8px 0;
+  }
+  .stock-order-total {
+    margin: 8px 0;
+  }
+  .stock-order-note {
+    margin-bottom: 0;
+  }
+  .stock-order-tabs button {
+    min-height: var(--control);
+  }
+  .stock-order > input {
+    height: var(--control-primary);
+    font-size: var(--type-strong);
+  }
+  .stock-order-shortcuts button {
+    min-height: var(--control-small);
+  }
+  .stock-submit {
+    min-height: var(--control-primary);
   }
 }
