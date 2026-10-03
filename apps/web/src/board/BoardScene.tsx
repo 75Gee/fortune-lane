@@ -46,6 +46,9 @@ export default function BoardScene(props: BoardSceneProps) {
   useEffect(() => {
     controller.current?.setEnabled(props.active ?? true)
   }, [props.active])
+  useEffect(() => {
+    latest.current.onCameraModeChange?.(mode)
+  }, [mode])
   return (
     <div
       className={styles.wrap}

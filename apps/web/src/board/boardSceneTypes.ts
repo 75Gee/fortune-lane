@@ -12,6 +12,7 @@ export interface BoardSceneProps {
   /** Canvas edges covered by the HUD, in CSS pixels; the camera centres on what is left. */
   viewInsets?: ViewInsets | undefined
   onSelectTile: (index: number) => void
+  onCameraModeChange?: ((mode: CameraMode) => void) | undefined
 }
 export type CameraMode = 'follow' | 'free'
 export type ViewAction = 'follow' | 'overview' | 'rotate-left' | 'rotate-right' | 'in' | 'out'

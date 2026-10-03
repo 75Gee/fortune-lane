@@ -1,6 +1,6 @@
 import type { GameCommand, GameEvent, GameView, ItemKind } from '@fortune/game'
 import type { RoomSnapshot } from '@fortune/protocol'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { DicePresentation } from '../board/DicePresentation.js'
 import { GameBoard } from '../board/GameBoard.js'
 import { useGamePresentation } from '../board/useGamePresentation.js'
@@ -12,6 +12,7 @@ import { CommandAvailabilityContext, Modal } from '../components/Modal.js'
 import { decisionId, needsDecision } from '../components/decisionState.js'
 import { ActionPanel } from '../components/game/ActionPanel.js'
 import { GameInfoPanel, type InfoTab } from '../components/game/GameInfoPanel.js'
+import { SheetFoldContext } from '../components/game/SheetFold.js'
 import { TileDetail } from '../components/game/TileDetail.js'
 import { StockMarketPanel } from '../components/stocks/StockMarketPanel.js'
 import { formatMoney } from '../lib/format.js'
@@ -66,6 +67,9 @@ export function GamePage({
     topRef = useRef<HTMLElement>(null),
     bottomRef = useRef<HTMLElement>(null)
   const viewInsets = useHudInsets(shellRef, topRef, bottomRef)
+  // Phones open each new action folded; dragging the board folds it again.
+  const [sheetFolded, setSheetFolded] = useState(true)
+  const sheetFold = useMemo(() => ({ folded: sheetFolded, setFolded: setSheetFolded }), [sheetFolded])
 
   const connected = connectionStatus === 'connected'
   const canSend = connected && !commandPending
@@ -100,6 +104,7 @@ export function GamePage({
     if (game.phase !== 'WAITING_FOR_DEBT') setConfirm((current) => (current === 'bankruptcy' ? null : current))
   }, [game.phase])
   useEffect(() => setWatchedDecision(null), [decisionKey])
+  useEffect(() => setSheetFolded(true), [game.phase, game.turnNumber, game.currentPlayerId, decisionKey])
   useEffect(() => {
     if (required && (!isPlaying || game.pendingAuction)) setPanel(null)
   }, [decisionKey, required, isPlaying])
@@ -131,7 +136,16 @@ export function GamePage({
 
   return (
     <CommandAvailabilityContext.Provider value={available}>
-      <main className={styles.shell} ref={shellRef}>
+      <main
+        className={styles.shell}
+        ref={shellRef}
+        style={
+          {
+            '--hud-top': `${viewInsets?.top ?? 70}px`,
+            '--hud-bottom': `${viewInsets?.bottom ?? 160}px`,
+          } as CSSProperties
+        }
+      >
         <div className={styles.board}>
           <GameBoard
             active
@@ -143,6 +157,7 @@ export function GamePage({
             activeEvent={activeEvent}
             activeEventStartedAt={activeEventStartedAt}
             viewInsets={viewInsets}
+            onCameraModeChange={(mode) => mode === 'free' && setSheetFolded(true)}
           />
         </div>
 
@@ -166,6 +181,9 @@ export function GamePage({
               onOpenInfo={(tab) => openInfo(tab)}
               onSurrender={() => setConfirm('surrender')}
               onLeave={() => setConfirm('leave')}
+              itemCount={me?.items.length ?? 0}
+              onOpenItems={() => setPanel({ type: 'items' })}
+              onOpenStocks={game.stockMarket ? () => setPanel({ type: 'stocks' }) : undefined}
             />
           </div>
         </header>
@@ -205,17 +223,19 @@ export function GamePage({
                 查看本局结果
               </Button>
             ) : (
-              <ActionPanel
-                game={game}
-                playerId={playerId}
-                onCommand={onCommand}
-                busy={isPlaying || !canSend}
-                onManageAssets={openAssets}
-                onOpenItems={(item) => setPanel(item ? { type: 'items', item } : { type: 'items' })}
-                onWatch={decisionKey && !required ? () => setWatchedDecision(decisionKey) : undefined}
-                onSkipToLive={isPlaying && connected ? skipToLive : undefined}
-                waitingLabel={!connected ? '等待重连…' : commandPending ? '正在提交…' : '行动进行中…'}
-              />
+              <SheetFoldContext.Provider value={sheetFold}>
+                <ActionPanel
+                  game={game}
+                  playerId={playerId}
+                  onCommand={onCommand}
+                  busy={isPlaying || !canSend}
+                  onManageAssets={openAssets}
+                  onOpenItems={(item) => setPanel(item ? { type: 'items', item } : { type: 'items' })}
+                  onWatch={decisionKey && !required ? () => setWatchedDecision(decisionKey) : undefined}
+                  onSkipToLive={isPlaying && connected ? skipToLive : undefined}
+                  waitingLabel={!connected ? '等待重连…' : commandPending ? '正在提交…' : '行动进行中…'}
+                />
+              </SheetFoldContext.Provider>
             )}
           </div>
           <Wallet

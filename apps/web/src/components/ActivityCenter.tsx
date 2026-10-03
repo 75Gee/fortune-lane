@@ -143,7 +143,8 @@ export function ActivityBroadcast({
           .join(' ')}`
       : current[1].map((event) => event.message).join(' ')
   return (
-    <section className={`${broadcastStyles.broadcast} ${className}`} aria-label="最近动态">
+    // Keyed by revision so the phone toast replays for each new update.
+    <section key={current[0]} className={`${broadcastStyles.broadcast} ${className}`} aria-label="最近动态">
       <span className={broadcastStyles.stamp}>最新</span>
       <p role="status" title={summary}>
         {summary}

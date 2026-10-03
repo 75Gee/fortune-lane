@@ -26,6 +26,9 @@
 .thumb {
   display: none;
 }
+.foldHandle {
+  display: none;
+}
 
 .body {
   flex: 1;
@@ -402,6 +405,67 @@
     float: none;
     display: flex;
     width: calc(100% - 24px);
-    margin: 0 12px 10px;
+    margin: 0 12px calc(10px + env(safe-area-inset-bottom));
+  }
+  .ticket,
+  .compact {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .foldHandle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    width: 100%;
+    min-height: 26px;
+    padding: 6px 0 0;
+    border: 0;
+    background: transparent;
+    color: var(--text-subtle);
+    font-size: var(--text-xs);
+    touch-action: none;
+  }
+  .foldHandle i {
+    width: 36px;
+    height: 4px;
+    margin-right: 8px;
+    border-radius: 2px;
+    background: var(--line-strong);
+  }
+  .ticket:has(.foldHandle) .body {
+    padding-top: 4px;
+  }
+
+  /* Folded: the title line and the commands, nothing else. */
+  .folded .body {
+    gap: 4px;
+    padding-bottom: 4px;
+  }
+  .folded .body > * {
+    display: none;
+  }
+  .folded .body > .title,
+  .folded .body > .warn {
+    display: block;
+  }
+  .folded .body > .titleRow {
+    display: flex;
+  }
+  .folded .title {
+    font-size: var(--text-2xl);
+  }
+  .folded .thumb {
+    width: 40px;
+    height: 40px;
+  }
+  .folded .stub {
+    padding-top: 10px;
+  }
+  .folded .hint {
+    display: none;
+  }
+  .folded .rollButton {
+    min-height: 52px;
   }
 }

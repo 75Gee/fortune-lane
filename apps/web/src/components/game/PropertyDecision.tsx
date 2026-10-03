@@ -14,6 +14,7 @@ import { Button } from '../../ui/index.js'
 import { CityImage, cityLatinName } from '../CityImage.js'
 import { StockPaymentHint } from '../stocks/StockPaymentHint.js'
 import styles from './ActionTicket.module.css'
+import { FoldHandle, useSheetFold } from './SheetFold.js'
 
 /** Purchase or upgrade offer, laid out as a boarding pass. */
 export function PropertyDecision({
@@ -49,9 +50,14 @@ export function PropertyDecision({
   const latin = cityLatinName(tile.name)
   // Phones fold the rent ladder so the sheet leaves room for the board.
   const compact = useMediaQuery('(max-width: 800px)')
+  const fold = useSheetFold()
 
   return (
-    <section className={styles.ticket} aria-label={`${tile.name}${purchase ? '购买' : '升级'}决策`}>
+    <section
+      className={`${styles.ticket} ${fold?.folded ? styles.folded : ''}`}
+      aria-label={`${tile.name}${purchase ? '购买' : '升级'}决策`}
+    >
+      {fold && <FoldHandle fold={fold} />}
       <CityImage city={tile.name} className={styles.image} />
       <div className={styles.body}>
         <div className={styles.titleRow}>

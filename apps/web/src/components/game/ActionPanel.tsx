@@ -18,6 +18,7 @@ import { actionDescription } from '../decisionState.js'
 import { StockPaymentHint } from '../stocks/StockPaymentHint.js'
 import styles from './ActionTicket.module.css'
 import { PropertyDecision } from './PropertyDecision.js'
+import { FoldHandle, useSheetFold } from './SheetFold.js'
 
 interface ActionPanelProps {
   game: GameView
@@ -62,9 +63,22 @@ function WaitingSlip({
   )
 }
 
-function Ticket({ children, stub, compact }: { children: ReactNode; stub: ReactNode; compact?: boolean }) {
+function Ticket({
+  children,
+  stub,
+  compact,
+  foldable = true,
+}: {
+  children: ReactNode
+  stub: ReactNode
+  compact?: boolean
+  /** Tickets whose body holds commands (jail, debt) always stay open. */
+  foldable?: boolean
+}) {
+  const fold = useSheetFold(foldable)
   return (
-    <section className={`${styles.ticket} ${compact ? styles.compact : ''}`}>
+    <section className={`${styles.ticket} ${compact ? styles.compact : ''} ${fold?.folded ? styles.folded : ''}`}>
+      {fold && <FoldHandle fold={fold} />}
       <div className={styles.body}>{children}</div>
       <div className={styles.stub}>{stub}</div>
     </section>
@@ -138,6 +152,7 @@ export function ActionPanel({
     const place = me.isInHospital ? '出院' : '出狱'
     return (
       <Ticket
+        foldable={false}
         stub={
           <div className={styles.commands}>
             <Button
@@ -229,6 +244,7 @@ export function ActionPanel({
     const creditor = game.players.find((player) => player.id === debt.creditorId)?.name ?? '银行'
     return (
       <Ticket
+        foldable={false}
         stub={
           <div className={styles.commands}>
             <Button

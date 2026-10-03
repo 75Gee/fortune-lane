@@ -25,6 +25,8 @@ interface View {
 }
 
 const FOCUS_Y = 0.8
+/** The followed view looks a little past the token, toward the landmark behind its tile. */
+const FOLLOW_LEAD = 0.85
 const MIN_DISTANCE = 9
 const NEAR_PITCH = THREE.MathUtils.degToRad(34)
 const FOLLOW_PITCH = THREE.MathUtils.degToRad(40)
@@ -180,8 +182,8 @@ export function boardCameraRig(camera: THREE.PerspectiveCamera) {
     /** The board view a following camera wants for this anchor and facing. */
     follow(anchor: THREE.Vector3, inward: THREE.Vector3, snap: boolean) {
       if (!following) return
-      goal.x = anchor.x - inward.x * TILE_SIZE * 0.55
-      goal.z = anchor.z - inward.z * TILE_SIZE * 0.55
+      goal.x = anchor.x - inward.x * TILE_SIZE * FOLLOW_LEAD
+      goal.z = anchor.z - inward.z * TILE_SIZE * FOLLOW_LEAD
       goal.yaw = current.yaw + shortestAngle(current.yaw, Math.atan2(inward.x, inward.z))
       goal.distance = followDistance()
       if (snap) Object.assign(current, goal)

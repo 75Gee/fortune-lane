@@ -1,4 +1,16 @@
-import { Building2, Flag, Library, LogOut, Menu, Sparkles, Users, Volume2, VolumeX } from 'lucide-react'
+import {
+  Backpack,
+  Building2,
+  ChartCandlestick,
+  Flag,
+  Library,
+  LogOut,
+  Menu,
+  Sparkles,
+  Users,
+  Volume2,
+  VolumeX,
+} from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { InfoTab } from '../../components/game/GameInfoPanel.js'
 import styles from './GameHud.module.css'
@@ -19,6 +31,10 @@ interface GameMenuProps {
   onOpenInfo: (tab: InfoTab) => void
   onSurrender: () => void
   onLeave: () => void
+  /** Phones have no wallet bar, so the menu carries its shortcuts. */
+  itemCount: number
+  onOpenItems: () => void
+  onOpenStocks?: (() => void) | undefined
 }
 
 export function GameMenu({
@@ -30,6 +46,9 @@ export function GameMenu({
   onOpenInfo,
   onSurrender,
   onLeave,
+  itemCount,
+  onOpenItems,
+  onOpenStocks,
 }: GameMenuProps) {
   const [open, setOpen] = useState(false)
   const trigger = useRef<HTMLButtonElement>(null)
@@ -76,6 +95,19 @@ export function GameMenu({
                 {label}
               </button>
             ))}
+            <div className={styles.menuPhone}>
+              <hr />
+              <button onClick={closeThen(onOpenItems)}>
+                <Backpack size={18} />
+                道具 · {itemCount} 张
+              </button>
+              {onOpenStocks && (
+                <button onClick={closeThen(onOpenStocks)}>
+                  <ChartCandlestick size={18} />
+                  股市
+                </button>
+              )}
+            </div>
             <hr />
             <button onClick={onToggleSound}>
               {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
