@@ -1,5 +1,6 @@
 import { STOCKS, type stockPaymentQuote } from '@fortune/game'
 import { stockMoney } from './format.js'
+import '../../styles/stocks.css'
 
 export function StockPaymentHint({
   payment,

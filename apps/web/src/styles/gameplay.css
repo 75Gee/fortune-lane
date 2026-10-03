@@ -473,13 +473,6 @@
 [hidden] {
   display: none !important;
 }
-.stock-payment-hint {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.6;
-  overflow-wrap: anywhere;
-}
 .landing-dialog {
   position: relative;
 }
