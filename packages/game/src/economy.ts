@@ -59,7 +59,8 @@ export function rentForTile(
 }
 
 export function redeemCost(tileIndex: number): number {
-  return Math.ceil((getTile(tileIndex).mortgage ?? 0) * 1.1)
+  const mortgage = getTile(tileIndex).mortgage ?? 0
+  return mortgage + Math.ceil(mortgage / 10)
 }
 
 export function buildingSaleValue(tileIndex: number): number {
