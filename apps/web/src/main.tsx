@@ -6,9 +6,6 @@ import '@fontsource/ibm-plex-mono/500.css'
 import '@fontsource/ibm-plex-mono/600.css'
 import './styles/tokens.css'
 import './styles/global.css'
-import './styles/gameplay.css'
-import './styles/interface.css'
-import './styles/cities.css'
 // Global styles load first so component CSS Modules, injected by the imports below, win ties.
 import { App } from './App.js'
 

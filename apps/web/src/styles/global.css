@@ -244,16 +244,6 @@ h2 {
   color: var(--red);
   fill: #cf506418;
 }
-/* Player, asset and activity views share one rail. */
-.rank {
-  color: var(--text-muted);
-  font-size: 11px;
-}
-.cash {
-  font-size: 13px;
-  font-weight: 750;
-  font-variant-numeric: tabular-nums;
-}
 .waiting-pulse {
   display: block;
   width: 9px;
@@ -400,6 +390,67 @@ h2 {
 }
 
 /* ---------- Passport touches: home ticket and lobby ---------- */
-@media (max-width: 430px) {
-  /* Seats are too narrow for the stamp; the status text already says ready. */
+
+.turn-clock {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.turn-clock.is-urgent {
+  color: var(--danger-strong);
+}
+.panel-backdrop {
+  display: block;
+  position: fixed;
+  z-index: var(--layer-panel-backdrop);
+  inset: 0;
+  border: 0;
+  background: var(--scrim);
+  backdrop-filter: blur(2px);
+}
+/* Phones: bottom of the right-hand column, just above the action sheet. */
+@media (prefers-reduced-motion: reduce) {
+  .waiting-pulse {
+    animation: none;
+  }
+}
+
+/* Keep the board primary; ordinary results occupy one quiet strip. */
+[hidden] {
+  display: none !important;
+}
+.entry-screen,
+.lobby-screen {
+  background: var(--surface-muted);
+  color: var(--text-ink);
+}
+.entry-form,
+.lobby-table {
+  background: var(--surface-subtle);
+  border-color: var(--line);
+  box-shadow: 0 12px 40px #1f2a440b;
+}
+
+/* Compact portfolios; management stays in the selected property's detail. */
+.catalog-disclosure > summary {
+  color: var(--ui-muted);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 5px 0;
+}
+.catalog-disclosure {
+  margin: 0 20px 20px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ui-line);
+}
+
+/* One city illustration, reused at the scale of each decision. */
+.city-image {
+  display: block;
+  object-fit: cover;
+  background: var(--surface-sunken);
 }

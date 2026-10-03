@@ -1,6 +1,0 @@
-/* One city illustration, reused at the scale of each decision. */
-.city-image {
-  display: block;
-  object-fit: cover;
-  background: var(--surface-sunken);
-}
