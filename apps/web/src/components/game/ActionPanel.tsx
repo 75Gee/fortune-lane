@@ -63,21 +63,30 @@ function WaitingSlip({
   )
 }
 
+/**
+ * How a ticket sits in the phone sheet:
+ * - `full`: always open, the body holds commands (jail, debt)
+ * - `foldable`: folds to its title, with a handle to reveal the details
+ * - `title`: nothing worth hiding, so just the title and the commands, no handle
+ * - `bare`: the command says it all; only the stub shows
+ */
+type PhoneLayout = 'full' | 'foldable' | 'title' | 'bare'
+
 function Ticket({
   children,
   stub,
   compact,
-  foldable = true,
+  phone = 'foldable',
 }: {
-  children: ReactNode
+  children?: ReactNode
   stub: ReactNode
   compact?: boolean
-  /** Tickets whose body holds commands (jail, debt) always stay open. */
-  foldable?: boolean
+  phone?: PhoneLayout
 }) {
-  const fold = useSheetFold(foldable)
+  const fold = useSheetFold(phone === 'foldable')
+  const layout = phone === 'title' || fold?.folded ? styles.folded : phone === 'bare' ? styles.bare : ''
   return (
-    <section className={`${styles.ticket} ${compact ? styles.compact : ''} ${fold?.folded ? styles.folded : ''}`}>
+    <section className={`${styles.ticket} ${compact ? styles.compact : ''} ${layout}`}>
       {fold && <FoldHandle fold={fold} />}
       <div className={styles.body}>{children}</div>
       <div className={styles.stub}>{stub}</div>
@@ -152,7 +161,7 @@ export function ActionPanel({
     const place = me.isInHospital ? '出院' : '出狱'
     return (
       <Ticket
-        foldable={false}
+        phone="full"
         stub={
           <div className={styles.commands}>
             <Button
@@ -206,6 +215,7 @@ export function ActionPanel({
     return (
       <Ticket
         compact
+        phone={canUseItem || turtle ? 'foldable' : 'title'}
         stub={
           <Button
             variant="primary"
@@ -244,7 +254,7 @@ export function ActionPanel({
     const creditor = game.players.find((player) => player.id === debt.creditorId)?.name ?? '银行'
     return (
       <Ticket
-        foldable={false}
+        phone="full"
         stub={
           <div className={styles.commands}>
             <Button
@@ -290,6 +300,7 @@ export function ActionPanel({
     return (
       <Ticket
         compact
+        phone={extra ? 'title' : 'bare'}
         stub={
           <Button
             variant="primary"

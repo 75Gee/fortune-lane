@@ -40,6 +40,7 @@ const scenes = [
   { name: 'decision-auction', url: `${game}&decision=auction` },
   { name: 'auction-bid', url: `${game}&decision=auction&viewer=muzi` },
   { name: 'decision-debt', url: `${game}&decision=debt` },
+  { name: 'decision-end', url: `${game}&decision=end` },
   { name: 'card-chance', url: `${game}&deck=chance` },
   { name: 'card-wheel', url: `${game}&card=chance-wheel-one` },
   { name: 'card-downgrade', url: `${game}&card=fate-downgrade` },

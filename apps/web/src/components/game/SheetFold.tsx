@@ -1,4 +1,3 @@
-import { ChevronDown, ChevronUp } from 'lucide-react'
 import { createContext, useContext, useRef } from 'react'
 import styles from './ActionTicket.module.css'
 
@@ -42,8 +41,6 @@ export function FoldHandle({ fold }: { fold: NonNullable<ReturnType<typeof useSh
       }}
     >
       <i aria-hidden="true" />
-      {fold.folded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-      {fold.folded ? '详情' : '收起'}
     </button>
   )
 }

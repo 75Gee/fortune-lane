@@ -209,7 +209,7 @@ export function GamePage({
 
         <footer className={styles.bottom} ref={bottomRef}>
           <ActivityBroadcast
-            className={styles.activity}
+            className={`${styles.activity} ${money.notice ? styles.activityYield : ''}`}
             events={presentedEvents}
             playerId={playerId}
             onHistory={openHistory}

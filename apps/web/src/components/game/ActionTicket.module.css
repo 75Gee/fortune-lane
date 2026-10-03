@@ -410,22 +410,17 @@
 
   .foldHandle {
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 2px;
     width: 100%;
-    min-height: 26px;
-    padding: 6px 0 0;
+    min-height: 20px;
+    padding: 8px 0 0;
     border: 0;
     background: transparent;
-    color: var(--text-subtle);
-    font-size: var(--text-xs);
     touch-action: none;
   }
   .foldHandle i {
     width: 36px;
     height: 4px;
-    margin-right: 8px;
     border-radius: 2px;
     background: var(--line-strong);
   }
@@ -463,5 +458,13 @@
   }
   .folded .rollButton {
     min-height: 52px;
+  }
+  /* Bare: the command alone, e.g. 结束回合. */
+  .bare .body {
+    display: none;
+  }
+  .bare .stub {
+    padding-top: 12px;
+    border-top: 0;
   }
 }

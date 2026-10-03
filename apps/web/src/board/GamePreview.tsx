@@ -131,6 +131,7 @@ function previewGame() {
       return applyCommand(game, 'xiaoman', { type: 'SKIP_PURCHASE' }).state
     }
   }
+  if (decision === 'end') game.phase = 'WAITING_FOR_END_TURN'
   if (decision === 'debt') {
     game.players[0]!.cash = 200
     game.phase = 'WAITING_FOR_DEBT'
