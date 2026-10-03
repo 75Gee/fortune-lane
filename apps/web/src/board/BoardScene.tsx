@@ -50,7 +50,7 @@ export default function BoardScene(props: BoardSceneProps) {
   return (
     <div className={styles.wrap}>
       <div className={styles.scene} ref={host} aria-label="世界之旅三维场景">
-        {failed && <p className={styles.fallback}>3D 画面暂不可用，请切换路线查看地点。</p>}
+        {failed && <p className={styles.fallback}>3D 画面暂不可用，可通过底部操作栏和玩家面板继续游戏。</p>}
       </div>
       {!failed && (
         <>

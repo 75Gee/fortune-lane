@@ -1,10 +1,8 @@
 import { rentGrowthStart, rentMultiplier, type GameView } from '@fortune/game'
-import { Clock3, Map, Route } from 'lucide-react'
+import { Clock3 } from 'lucide-react'
 import { useCountdown } from '../../lib/useCountdown.js'
 import { actionDescription } from '../../components/decisionState.js'
 import styles from './GameHud.module.css'
-
-export type BoardView = 'board' | 'route'
 
 interface TurnTicketProps {
   game: GameView
@@ -60,20 +58,5 @@ export function TurnTicket({ game, playerId, turnDeadline, clockOffset }: TurnTi
         </span>
       )}
     </section>
-  )
-}
-
-export function BoardViewSwitch({ view, onChange }: { view: BoardView; onChange: (view: BoardView) => void }) {
-  return (
-    <div className={`${styles.panel} ${styles.viewSwitch}`} role="group" aria-label="棋盘视图">
-      <button aria-pressed={view === 'board'} onClick={() => onChange('board')}>
-        <Map size={16} />
-        实景
-      </button>
-      <button aria-pressed={view === 'route'} onClick={() => onChange('route')}>
-        <Route size={16} />
-        路线
-      </button>
-    </div>
   )
 }

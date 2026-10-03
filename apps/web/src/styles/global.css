@@ -606,60 +606,6 @@ h2 {
 .is-rolling .die {
   animation: dice-roll 0.56s ease-out;
 }
-.route-list {
-  width: 100%;
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
-}
-.route-stop {
-  display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) auto 16px;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  min-height: 68px;
-  padding: 10px 12px;
-  border: 0;
-  border-bottom: 1px solid var(--line);
-  background: var(--surface);
-  text-align: left;
-}
-.route-stop:hover {
-  background: var(--surface-page);
-}
-.route-number {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border: 3px solid;
-  border-radius: 50%;
-  font-size: 12px;
-  color: var(--muted);
-}
-.route-stop > span:nth-child(2) {
-  display: grid;
-  gap: 5px;
-}
-.route-stop strong {
-  font-size: 14px;
-}
-.route-stop small {
-  color: var(--muted);
-  font-size: 11px;
-}
-.route-occupants {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: end;
-  max-width: 84px;
-}
-.route-occupants img {
-  width: 25px;
-  height: 25px;
-}
-
 /* Player, asset and activity views share one rail. */
 .rank {
   color: var(--text-muted);
@@ -1044,9 +990,6 @@ h2 {
   .landing-dialog.wheel-dialog {
     border-radius: 8px;
     max-height: calc(100dvh - 24px);
-  }
-  .route-list {
-    overflow: visible;
   }
   .panel-backdrop {
     display: block;

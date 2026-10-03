@@ -16,18 +16,6 @@
   inset: 0;
 }
 
-.routeLayer {
-  position: absolute;
-  inset: 0;
-  overflow: auto;
-  padding: 176px 24px 300px;
-  background: var(--surface-page);
-}
-.routeLayer > * {
-  max-width: 760px;
-  margin-inline: auto;
-}
-
 .panel {
   background: var(--surface);
   border: 1px solid var(--line);
@@ -171,30 +159,6 @@
   .urgentTicket {
     animation: none;
   }
-}
-
-/* Board view switch */
-.viewSwitch {
-  display: flex;
-  gap: 2px;
-  padding: 4px;
-}
-.viewSwitch button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 36px;
-  padding: 0 14px;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: var(--text);
-  font-size: var(--text-md);
-  font-weight: var(--weight-medium);
-}
-.viewSwitch button[aria-pressed='true'] {
-  background: var(--surface-ink);
-  color: var(--text-on-ink);
 }
 
 /* Travellers */
@@ -578,15 +542,6 @@
     padding: 4px 9px;
     font-size: var(--text-md);
   }
-  .viewSwitch {
-    flex-direction: column;
-    padding: 3px;
-  }
-  .viewSwitch button {
-    min-height: 0;
-    flex: 1;
-    padding: 0 10px;
-  }
   .trail {
     align-items: stretch;
   }
@@ -693,9 +648,6 @@
   }
   .moveResult {
     top: 150px;
-  }
-  .routeLayer {
-    padding: 150px 12px 320px;
   }
 }
 

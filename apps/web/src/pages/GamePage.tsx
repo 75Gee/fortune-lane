@@ -12,7 +12,6 @@ import { CommandAvailabilityContext, Modal } from '../components/Modal.js'
 import { decisionId, needsDecision } from '../components/decisionState.js'
 import { ActionPanel } from '../components/game/ActionPanel.js'
 import { GameInfoPanel, type InfoTab } from '../components/game/GameInfoPanel.js'
-import { RouteView } from '../components/game/RouteView.js'
 import { TileDetail } from '../components/game/TileDetail.js'
 import { StockMarketPanel } from '../components/stocks/StockMarketPanel.js'
 import { formatMoney } from '../lib/format.js'
@@ -22,7 +21,7 @@ import { GameConfirmations, type GameConfirmation } from './game/GameConfirmatio
 import styles from './game/GameHud.module.css'
 import { GameMenu } from './game/GameMenu.js'
 import { PlayerRail } from './game/PlayerRail.js'
-import { BoardViewSwitch, TurnTicket, type BoardView } from './game/TurnTicket.js'
+import { TurnTicket } from './game/TurnTicket.js'
 import { useMoneyFeedback } from './game/useMoneyFeedback.js'
 import { Wallet } from './game/Wallet.js'
 
@@ -60,7 +59,6 @@ export function GamePage({
   const [panel, setPanel] = useState<Panel>(null)
   const [confirm, setConfirm] = useState<GameConfirmation | null>(null)
   const [watchedDecision, setWatchedDecision] = useState<string | null>(null)
-  const [boardView, setBoardView] = useState<BoardView>('board')
   const [resultReviewed, setResultReviewed] = useState(false)
   const [soundEnabled, setSoundEnabled] = usePersistentToggle('fortune-sound')
 
@@ -129,9 +127,9 @@ export function GamePage({
   return (
     <CommandAvailabilityContext.Provider value={available}>
       <main className={styles.shell}>
-        <div className={styles.board} hidden={boardView === 'route'}>
+        <div className={styles.board}>
           <GameBoard
-            active={boardView === 'board'}
+            active
             game={visualGame}
             playerId={playerId}
             displayPositions={displayPositions}
@@ -141,22 +139,10 @@ export function GamePage({
             activeEventStartedAt={activeEventStartedAt}
           />
         </div>
-        {boardView === 'route' && (
-          <div className={styles.routeLayer}>
-            <RouteView
-              game={game}
-              displayPositions={displayPositions}
-              displayHazards={displayHazards}
-              activeEvent={activeEvent}
-              onSelectTile={selectTile}
-            />
-          </div>
-        )}
 
         <header className={styles.top}>
           <div className={styles.lead}>
             <TurnTicket game={game} playerId={playerId} turnDeadline={room.turnDeadline} clockOffset={clockOffset} />
-            <BoardViewSwitch view={boardView} onChange={setBoardView} />
           </div>
           <div className={styles.trail}>
             <PlayerRail
